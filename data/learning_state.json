@@ -1,0 +1,15 @@
+{
+  "version": "v1.0",
+  "last_refresh_utc": null,
+  "next_admin_review_utc": null,
+  "candidate_claims": [],
+  "user_evidence_events": [],
+  "conflict_queue": [],
+  "source_health": [],
+  "model_feedback": {
+    "accepted": 0,
+    "corrected": 0,
+    "rejected": 0
+  },
+  "promotion_history": []
+}
