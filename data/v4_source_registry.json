@@ -1,0 +1,48 @@
+{
+  "schema_version": "4.0",
+  "last_reviewed": "2026-09-16",
+  "purpose": "Evidence-first multi-source FGF intelligence acquisition and control",
+  "tiers": {
+    "T1": "direct current in-game evidence",
+    "T2": "official game information, portal, patch notes, developer communications",
+    "T3": "strong tested technical/community evidence",
+    "T4": "creator/video/written guides",
+    "T5": "meta opinions/recommendations",
+    "T6": "rumours/unverified"
+  },
+  "source_families": [
+    {"id":"fgf_wiki","name":"FGF Wiki / Encyclopedia Galactica","default_tier":"T3","dynamic":true,"url":"https://fgfwiki.com/"},
+    {"id":"fgf_fandom","name":"FGF Fandom Wiki","default_tier":"T3","dynamic":true,"url":"https://foundation-galactic-frontier.fandom.com/wiki/Foundation:_Galactic_Frontier_Wiki"},
+    {"id":"official_portal","name":"FGF Official Portal","default_tier":"T2","dynamic":true,"url":"https://www.foundation.game/en"},
+    {"id":"official_news","name":"FGF Official News","default_tier":"T2","dynamic":true,"url":"https://www.foundation.game/en/news"},
+    {"id":"official_x","name":"FGF Official X","default_tier":"T2","dynamic":true,"url":"https://x.com/FoundationGF_EN"},
+    {"id":"official_instagram","name":"FGF Official Instagram","default_tier":"T2","dynamic":true,"url":"https://www.instagram.com/foundation_gf_en/"},
+    {"id":"official_facebook","name":"FGF Official Facebook","default_tier":"T2","dynamic":true,"url":"https://www.facebook.com/FoundationGalacticFrontier"},
+    {"id":"official_youtube","name":"FGF Official YouTube","default_tier":"T2","dynamic":true,"url":"https://www.youtube.com/@Foundation_GalacticFrontier"},
+    {"id":"official_discord","name":"FGF Official Discord","default_tier":"T2","dynamic":true,"url":"https://discord.gg/GrndnDvBPS"},
+    {"id":"reddit","name":"Reddit / FGF communities and player posts","default_tier":"T3","dynamic":true,"url":"https://www.reddit.com/r/FoundationGFrontier/"},
+    {"id":"youtube_community","name":"YouTube community / creator videos and playlists","default_tier":"T4","dynamic":true,"url":"https://www.youtube.com/"},
+    {"id":"steam","name":"Steam store/community/update history","default_tier":"T2","dynamic":true,"url":"https://store.steampowered.com/app/4223760/Foundation_Galactic_Frontier/"},
+    {"id":"google_play","name":"Google Play listing/update notes","default_tier":"T2","dynamic":true,"url":"https://play.google.com/store/apps/details?id=com.games.foundation"},
+    {"id":"app_store","name":"Apple App Store listing/update information","default_tier":"T2","dynamic":true,"url":"https://apps.apple.com/in/app/foundation-galactic-frontier/id6737595599"}
+  ],
+  "tools": {
+    "notion":"evidence control, human verification, conflicts and operating standard",
+    "github":"versioned application, schemas, snapshots and tests",
+    "supabase":"persistent learning database; project not yet provisioned",
+    "firecrawl":"search, crawl, extraction, image discovery and change monitoring",
+    "tinyfish":"interactive/browser acquisition for dynamic sources",
+    "web":"independent discovery and cross-check",
+    "llm":"synthesis and hypothesis generation only"
+  },
+  "monitor": {
+    "provider":"firecrawl",
+    "id":"01a0a780-e7ea-737c-b09f-43b5e0a28d52",
+    "schedule":"every 6 hours",
+    "timezone":"Asia/Kolkata",
+    "status":"active"
+  },
+  "media_first": true,
+  "media_fields": ["media_id","source_url","media_type","creator","published_at","acquired_at","game_version","season","server_scope","timestamp_or_frame","ocr_text","transcript_ref","visual_claims","content_hash","duplicate_group","tier","confidence","status"],
+  "promotion_rule": "No automatic promotion to canonical T1 without appropriate evidence and verification."
+}
