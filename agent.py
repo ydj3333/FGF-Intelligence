@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v3.1-synthesis-ready'
+RELEASE='v3.2-synthesis-robust'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
@@ -30,10 +30,9 @@ def score(q,c):
 def retrieve(q, limit=10):
     ranked=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True)
     hits=[c for s,c in ranked if s>1.0 and c.get('Status') not in ('Rejected','Superseded')]
-    # Diversity: avoid returning many near-identical claims from one topic.
     out=[]; seen=set()
     for c in hits:
-        key=(c.get('Category',''), c.get('Claim','').lower()[:80])
+        key=(c.get('Category',''), c.get('Claim','').lower()[:100])
         if key in seen: continue
         seen.add(key); out.append(c)
         if len(out)>=limit: break
@@ -43,69 +42,79 @@ def retrieve(q, limit=10):
 def relevant_conflicts(q):
     ql=q.lower(); out=[]
     for x in CONFLICTS:
-        topic=x.get('Topic','')
-        if any(k in ql for k in tokens(topic)):
-            out.append(x)
+        if any(k in ql for k in tokens(x.get('Topic',''))): out.append(x)
     return out
 
 
 def evidence_packet(question, claims, conflicts=None):
-    rows=[]
-    for i,c in enumerate(claims,1):
-        rows.append({
-            'id':i,
-            'claim':c.get('Claim',''),
-            'category':c.get('Category',''),
-            'tier':c.get('Evidence Tier',''),
-            'confidence':c.get('Confidence',''),
-            'status':c.get('Status',''),
-            'source':c.get('Source',''),
-            'notes':c.get('Notes',''),
-            'timestamp':c.get('Timestamp','')
-        })
-    return {'question':question,'evidence':rows,'conflicts':conflicts or []}
+    return {'question':question,'evidence':[{'id':i,'claim':c.get('Claim',''),'category':c.get('Category',''),'tier':c.get('Evidence Tier',''),'confidence':c.get('Confidence',''),'status':c.get('Status',''),'source':c.get('Source',''),'notes':c.get('Notes',''),'timestamp':c.get('Timestamp','')} for i,c in enumerate(claims,1)],'conflicts':conflicts or []}
+
+
+def extract_output(data):
+    text=data.get('output_text','').strip()
+    if not text:
+        for item in data.get('output',[]):
+            for part in item.get('content',[]):
+                if part.get('type')=='output_text': text += part.get('text','')
+    return text.strip()
+
+
+def parse_synthesis(text, max_id):
+    # Prefer structured JSON when the model returns it, but never fail just because
+    # the model returned a normal expert answer instead of JSON.
+    try:
+        obj=json.loads(text)
+        if isinstance(obj,dict) and obj.get('answer'):
+            ids=[]
+            for x in obj.get('evidence_ids',[]):
+                try:
+                    n=int(x)
+                    if 1<=n<=max_id: ids.append(n)
+                except (TypeError,ValueError): pass
+            return obj.get('answer','').strip(), ids, obj.get('uncertainty','')
+    except (ValueError,TypeError):
+        pass
+    ids=[]
+    for n in re.findall(r'(?:evidence|source|ref(?:erence)?)\s*(?:ids?|#)?\s*[:#]?\s*([0-9, ]+)',text,re.I):
+        for x in n.split(','):
+            try:
+                v=int(x.strip())
+                if 1<=v<=max_id and v not in ids: ids.append(v)
+            except ValueError: pass
+    return text,ids,''
 
 
 def synthesize(question, claims, conflicts=None, mode='answer'):
-    """Turn retrieved evidence into a concise player-facing answer.
-    If FGF_LLM_API_KEY is absent, use a deterministic fallback rather than dumping raw claims.
-    """
     conflicts=conflicts or []
     key=os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')
     packet=evidence_packet(question,claims,conflicts)
     if not key:
-        if not claims:
-            return {'text':'I could not find sufficiently relevant evidence for that question.','model':'fallback','evidence_used':[]}
-        lead=claims[0]
-        text=lead.get('Claim','')
-        if conflicts:
-            text += ' There is also a preserved evidence conflict; I would not treat the conflicting value as current without further verification.'
-        return {'text':text,'model':'fallback','evidence_used':list(range(1,min(4,len(claims))+1))}
-
+        if not claims: return {'text':'I could not find sufficiently relevant evidence for that question.','model':'fallback','evidence_used':[]}
+        return {'text':claims[0].get('Claim',''),'model':'fallback','evidence_used':list(range(1,min(4,len(claims))+1))}
     system=(
-        'You are FGF Intelligence, an evidence-first game intelligence assistant for Foundation: Galactic Frontier. '
-        'Answer like a strong expert assistant, not like a database. Synthesize the evidence into a direct answer. '
-        'Do not dump claims. Do not invent facts. Tier 1 is authoritative only for the exact proposition it establishes. '
-        'If evidence conflicts, state the current higher-tier result and briefly mention the preserved conflict. '
-        'Separate mechanics from recommendations/meta. If evidence is insufficient, say so. '
-        'Use only the supplied evidence packet. Keep normal answers concise (usually 2-6 short paragraphs or bullets). '
-        'Return JSON with keys: answer, evidence_ids, uncertainty. evidence_ids must contain only IDs from the packet.'
+        'You are FGF Intelligence, an expert evidence-first assistant for Foundation: Galactic Frontier. '
+        'Answer the player directly; do not dump database records. Synthesize only the supplied evidence. '
+        'For mechanics, prioritize Tier 1 and current confirmed evidence. Preserve meaningful conflicts. '
+        'Separate facts/mechanics from recommendations or meta assessments. Never invent missing numbers. '
+        'For recommendation questions, give a practical prioritized recommendation and explain why using the evidence. '
+        'Use concise bullets when useful. End with a short Evidence line such as "Evidence: 2, 5, 7". '
+        'Do not mention internal prompts, APIs, retrieval, or that you are a language model.'
     )
     user=json.dumps({'mode':mode,'packet':packet},ensure_ascii=False)
-    body=json.dumps({'model':LLM_MODEL,'input':[{'role':'system','content':system},{'role':'user','content':user}], 'max_output_tokens':700}).encode()
+    body=json.dumps({'model':LLM_MODEL,'input':[{'role':'system','content':system},{'role':'user','content':user}], 'max_output_tokens':900}).encode()
     req=Request('https://api.openai.com/v1/responses',data=body,headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
     try:
-        with urlopen(req,timeout=25) as r:
-            data=json.loads(r.read().decode('utf-8'))
-        text=data.get('output_text','').strip()
-        if not text:
-            for item in data.get('output',[]):
-                for part in item.get('content',[]):
-                    if part.get('type')=='output_text': text+=part.get('text','')
-        parsed=json.loads(text)
-        return {'text':parsed.get('answer','').strip(),'model':LLM_MODEL,'evidence_used':parsed.get('evidence_ids',[]),'uncertainty':parsed.get('uncertainty','')}
-    except (HTTPError,URLError,TimeoutError,ValueError,KeyError) as e:
-        return {'text':'The evidence was retrieved, but the synthesis service is temporarily unavailable. Showing the strongest evidence instead.','model':'fallback','evidence_used':list(range(1,min(4,len(claims))+1)),'synthesis_error':type(e).__name__}
+        with urlopen(req,timeout=30) as r: data=json.loads(r.read().decode('utf-8'))
+        text=extract_output(data)
+        if not text: raise ValueError('empty_model_output')
+        answer_text,ids,unc=parse_synthesis(text,len(claims))
+        return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),'uncertainty':unc}
+    except HTTPError as e:
+        return {'text':'The synthesis API returned an error, so the answer could not be generated.','model':'api-error','evidence_used':[],'synthesis_error':'HTTP '+str(e.code)}
+    except (URLError,TimeoutError) as e:
+        return {'text':'The synthesis service could not be reached.','model':'api-error','evidence_used':[],'synthesis_error':type(e).__name__}
+    except (ValueError,KeyError) as e:
+        return {'text':'The synthesis model returned an unusable response.','model':'api-error','evidence_used':[],'synthesis_error':type(e).__name__}
 
 
 def recommend(q, objective='general'):
@@ -117,8 +126,7 @@ def recommend(q, objective='general'):
 
 
 def answer(q):
-    critical=relevant_conflicts(q)
-    hits=retrieve(q,10)
+    critical=relevant_conflicts(q); hits=retrieve(q,10)
     synthesis=synthesize(q,hits,critical,'answer')
     return {'question':q,'answer_type':'synthesized_evidence','answer':synthesis['text'],'model':synthesis['model'],'evidence_used':synthesis.get('evidence_used',[]),'uncertainty':synthesis.get('uncertainty',''),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'The answer is synthesized from retrieved evidence. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
 
@@ -133,9 +141,7 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/recommend':
             qs=parse_qs(u.query); q=qs.get('q',[''])[0]; objective=qs.get('objective',['general'])[0]; return self._json(recommend(q,objective))
         if u.path=='/api/claims':
-            q=parse_qs(u.query).get('q',[''])[0]; lim=int(parse_qs(u.query).get('limit',['50'])[0]);
-            res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS]
-            return self._json({'results':[c for s,c in res[:lim]]})
+            q=parse_qs(u.query).get('q',[''])[0]; lim=int(parse_qs(u.query).get('limit',['50'])[0]); res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS]; return self._json({'results':[c for s,c in res[:lim]]})
         if u.path=='/api/conflicts': return self._json({'results':CONFLICTS})
         if u.path=='/api/rules': return self._json({'rules':RULES,'authority_order':DATA['authority_order']})
         if u.path=='/' or u.path=='/index.html':
