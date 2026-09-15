@@ -1,0 +1,33 @@
+{
+  "version": "v1.0",
+  "architecture": "tier1-blackbox-adaptive-learning",
+  "refresh_hours": 6,
+  "admin_review_days": 21,
+  "tier1_requires_admin_proof": true,
+  "session_learning_only": true,
+  "session_learning_ttl_hours": 24,
+  "never_autopromote_to_tier1": true,
+  "source_policy": {
+    "enabled_types": ["official", "in_game", "community", "creator", "search"],
+    "official_first": true,
+    "search_for_discovery_only": true,
+    "preserve_original_source": true,
+    "record_retrieval_time": true
+  },
+  "promotion_policy": {
+    "tier1": "Admin-confirmed current proof, preferably direct in-game evidence or authoritative official evidence for the exact proposition.",
+    "tier2": "Admin-confirmed official source when direct in-game proof is unavailable or the proposition is officially documented rather than visible in-game.",
+    "tier3": "Strong tested technical/community evidence accepted by admin.",
+    "tier4": "Creator/video/written guide evidence.",
+    "tier5": "Meta opinion/recommendation.",
+    "tier6": "Rumor/unverified; never treated as confirmed truth."
+  },
+  "admin_queue": {
+    "prioritize": ["conflict", "repeated_user_evidence", "high_usage_uncertainty", "source_upgrade", "new_mechanic", "stale_source"],
+    "deduplicate": true,
+    "show_proposed_change": true,
+    "show_current_truth": true,
+    "show_proof": true,
+    "show_affected_claims": true
+  }
+}
