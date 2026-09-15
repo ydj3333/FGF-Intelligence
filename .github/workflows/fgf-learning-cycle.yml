@@ -1,0 +1,29 @@
+name: FGF Learning Cycle
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Run bounded discovery cycle
+        run: python scripts/learning_cycle.py
+      - name: Commit learning state
+        run: |
+          git config user.name 'FGF Intelligence Bot'
+          git config user.email 'fgf-intelligence-bot@users.noreply.github.com'
+          git add data/learning_state.json
+          git diff --cached --quiet || git commit -m 'chore: refresh FGF learning evidence'
+          git push
