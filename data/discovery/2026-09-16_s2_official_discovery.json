@@ -1,0 +1,30 @@
+{
+  "acquired_at": "2026-09-16",
+  "acquisition": "Firecrawl scrape",
+  "source": {
+    "url": "https://www.foundation.game/en/news/epoch-of-fusion-seed-lv35-buildings-4th-battle-queue",
+    "title": "Epoch of Fusion Seed — LV35 Buildings & 4th Battle Queue",
+    "published": "2026-09-09",
+    "tier": "T2"
+  },
+  "claims_extracted": [
+    {"claim":"Starting from Week 27 after server launch, once Combat Craft Modification technology reaches 60%, the Epoch of Fusion Seed technology tree becomes available at the Research Center.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"Completing the final Epoch of Fusion Seed technology increases the Energy Core level cap to 35.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"Energy Core Level 33 unlocks a fourth Battle Queue.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"Fusion Seed is used for Epoch of Fusion Seed research and Lvl 31–35 building upgrades, including Energy Core.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"Fusion Seed sources listed by the official article are Fusion Seed Refinery, Trader Commissions, Ruins Excavation and related packs.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"Fusion Seed Refinery starts with 1 Fusion Reactor; related technology adds 2 reactors and Refinery upgrades add 3 reactors, for a maximum of 6 reactors.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"From Energy Core Level 31 through 35, each Energy Core level raises Champion level cap by 5 and Flagship level cap by 1.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"Lvl 31–35 building upgrades use 5 Energy Slots per level; each completed stage fills one slot and consumes Fusion Seeds.","status":"candidate","version_scope":"S2/current source","evidence":"official article"},
+    {"claim":"At 80% Combat Craft Modification technology progress, Kinetic, Beam and Ion specialization trees unlock.","status":"candidate","version_scope":"S2/current source","evidence":"official article"}
+  ],
+  "promotion": "Do not promote automatically to T1. Cross-check against direct in-game evidence and version/server scope before canonical promotion.",
+  "next_tests": [
+    "Capture in-game Energy Core 31–35 costs and Energy Slot mechanics.",
+    "Verify exact Week-27 and 60% prerequisite behavior in-game.",
+    "Verify Energy Core 33 fourth Battle Queue unlock.",
+    "Determine exact Fusion Seed production formula by reactor count/level.",
+    "Determine exact Power contribution of Level 31–35 upgrades.",
+    "Capture S2 server-specific rollout and event schedule differences."
+  ]
+}
