@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v3.2-synthesis-robust'
+RELEASE='v3.2.1-synthesis-diagnostics'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
@@ -60,8 +60,6 @@ def extract_output(data):
 
 
 def parse_synthesis(text, max_id):
-    # Prefer structured JSON when the model returns it, but never fail just because
-    # the model returned a normal expert answer instead of JSON.
     try:
         obj=json.loads(text)
         if isinstance(obj,dict) and obj.get('answer'):
@@ -82,6 +80,20 @@ def parse_synthesis(text, max_id):
                 if 1<=v<=max_id and v not in ids: ids.append(v)
             except ValueError: pass
     return text,ids,''
+
+
+def _api_error_detail(e):
+    try:
+        raw=e.read().decode('utf-8','replace')
+        obj=json.loads(raw)
+        err=obj.get('error',{}) if isinstance(obj,dict) else {}
+        msg=err.get('message') or err.get('code') or raw
+        typ=err.get('type','')
+        code=err.get('code','')
+        detail='; '.join(x for x in [typ,code,msg] if x)
+        return detail[:600]
+    except Exception:
+        return str(e.reason)[:300]
 
 
 def synthesize(question, claims, conflicts=None, mode='answer'):
@@ -110,7 +122,8 @@ def synthesize(question, claims, conflicts=None, mode='answer'):
         answer_text,ids,unc=parse_synthesis(text,len(claims))
         return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),'uncertainty':unc}
     except HTTPError as e:
-        return {'text':'The synthesis API returned an error, so the answer could not be generated.','model':'api-error','evidence_used':[],'synthesis_error':'HTTP '+str(e.code)}
+        detail=_api_error_detail(e)
+        return {'text':'The synthesis API returned an error.','model':'api-error','evidence_used':[],'synthesis_error':'HTTP '+str(e.code),'synthesis_error_detail':detail}
     except (URLError,TimeoutError) as e:
         return {'text':'The synthesis service could not be reached.','model':'api-error','evidence_used':[],'synthesis_error':type(e).__name__}
     except (ValueError,KeyError) as e:
@@ -122,13 +135,13 @@ def recommend(q, objective='general'):
     qq=(q+' '+objective_terms.get(objective,'')).strip()
     hits=retrieve(qq,12)
     synthesis=synthesize(q or ('Give me the best recommendation for '+objective),hits,relevant_conflicts(q+' '+objective),'recommendation')
-    return {'question':q,'objective':objective,'answer':synthesis['text'],'model':synthesis['model'],'evidence_used':synthesis.get('evidence_used',[]),'uncertainty':synthesis.get('uncertainty',''),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
+    return {'question':q,'objective':objective,'answer':synthesis['text'],'model':synthesis['model'],'evidence_used':synthesis.get('evidence_used',[]),'uncertainty':synthesis.get('uncertainty',''),'synthesis_error':synthesis.get('synthesis_error'),'synthesis_error_detail':synthesis.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
 
 
 def answer(q):
     critical=relevant_conflicts(q); hits=retrieve(q,10)
     synthesis=synthesize(q,hits,critical,'answer')
-    return {'question':q,'answer_type':'synthesized_evidence','answer':synthesis['text'],'model':synthesis['model'],'evidence_used':synthesis.get('evidence_used',[]),'uncertainty':synthesis.get('uncertainty',''),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'The answer is synthesized from retrieved evidence. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
+    return {'question':q,'answer_type':'synthesized_evidence','answer':synthesis['text'],'model':synthesis['model'],'evidence_used':synthesis.get('evidence_used',[]),'uncertainty':synthesis.get('uncertainty',''),'synthesis_error':synthesis.get('synthesis_error'),'synthesis_error_detail':synthesis.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'The answer is synthesized from retrieved evidence. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
 
 
 class H(BaseHTTPRequestHandler):
