@@ -1,0 +1,11 @@
+{
+  "sources": [
+    {
+      "id": "fgf-official-wiki",
+      "name": "FGF official/wiki source registry entry",
+      "type": "official",
+      "url": "https://fgfwiki.com/en/champions",
+      "enabled": true
+    }
+  ]
+}
