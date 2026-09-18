@@ -1,48 +1,196 @@
 {
-  "schema_version": "4.0",
-  "last_reviewed": "2026-09-16",
-  "purpose": "Evidence-first multi-source FGF intelligence acquisition and control",
-  "tiers": {
-    "T1": "direct current in-game evidence",
-    "T2": "official game information, portal, patch notes, developer communications",
+  "schema_version": "4.1",
+  "last_reviewed": "2026-09-19",
+  "project_name": "FGF Intelligence",
+  "target": "0.01% FGF intelligence standard",
+  "operating_principle": "Monitor the whole game, not a single season. S1 is the baseline for new servers; S2 and later seasons are version/server-scoped overlays. Never assume S2 applies globally.",
+  "cost_policy": {
+    "target": "free-first",
+    "rule": "Use free/native/low-cost acquisition first; meter paid operations; deduplicate before expensive extraction; reserve metered browser automation for sources that require interaction; do not create paid infrastructure without explicit cost confirmation.",
+    "supabase_project_cost_confirmed_by_cost_tool": "0 monthly"
+  },
+  "evidence_tiers": {
+    "T1": "direct current in-game evidence; exact proposition visibly established",
+    "T2": "official game portal/news/patch/developer communications",
     "T3": "strong tested technical/community evidence",
     "T4": "creator/video/written guides",
     "T5": "meta opinions/recommendations",
     "T6": "rumours/unverified"
   },
+  "server_and_season_model": {
+    "baseline": "S1/new-server state",
+    "overlays": [
+      "S2",
+      "S3",
+      "future seasons"
+    ],
+    "dimensions": [
+      "season",
+      "server_age_or_week",
+      "server_scope",
+      "region",
+      "game_version",
+      "event_window"
+    ],
+    "rule": "A source is never applied globally when its scope is season/server/version-specific."
+  },
   "source_families": [
-    {"id":"fgf_wiki","name":"FGF Wiki / Encyclopedia Galactica","default_tier":"T3","dynamic":true,"url":"https://fgfwiki.com/"},
-    {"id":"fgf_fandom","name":"FGF Fandom Wiki","default_tier":"T3","dynamic":true,"url":"https://foundation-galactic-frontier.fandom.com/wiki/Foundation:_Galactic_Frontier_Wiki"},
-    {"id":"official_portal","name":"FGF Official Portal","default_tier":"T2","dynamic":true,"url":"https://www.foundation.game/en"},
-    {"id":"official_news","name":"FGF Official News","default_tier":"T2","dynamic":true,"url":"https://www.foundation.game/en/news"},
-    {"id":"official_x","name":"FGF Official X","default_tier":"T2","dynamic":true,"url":"https://x.com/FoundationGF_EN"},
-    {"id":"official_instagram","name":"FGF Official Instagram","default_tier":"T2","dynamic":true,"url":"https://www.instagram.com/foundation_gf_en/"},
-    {"id":"official_facebook","name":"FGF Official Facebook","default_tier":"T2","dynamic":true,"url":"https://www.facebook.com/FoundationGalacticFrontier"},
-    {"id":"official_youtube","name":"FGF Official YouTube","default_tier":"T2","dynamic":true,"url":"https://www.youtube.com/@Foundation_GalacticFrontier"},
-    {"id":"official_discord","name":"FGF Official Discord","default_tier":"T2","dynamic":true,"url":"https://discord.gg/GrndnDvBPS"},
-    {"id":"reddit","name":"Reddit / FGF communities and player posts","default_tier":"T3","dynamic":true,"url":"https://www.reddit.com/r/FoundationGFrontier/"},
-    {"id":"youtube_community","name":"YouTube community / creator videos and playlists","default_tier":"T4","dynamic":true,"url":"https://www.youtube.com/"},
-    {"id":"steam","name":"Steam store/community/update history","default_tier":"T2","dynamic":true,"url":"https://store.steampowered.com/app/4223760/Foundation_Galactic_Frontier/"},
-    {"id":"google_play","name":"Google Play listing/update notes","default_tier":"T2","dynamic":true,"url":"https://play.google.com/store/apps/details?id=com.games.foundation"},
-    {"id":"app_store","name":"Apple App Store listing/update information","default_tier":"T2","dynamic":true,"url":"https://apps.apple.com/in/app/foundation-galactic-frontier/id6737595599"}
+    [
+      "SRC-01",
+      "FGF Wiki / Encyclopedia Galactica",
+      "T3",
+      "https://fgfwiki.com/"
+    ],
+    [
+      "SRC-02",
+      "FGF Fandom Wiki",
+      "T3",
+      "https://foundation-galactic-frontier.fandom.com/wiki/Foundation:_Galactic_Frontier_Wiki"
+    ],
+    [
+      "SRC-03",
+      "FGF Official Portal",
+      "T2",
+      "https://www.foundation.game/en"
+    ],
+    [
+      "SRC-04",
+      "FGF Official News / Patches",
+      "T2",
+      "https://www.foundation.game/en/news"
+    ],
+    [
+      "SRC-05",
+      "FGF Official Social — X",
+      "T2",
+      "https://x.com/FoundationGF_EN"
+    ],
+    [
+      "SRC-06",
+      "FGF Official Social — Instagram",
+      "T2",
+      "https://www.instagram.com/foundation_gf_en/"
+    ],
+    [
+      "SRC-07",
+      "FGF Official Social — Facebook",
+      "T2",
+      "https://www.facebook.com/FoundationGalacticFrontier"
+    ],
+    [
+      "SRC-08",
+      "FGF Official YouTube",
+      "T2",
+      "https://www.youtube.com/@Foundation_GalacticFrontier"
+    ],
+    [
+      "SRC-09",
+      "FGF Official Discord",
+      "T2",
+      "https://discord.gg/GrndnDvBPS"
+    ],
+    [
+      "SRC-10",
+      "FGF Reddit / Player Community",
+      "T3",
+      "https://www.reddit.com/r/FoundationGFrontier/"
+    ],
+    [
+      "SRC-11",
+      "FGF YouTube Community / Creators / Playlists",
+      "T4",
+      "https://www.youtube.com/"
+    ],
+    [
+      "SRC-12",
+      "Steam / Store / Update History",
+      "T2",
+      "https://store.steampowered.com/app/4223760/Foundation_Galactic_Frontier/"
+    ],
+    [
+      "SRC-13",
+      "Google Play",
+      "T2",
+      "https://play.google.com/store/apps/details?id=com.games.foundation"
+    ],
+    [
+      "SRC-14",
+      "Apple App Store",
+      "T2",
+      "https://apps.apple.com/in/app/foundation-galactic-frontier/id6737595599"
+    ],
+    [
+      "SRC-15",
+      "Third-party Guides / Forums / Databases",
+      "T4",
+      "dynamic discovery"
+    ],
+    [
+      "SRC-16",
+      "User Evidence",
+      "T1-T6",
+      "conversation/project uploads"
+    ]
   ],
   "tools": {
-    "notion":"evidence control, human verification, conflicts and operating standard",
-    "github":"versioned application, schemas, snapshots and tests",
-    "supabase":"persistent learning database; project not yet provisioned",
-    "firecrawl":"search, crawl, extraction, image discovery and change monitoring",
-    "tinyfish":"interactive/browser acquisition for dynamic sources",
-    "web":"independent discovery and cross-check",
-    "llm":"synthesis and hypothesis generation only"
+    "TOOL-01": "Notion — human evidence control, verification, conflicts, source/plugin master",
+    "TOOL-02": "GitHub — code, schemas, tests, release snapshots and machine-readable manifests",
+    "TOOL-03": "Supabase — persistent learning/data laboratory and analytics store",
+    "TOOL-04": "Firecrawl — broad discovery, crawl, extraction, image discovery and scheduled change detection",
+    "TOOL-05": "TinyFish — free search/fetch first; metered browser automation only when interaction is required",
+    "TOOL-06": "Web Search — independent cross-check/discovery",
+    "TOOL-07": "LLM — synthesis, inference, benchmark generation; never canonical authority"
   },
-  "monitor": {
-    "provider":"firecrawl",
-    "id":"01a0a780-e7ea-737c-b09f-43b5e0a28d52",
-    "schedule":"every 6 hours",
-    "timezone":"Asia/Kolkata",
-    "status":"active"
-  },
+  "redundancy_policy": "Where 2–3 tools can perform the same task, compare outputs, preserve provenance, and select the strongest supported result without deleting disagreement.",
   "media_first": true,
-  "media_fields": ["media_id","source_url","media_type","creator","published_at","acquired_at","game_version","season","server_scope","timestamp_or_frame","ocr_text","transcript_ref","visual_claims","content_hash","duplicate_group","tier","confidence","status"],
-  "promotion_rule": "No automatic promotion to canonical T1 without appropriate evidence and verification."
+  "media_fields": [
+    "media_id",
+    "source_url",
+    "media_type",
+    "creator",
+    "published_at",
+    "acquired_at",
+    "game_version",
+    "season",
+    "server_scope",
+    "timestamp_or_frame",
+    "ocr_text",
+    "transcript_ref",
+    "visual_claims",
+    "content_hash",
+    "duplicate_group",
+    "tier",
+    "confidence",
+    "status"
+  ],
+  "learning_loop": [
+    "discover",
+    "acquire",
+    "fingerprint",
+    "deduplicate",
+    "OCR/transcribe",
+    "extract atomic claims",
+    "classify tier/version/scope",
+    "cross-check",
+    "calculate/infer",
+    "detect conflicts",
+    "candidate layer",
+    "benchmark Q&A",
+    "evaluate",
+    "admin review",
+    "promote/supersede",
+    "release snapshot"
+  ],
+  "promotion_rule": "No automatic canonical T1 promotion. User/session evidence may affect the current answer provisionally; promotion requires appropriate evidence and auditable verification.",
+  "monitoring": {
+    "name": "FGF V4 — Global Source Discovery — 6h",
+    "provider": "Firecrawl",
+    "monitor_id": "01a0a787-69be-76af-b092-7df17bf4862d",
+    "cadence": "every 6 hours",
+    "timezone": "Asia/Kolkata",
+    "scope": "all FGF seasons/server states; mechanics, progression, resource/Power formulas, events, buildings, Champions, Flagships, Technology, economy, PvP, ports, bugs, fixes, patches, guides, testing, official announcements, social, Reddit, Discord, YouTube/videos/playlists, images and store updates",
+    "retention_days": 30,
+    "estimated_credits_per_month": 7680,
+    "budget_rule": "This monitor is a discovery net, not the whole ingestion pipeline. Reduce frequency/queries or split by source criticality if credit use exceeds budget; use free TinyFish search/fetch and targeted Firecrawl fetches for deep acquisition."
+  }
 }
