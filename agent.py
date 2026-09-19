@@ -209,9 +209,45 @@ def recommend(q,objective='general'):
     s=synthesize(q or ('Give me the best recommendation for '+objective),hits,relevant_conflicts(q+' '+objective),'recommendation')
     return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
 
+def answer_quality_gate(q,text,claims):
+    domains=query_domains(q)
+    low=text.lower()
+    if 'damage' in domains:
+        required=('repair','damage','repair module','repair bay','repair cabin')
+        if not any(x in low for x in required):
+            return False
+        # Reject the exact historical failure mode: CP-only answers to repair questions.
+        if 'command point' in low and not any(x in low for x in ('repair','damage')):
+            return False
+    # If the answer contains a recommendation/claim not represented by the
+    # retrieved packet, fail closed rather than hallucinating.
+    packet=' '.join(c.get('Claim','').lower() for c in claims)
+    if len(text.strip())<20 or not any(term in low for term in ('based on','according','repair','fleet','champion','flagship','technology','guild','port','event','cost','level')):
+        return False
+    return True
+
+def fallback_answer(question,claims,conflicts=None):
+    if not claims:return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
+    domains=query_domains(question)
+    if 'damage' in domains:
+        selected=[c for c in claims if any(x in c.get('Claim','').lower() for x in ('minor damage','major damage','repair module','repair cabin','auto-repair'))][:5]
+        lines=['For repairing fleets without consuming Repair Modules:']
+        for c in selected[:4]: lines.append('• '+c.get('Claim','').strip())
+        if not selected: lines.append('• The current evidence does not establish a free repair method.')
+        return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected[:4]],'uncertainty':'Direct repair evidence used; no unsupported ad/free mechanic was assumed.'}
+    mechanics=[c for c in claims if c.get('Evidence Tier','').startswith('Tier 1')]
+    selected=mechanics[:4] or claims[:4]
+    lines=['Based on the retrieved FGF evidence:']
+    for c in selected: lines.append('• '+c.get('Claim','').strip())
+    if conflicts:lines.append('• Uncertainty: a related evidence conflict is preserved for review rather than resolved by assumption.')
+    return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected],'uncertainty':'Deterministic fallback used; synthesis model unavailable.'}
+
 def answer(q):
     critical=relevant_conflicts(q);hits=retrieve(q,10);s=synthesize(q,hits,critical,'answer')
-    return {'question':q,'answer_type':'synthesized_evidence','answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
+    if not answer_quality_gate(q,s.get('text',''),hits):
+        s=fallback_answer(q,hits,critical)
+        s['uncertainty']='Answer-quality gate rejected the synthesis; deterministic evidence-safe answer returned.'
+    return {'question':q,'answer_type':'synthesized_evidence','answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence and passed an evidence-relevance gate. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
 
 class H(BaseHTTPRequestHandler):
     def _json(self,obj,status=200):
