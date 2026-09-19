@@ -88,3 +88,26 @@ The official site currently exposes a Sep 9, 2026 item titled `Epoch of Fusion S
 
 ## Next implementation gate
 Provision Supabase, then implement ingestion tables and media/evidence pipelines. Until then, GitHub remains the reproducible release store and Notion remains the human control room.
+
+## Global monitoring and season model — mandatory
+The acquisition scope is **the whole game**, not S2. Every 6-hour cycle must check all registered source families for meaningful changes. **S1 is the baseline for new servers; S2/S3/future seasons are overlays tied to server age/week, season, game version and event window.** A seasonal finding must never be generalized to all servers.
+
+### Zero-paid-first acquisition budget
+- Recurring paid Firecrawl monitoring is currently **disabled** to protect the free-first target.
+- The active design is a 6-hour orchestration cycle using free/native discovery and independent cross-checks first.
+- Firecrawl/TinyFish are reserved for targeted deep acquisition, dynamic pages or sources that cannot be reliably acquired through the free path. Any metered use is recorded and budget-controlled.
+- Deduplicate/fingerprint before OCR, transcription, browser automation or other metered work.
+- Supabase project **FGF Intelligence V4** is provisioned in **ap-south-1** at **$0/month project cost** according to the current cost check.
+
+### Uniform control names
+Use these identifiers everywhere — Notion, GitHub, Supabase, automation logs and plugin records:
+- **FGF V4 — Global Source Discovery — 6h** = acquisition cycle
+- **FGF V4 — Source & Plugin Control Master** = master governance document
+- **FGF V4 — Learning Laboratory** = Supabase persistent learning/data layer
+- **FGF V4 — Evidence Promotion Pipeline** = candidate → verification → canonical workflow
+
+### 6-hour source families
+Each cycle checks, where accessible: FGF Wiki/Encyclopedia, Fandom, official portal/news/guides, official social accounts, official/community Discord, Reddit/player posts, YouTube/videos/playlists, Steam/store metadata, third-party guides/forums, and user evidence. Results are tagged by season/server/version and classified T1–T6. Images/video are first-class evidence, not leftovers.
+
+### Redundancy rule
+When two or three acquisition paths can cover the same source, use independent paths where practical, compare provenance and content, preserve disagreements, and use the strongest supported evidence. Redundancy does not mean duplicating expensive work.
