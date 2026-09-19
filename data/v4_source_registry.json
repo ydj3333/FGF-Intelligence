@@ -3,11 +3,13 @@
   "last_reviewed": "2026-09-19",
   "project_name": "FGF Intelligence",
   "target": "0.01% FGF intelligence standard",
-  "operating_principle": "Monitor the whole game, not a single season. S1 is the baseline for new servers; S2 and later seasons are version/server-scoped overlays. Never assume S2 applies globally.",
+  "operating_principle": "Monitor the whole game, not a single season. S1 is the baseline for new servers; S2 and later seasons are server/version-scoped overlays. Every acquisition cycle checks the global source families; season-specific findings are tagged, never generalized.",
   "cost_policy": {
     "target": "free-first",
-    "rule": "Use free/native/low-cost acquisition first; meter paid operations; deduplicate before expensive extraction; reserve metered browser automation for sources that require interaction; do not create paid infrastructure without explicit cost confirmation.",
-    "supabase_project_cost_confirmed_by_cost_tool": "0 monthly"
+    "rule": "Zero-paid-first architecture. Use native/web discovery, GitHub, Notion and connected free-access paths first. Metered acquisition is opt-in and budget-controlled. No recurring paid monitor remains active without an explicit budget decision. Deduplicate and fingerprint before any metered extraction.",
+    "supabase_project": "FGF Intelligence V4",
+    "supabase_project_id": "ebdsprrqytqeqjmmucbm",
+    "supabase_monthly_project_cost": 0
   },
   "evidence_tiers": {
     "T1": "direct current in-game evidence; exact proposition visibly established",
@@ -184,13 +186,12 @@
   "promotion_rule": "No automatic canonical T1 promotion. User/session evidence may affect the current answer provisionally; promotion requires appropriate evidence and auditable verification.",
   "monitoring": {
     "name": "FGF V4 — Global Source Discovery — 6h",
-    "provider": "Firecrawl",
-    "monitor_id": "01a0a787-69be-76af-b092-7df17bf4862d",
+    "provider": "Automation + free/native discovery layer",
+    "status": "Firecrawl recurring monitor disabled to protect zero-cost target",
     "cadence": "every 6 hours",
     "timezone": "Asia/Kolkata",
     "scope": "all FGF seasons/server states; mechanics, progression, resource/Power formulas, events, buildings, Champions, Flagships, Technology, economy, PvP, ports, bugs, fixes, patches, guides, testing, official announcements, social, Reddit, Discord, YouTube/videos/playlists, images and store updates",
-    "retention_days": 30,
-    "estimated_credits_per_month": 7680,
-    "budget_rule": "This monitor is a discovery net, not the whole ingestion pipeline. Reduce frequency/queries or split by source criticality if credit use exceeds budget; use free TinyFish search/fetch and targeted Firecrawl fetches for deep acquisition."
+    "paid_firecrawl_estimated_monthly_credits": 0,
+    "budget_rule": "Keep recurring acquisition at zero paid credits by default. Use Firecrawl/TinyFish only for targeted deep acquisition when a source cannot be handled by free/native discovery; record any metered use in the control log before scaling it."
   }
 }
