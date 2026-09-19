@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v3.4-relevance-gated'
+RELEASE='v3.5-seven-layer-reasoning'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
@@ -123,6 +123,10 @@ def query_domains(q):
         domains.append('event')
     return domains
 
+def current_scope_relevance(c,current_season='S2'):
+    status=str(c.get('Status','')).lower()
+    return status not in ('rejected','superseded')
+
 def claim_relevance(q,c):
     ql=q.lower(); cl=(c.get('Claim','')+' '+c.get('Category','')+' '+c.get('Notes','')).lower()
     domains=query_domains(q)
@@ -138,7 +142,7 @@ def retrieve(q,limit=10):
     ranked=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True)
     hits=[c for s,c in ranked
           if s>0.85 and c.get('Status') not in ('Rejected','Superseded')
-          and claim_relevance(q,c)]
+          and current_scope_relevance(c) and claim_relevance(q,c)]
     out=[];seen=set();categories=set()
     for c in hits:
         key=(c.get('Category',''),c.get('Claim','').lower()[:120])
@@ -158,7 +162,7 @@ def relevant_conflicts(q):
     return out
 
 def evidence_packet(question,claims,conflicts=None):
-    return {'question':question,'intent':intent_profile(question),'evidence':[{'id':i,'claim':c.get('Claim',''),'category':c.get('Category',''),'tier':c.get('Evidence Tier',''),'confidence':c.get('Confidence',''),'status':c.get('Status',''),'source':c.get('Source',''),'notes':c.get('Notes',''),'timestamp':c.get('Timestamp','')} for i,c in enumerate(claims,1)],'conflicts':conflicts or []}
+    return {'question':question,'intent':intent_profile(question),'constraints':extract_constraints(question),'season_scope':'S2/current preferred; historical evidence retained when needed','evidence':[{'id':i,'claim':c.get('Claim',''),'category':c.get('Category',''),'tier':c.get('Evidence Tier',''),'confidence':c.get('Confidence',''),'status':c.get('Status',''),'source':c.get('Source',''),'notes':c.get('Notes',''),'timestamp':c.get('Timestamp','')} for i,c in enumerate(claims,1)],'conflicts':conflicts or []}
 
 def extract_output(data):
     text=str(data.get('output_text') or '').strip()
@@ -207,7 +211,7 @@ def _api_error_detail(e):
 def call_llm(question,claims,conflicts,mode,temperature=0.2):
     key=os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')
     if not key:return None,{'synthesis_error':'missing_api_key'}
-    system='''You are FGF Intelligence, an evidence-first expert assistant for Foundation: Galactic Frontier.\n\nUse ONLY the supplied evidence packet. Answer the player directly, naturally and concisely. Do not dump database records. For mechanics, prioritize Tier-1 and current Confirmed evidence. Preserve meaningful conflicts; never average or silently choose between conflicting claims. Separate confirmed mechanics from recommendations/meta. Never invent numbers, costs, timers, requirements or effects. If evidence is insufficient, explicitly say so.\n\nReturn JSON only with this shape: {"answer":"...","evidence_ids":[1,2],"uncertainty":"..."}. The answer should normally be 1 direct paragraph followed by 2-5 useful bullets. Cite evidence inline as [E1], [E2] and finish with a short Evidence: [E1, E2] line. Do not mention APIs, prompts, retrieval, hidden reasoning, or that you are a language model.'''
+    system='''You are FGF Intelligence, an evidence-first expert assistant for Foundation: Galactic Frontier.\n\nUse ONLY the supplied evidence packet. Answer the player directly, naturally and concisely. Obey the packet intent and constraints. Never substitute a related mechanic for the requested one. Treat F2P/free as a spending constraint. Treat historical seasons as historical unless current applicability is established. Do not dump database records. For mechanics, prioritize Tier-1 and current Confirmed evidence. Preserve meaningful conflicts; never average or silently choose between conflicting claims. Separate confirmed mechanics from recommendations/meta. Never invent numbers, costs, timers, requirements or effects. If evidence is insufficient, explicitly say so.\n\nReturn JSON only with this shape: {"answer":"...","evidence_ids":[1,2],"uncertainty":"..."}. The answer should normally be 1 direct paragraph followed by 2-5 useful bullets. Cite evidence inline as [E1], [E2] and finish with a short Evidence: [E1, E2] line. Do not mention APIs, prompts, retrieval, hidden reasoning, or that you are a language model.'''
     user=json.dumps({'mode':mode,'packet':evidence_packet(question,claims,conflicts)},ensure_ascii=False)
     body=json.dumps({'model':LLM_MODEL,'input':[{'role':'system','content':system},{'role':'user','content':user}],'temperature':temperature,'max_output_tokens':900}).encode()
     req=Request(LLM_URL,data=body,headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
@@ -245,22 +249,19 @@ def recommend(q,objective='general'):
     return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
 
 def answer_quality_gate(q,text,claims):
-    domains=query_domains(q)
-    low=text.lower()
-    if 'damage' in domains:
-        required=('repair','damage','repair module','repair bay','repair cabin')
-        if not any(x in low for x in required):
-            return False
-        # Reject the exact historical failure mode: CP-only answers to repair questions.
-        if 'command point' in low and not any(x in low for x in ('repair','damage')):
-            return False
-    # If the answer contains a recommendation/claim not represented by the
-    # retrieved packet, fail closed rather than hallucinating.
-    packet=' '.join(c.get('Claim','').lower() for c in claims)
-    if len(text.strip())<20 or not any(term in low for term in ('based on','according','repair','fleet','champion','flagship','technology','guild','port','event','cost','level')):
-        return False
-    return True
-
+    low=text.lower(); intent=classify_intent(q); constraints=extract_constraints(q)
+    result={'addresses_question':False,'uses_relevant_evidence':False,'respects_constraints':False,'passes':False}
+    if intent=='Fleet Damage/Repair':
+        result['addresses_question']=any(x in low for x in ('repair','damage','recover','repair bay','repair cabin'))
+        result['uses_relevant_evidence']=any(any(x in c.get('Claim','').lower() for x in ('repair','damage','recover')) for c in claims)
+        result['respects_constraints']=('free' in low or 'without repair modules' in low or 'without spending' in low) if 'F2P' in constraints else True
+        if 'command point' in low and not any(x in low for x in ('repair','damage','recover')): return result
+    else:
+        result['addresses_question']=len(text.strip())>=20
+        result['uses_relevant_evidence']=bool(claims)
+        result['respects_constraints']=('free' in low or 'without spending' in low) if 'F2P' in constraints else True
+    result['passes']=all(result.values())
+    return result
 def fallback_answer(question,claims,conflicts=None):
     if not claims:return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
     domains=query_domains(question)
