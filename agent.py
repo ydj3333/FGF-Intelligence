@@ -91,10 +91,22 @@ CONSTRAINT_PATTERNS = {
 
 def classify_intent(q):
     ql=q.lower()
+    # Match multi-word phrases normally, but match short tokens as whole words.
+    # This prevents false positives such as "ion" matching the suffix of "fusion".
+    def matches(keyword):
+        if ' ' in keyword or '-' in keyword:
+            return keyword in ql
+        return re.search(r'\\b'+re.escape(keyword)+r'\\b', ql) is not None
     # Specific intents must win over broad domains such as Combat/Economy.
-    for intent in ['Fleet Damage/Repair','Progression','Champions','Events','Economy','Combat']:
-        if any(k in ql for k in INTENT_CLASSES[intent]):
+    ordered=['Fleet Damage/Repair','Progression','Champions','Events','Combat','Economy']
+    for intent in ordered:
+        if any(matches(k) for k in INTENT_CLASSES[intent]):
             return intent
+    # Explicit shorthand/late-progression vocabulary.
+    if re.search(r'\\bcp\\b', ql) or 'command point' in ql:
+        return 'Combat'
+    if re.search(r'\\bcore\\s*(?:3[1-5]|35)\\b', ql) or 'fusion seed' in ql or 'fusion seeds' in ql:
+        return 'Progression'
     return 'Unknown'
 
 def extract_constraints(q):
