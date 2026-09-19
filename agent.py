@@ -96,16 +96,16 @@ def classify_intent(q):
     def matches(keyword):
         if ' ' in keyword or '-' in keyword:
             return keyword in ql
-        return re.search(r'\\b'+re.escape(keyword)+r'\\b', ql) is not None
+        return re.search(r'\b'+re.escape(keyword)+r'\b', ql) is not None
     # Specific intents must win over broad domains such as Combat/Economy.
     ordered=['Fleet Damage/Repair','Progression','Champions','Events','Combat','Economy']
     for intent in ordered:
         if any(matches(k) for k in INTENT_CLASSES[intent]):
             return intent
     # Explicit shorthand/late-progression vocabulary.
-    if re.search(r'\\bcp\\b', ql) or 'command point' in ql:
+    if re.search(r'\bcp\b', ql) or 'command point' in ql:
         return 'Combat'
-    if re.search(r'\\bcore\\s*(?:3[1-5]|35)\\b', ql) or 'fusion seed' in ql or 'fusion seeds' in ql:
+    if re.search(r'\bcore\s*(?:3[1-5]|35)\b', ql) or 'fusion seed' in ql or 'fusion seeds' in ql:
         return 'Progression'
     return 'Unknown'
 
