@@ -98,6 +98,7 @@ def classify_intent(q):
             return keyword in ql
         return re.search(r'\b'+re.escape(keyword)+r'\b', ql) is not None
     # Specific intents must win over broad domains such as Combat/Economy.
+    # Player/roster recommendation terms take precedence over broad combat terms.
     ordered=['Fleet Damage/Repair','Progression','Champions','Events','Combat','Economy']
     for intent in ordered:
         if any(matches(k) for k in INTENT_CLASSES[intent]):
@@ -252,6 +253,30 @@ def fallback_answer(question,claims,conflicts=None):
     if not claims:
         return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
 
+    # Recommendation questions about heroes/champions must not fall back to generic
+    # energy-type mechanics. Use champion evidence and clearly separate meta from facts.
+    if classify_intent(question)=='Champions' and any(x in ql for x in ('best','optimal','recommended','heroes','champions','team','composition')):
+        kinetic = any(x in ql for x in ('kinetic','kinetic ship','kinetic fleet'))
+        candidates=[]
+        for c in claims:
+            cl=c.get('Claim','').lower()
+            if 'champion' not in cl and 'kinetic' not in cl: continue
+            if kinetic and ('kinetic' not in cl): continue
+            if any(name in cl for name in ('killer bee','eva von trier','zora dominii','zora domini','kama moai','riian dessos','lani verita','cocoon')):
+                candidates.append(c)
+        # Prefer confirmed/current evidence first, then high-confidence meta evidence.
+        candidates=sorted(candidates,key=lambda c: (
+            0 if c.get('Status')=='Confirmed' else 1,
+            0 if str(c.get('Confidence','')).lower().startswith('high') else 1,
+            c.get('Claim','').lower()
+        ))
+        if candidates:
+            lines=['For a Kinetic ship/fleet, the available evidence identifies these Kinetic Champions:']
+            for c in candidates[:6]:
+                lines.append('• '+c.get('Claim','').strip())
+            lines.append('• Important: the champion classifications are mostly Tier-2/community evidence and several are marked Under Review, so I would not present a single “best” hero as a confirmed fact.')
+            return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in candidates[:6]],'uncertainty':'Recommendation is evidence-based but the available Kinetic Champion meta is not uniformly confirmed; Under Review claims remain labeled as such.'}
+
     # Repair questions must answer the player's actual location/action question,
     # not merely recite the damage taxonomy.
     if any(k in ql for k in ('repair','where can i repair','where do i repair','repair my fleet','fix my fleet')):
@@ -355,7 +380,8 @@ def run_benchmarks():
         ("what's the best ways to repair your fleets ad free way","Fleet Damage/Repair",["F2P","Best"],["repair","damage"]),
         ("How do I repair my fleet?","Fleet Damage/Repair",[],["repair","damage"]),
         ("Why does CP matter?","Combat",[],["command point"]),
-        ("How much does Core 35 cost in fusion seeds?","Progression",[],["does not establish","will not infer"])
+        ("How much does Core 35 cost in fusion seeds?","Progression",[],["does not establish","will not infer"]),
+        ("best heroes for kinetic ship","Champions",["Best"],["kinetic","champion"])
     ]
     results=[]
     for q,expected_intent,expected_constraints,answer_markers in tests:
