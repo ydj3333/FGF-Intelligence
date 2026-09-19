@@ -10,7 +10,27 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;margin:0;back
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function card(c){return `<div class="card ${String(c['Evidence Tier']||'').startsWith('Tier 1')?'tier1':''}"><div class="claim">${esc(c.Claim)}</div><div class="small"><span class=pill>${esc(c.Category)}</span><span class=pill>${esc(c['Evidence Tier'])}</span><span class=pill>${esc(c.Confidence)}</span><span class=pill>${esc(c.Status)}</span></div><p class="source small">${esc(c.Source)} ${esc(c.Timestamp||'')}</p><p class="muted small">${esc(c.Notes)}</p></div>`}
 function show(id,btn){document.querySelectorAll('main>section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
-async function getJSON(url){const r=await fetch(url);let a;try{a=await r.json()}catch(e){throw new Error('Server returned an invalid response')};if(!r.ok)throw new Error(a.error||a.detail||`Request failed (${r.status})`);return a}
+async function getJSON(url){
+  let lastErr;
+  for(let attempt=0;attempt<2;attempt++){
+    try{
+      const r=await fetch(url,{cache:'no-store'});
+      const raw=await r.text();
+      let a=null;
+      try{a=JSON.parse(raw)}catch(e){
+        lastErr=new Error(`Server returned a non-JSON response (HTTP ${r.status}). The Render service may be waking up; retrying…`);
+        if(attempt===0){await new Promise(x=>setTimeout(x,2500));continue}
+        throw lastErr;
+      }
+      if(!r.ok)throw new Error(a.error||a.detail||`Request failed (HTTP ${r.status})`);
+      return a;
+    }catch(e){
+      lastErr=e;
+      if(attempt===0){await new Promise(x=>setTimeout(x,2500));continue}
+    }
+  }
+  throw lastErr||new Error('Request failed');
+}
 async function init(){try{let h=await getJSON('/api/health');document.getElementById('kpi').innerHTML=`<div class=k>Claims <b>${h.claims}</b></div><div class=k>Tier 1 <b>${h.tier1}</b></div><div class=k>Sources <b>${h.sources}</b></div><div class=k>Changes <b>${h.changes}</b></div><div class=k>Open conflicts <b>${h.conflicts}</b></div>`;loadConflicts()}catch(e){document.getElementById('kpi').innerHTML=`<div class="card error">Backend error: ${esc(e.message)}</div>`}}
 function renderAsk(a){let html='';if(a.answer){html+=`<div class="card"><b>FGF Intelligence</b><div class="answer">${esc(a.answer)}</div>${a.model?`<div class="muted small">Synthesized by ${esc(a.model)}</div>`:''}${a.uncertainty?`<p class="muted small">Uncertainty: ${esc(a.uncertainty)}</p>`:''}</div>`}else if(a.note){html+=`<div class="card"><b>Evidence-ranked response</b><p class="muted">${esc(a.note)}</p></div>`}if(a.critical_conflicts?.length)html+=a.critical_conflicts.map(x=>`<div class="card conflict warn"><b>⚠ ${esc(x.Topic)}</b><p>${esc(x['Tier-1 evidence'])}</p><p class=muted>${esc(x.Notes)}</p></div>`).join('');if(a.evidence?.length){html+=`<div class="card"><h3>Evidence used</h3>`+a.evidence.map((x,i)=>`<div class="evidence"><b>Evidence ${i+1}</b><p>${esc(x.Claim||x.Notes||x)}</p><p class="muted small">${esc(x.Source||'')} ${esc(x['Evidence Tier']||'')} ${esc(x.Confidence||'')}</p></div>`).join('')+'</div>'}else if(a.results?.length){html+=a.results.map(card).join('')}return html||'<div class="card">No answer was returned. Please try another question.</div>'}
 async function ask(){let q=document.getElementById('q').value.trim();if(!q)return;document.getElementById('answer').innerHTML='<div class="card">Thinking… retrieving evidence and synthesizing an answer.</div>';try{let a=await getJSON('/api/ask?q='+encodeURIComponent(q));document.getElementById('answer').innerHTML=renderAsk(a)}catch(e){document.getElementById('answer').innerHTML=`<div class="card error"><b>Unable to answer</b><p>${esc(e.message)}</p></div>`}}
