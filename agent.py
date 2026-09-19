@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v3.6-progression-aware'
+RELEASE='v4.0-intent-sovereign'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
