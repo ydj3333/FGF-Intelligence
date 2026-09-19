@@ -1,4 +1,5 @@
 name: Deploy FGF Intelligence to Render
+# Secret RENDER_DEPLOY_HOOK_URL is configured in repository Actions secrets.
 
 on:
   push:
