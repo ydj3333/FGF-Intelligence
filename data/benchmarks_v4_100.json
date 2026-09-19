@@ -1,0 +1,507 @@
+{
+  "version": "v4.0",
+  "title": "FGF V4 — 100 Question Benchmark Suite",
+  "purpose": "Evaluate intent classification, evidence retrieval, constraint handling, answer synthesis, and evidence-safe abstention across major FGF gameplay topics.",
+  "questions": [
+    {
+      "id": 1,
+      "category": "Combat & Fleet Mechanics",
+      "question": "What does Kinetic weapon type counter?"
+    },
+    {
+      "id": 2,
+      "category": "Combat & Fleet Mechanics",
+      "question": "What does Beam weapon type counter?"
+    },
+    {
+      "id": 3,
+      "category": "Combat & Fleet Mechanics",
+      "question": "What does Ion weapon type counter?"
+    },
+    {
+      "id": 4,
+      "category": "Combat & Fleet Mechanics",
+      "question": "Which weapon type is strongest against shields?"
+    },
+    {
+      "id": 5,
+      "category": "Combat & Fleet Mechanics",
+      "question": "Which weapon type is strongest against armor?"
+    },
+    {
+      "id": 6,
+      "category": "Combat & Fleet Mechanics",
+      "question": "How does ship speed affect combat?"
+    },
+    {
+      "id": 7,
+      "category": "Combat & Fleet Mechanics",
+      "question": "What happens when a ship's hull reaches zero?"
+    },
+    {
+      "id": 8,
+      "category": "Combat & Fleet Mechanics",
+      "question": "Do destroyed ships return to fleet after battle?"
+    },
+    {
+      "id": 9,
+      "category": "Combat & Fleet Mechanics",
+      "question": "What is the difference between minor and major damage?"
+    },
+    {
+      "id": 10,
+      "category": "Combat & Fleet Mechanics",
+      "question": "Which ship type has the highest base speed?"
+    },
+    {
+      "id": 11,
+      "category": "Combat & Fleet Mechanics",
+      "question": "Do cruisers have better range than destroyers?"
+    },
+    {
+      "id": 12,
+      "category": "Combat & Fleet Mechanics",
+      "question": "What advantage do frigates have in early game?"
+    },
+    {
+      "id": 13,
+      "category": "Combat & Fleet Mechanics",
+      "question": "How does formation affect fleet combat?"
+    },
+    {
+      "id": 14,
+      "category": "Combat & Fleet Mechanics",
+      "question": "Can a single ship type counter all weapon types?"
+    },
+    {
+      "id": 15,
+      "category": "Combat & Fleet Mechanics",
+      "question": "What happens to weapons when a ship is disabled?"
+    },
+    {
+      "id": 16,
+      "category": "Fleet Repair & Recovery",
+      "question": "How does fleet repair work?"
+    },
+    {
+      "id": 17,
+      "category": "Fleet Repair & Recovery",
+      "question": "What repairs major damage on ships?"
+    },
+    {
+      "id": 18,
+      "category": "Fleet Repair & Recovery",
+      "question": "Do I need repair modules for minor damage?"
+    },
+    {
+      "id": 19,
+      "category": "Fleet Repair & Recovery",
+      "question": "How long does auto-repair take for minor damage?"
+    },
+    {
+      "id": 20,
+      "category": "Fleet Repair & Recovery",
+      "question": "What building repairs major damage?"
+    },
+    {
+      "id": 21,
+      "category": "Fleet Repair & Recovery",
+      "question": "Can mothership repair cabin fix all ship types?"
+    },
+    {
+      "id": 22,
+      "category": "Fleet Repair & Recovery",
+      "question": "Do repair modules work on major damage?"
+    },
+    {
+      "id": 23,
+      "category": "Fleet Repair & Recovery",
+      "question": "How many repair modules can a ship carry?"
+    },
+    {
+      "id": 24,
+      "category": "Fleet Repair & Recovery",
+      "question": "What happens if a ship has no repair modules and takes major damage?"
+    },
+    {
+      "id": 25,
+      "category": "Fleet Repair & Recovery",
+      "question": "Does fleet recovery work without mothership repair cabin?"
+    },
+    {
+      "id": 26,
+      "category": "Fleet Repair & Recovery",
+      "question": "Can I repair ships during combat?"
+    },
+    {
+      "id": 27,
+      "category": "Fleet Repair & Recovery",
+      "question": "Do repair modules regenerate after use?"
+    },
+    {
+      "id": 28,
+      "category": "Fleet Repair & Recovery",
+      "question": "What is the repair speed of mothership repair cabin?"
+    },
+    {
+      "id": 29,
+      "category": "Fleet Repair & Recovery",
+      "question": "Should I prioritize repair modules or repair cabin for F2P?"
+    },
+    {
+      "id": 30,
+      "category": "Fleet Repair & Recovery",
+      "question": "How do I know if my ship has minor or major damage?"
+    },
+    {
+      "id": 31,
+      "category": "Energy Core & Progression",
+      "question": "What does Energy Core level affect?"
+    },
+    {
+      "id": 32,
+      "category": "Energy Core & Progression",
+      "question": "How much does Core 35 cost in fusion seeds?"
+    },
+    {
+      "id": 33,
+      "category": "Energy Core & Progression",
+      "question": "What is the maximum Energy Core level?"
+    },
+    {
+      "id": 34,
+      "category": "Energy Core & Progression",
+      "question": "Do I need fusion seeds for Core 31?"
+    },
+    {
+      "id": 35,
+      "category": "Energy Core & Progression",
+      "question": "How do I get fusion seeds?"
+    },
+    {
+      "id": 36,
+      "category": "Energy Core & Progression",
+      "question": "What building produces fusion seeds?"
+    },
+    {
+      "id": 37,
+      "category": "Energy Core & Progression",
+      "question": "How many fusion seeds per hour does refinery produce?"
+    },
+    {
+      "id": 38,
+      "category": "Energy Core & Progression",
+      "question": "Can I skip Energy Core levels?"
+    },
+    {
+      "id": 39,
+      "category": "Energy Core & Progression",
+      "question": "What happens if I don't upgrade Energy Core?"
+    },
+    {
+      "id": 40,
+      "category": "Energy Core & Progression",
+      "question": "Does Energy Core affect ship stats?"
+    },
+    {
+      "id": 41,
+      "category": "Energy Core & Progression",
+      "question": "What is the cost difference between Core 31 and Core 35?"
+    },
+    {
+      "id": 42,
+      "category": "Energy Core & Progression",
+      "question": "Do I need to max Energy Core before upgrading other buildings?"
+    },
+    {
+      "id": 43,
+      "category": "Energy Core & Progression",
+      "question": "How long does it take to farm fusion seeds for Core 35?"
+    },
+    {
+      "id": 44,
+      "category": "Energy Core & Progression",
+      "question": "Should I upgrade Energy Core or flagship first?"
+    },
+    {
+      "id": 45,
+      "category": "Energy Core & Progression",
+      "question": "What unlocks at Energy Core level 40?"
+    },
+    {
+      "id": 46,
+      "category": "Flagship & Blueprints",
+      "question": "What is a flagship?"
+    },
+    {
+      "id": 47,
+      "category": "Flagship & Blueprints",
+      "question": "How do I get flagship blueprints?"
+    },
+    {
+      "id": 48,
+      "category": "Flagship & Blueprints",
+      "question": "What is the best flagship for F2P players?"
+    },
+    {
+      "id": 49,
+      "category": "Flagship & Blueprints",
+      "question": "How many flagship blueprints do I need to unlock a ship?"
+    },
+    {
+      "id": 50,
+      "category": "Flagship & Blueprints",
+      "question": "Can I change my flagship after choosing one?"
+    },
+    {
+      "id": 51,
+      "category": "Flagship & Blueprints",
+      "question": "What stats do flagship components affect?"
+    },
+    {
+      "id": 52,
+      "category": "Flagship & Blueprints",
+      "question": "How do I upgrade flagship components?"
+    },
+    {
+      "id": 53,
+      "category": "Flagship & Blueprints",
+      "question": "Do flagship bonuses apply to all ships or just flagship?"
+    },
+    {
+      "id": 54,
+      "category": "Flagship & Blueprints",
+      "question": "What is the difference between flagship and regular ships?"
+    },
+    {
+      "id": 55,
+      "category": "Flagship & Blueprints",
+      "question": "Can I have multiple flagships?"
+    },
+    {
+      "id": 56,
+      "category": "Flagship & Blueprints",
+      "question": "How do I get more flagship component slots?"
+    },
+    {
+      "id": 57,
+      "category": "Flagship & Blueprints",
+      "question": "What flagship is best for kinetic fleet?"
+    },
+    {
+      "id": 58,
+      "category": "Flagship & Blueprints",
+      "question": "What flagship is best for beam fleet?"
+    },
+    {
+      "id": 59,
+      "category": "Flagship & Blueprints",
+      "question": "Do flagship blueprints drop from all missions?"
+    },
+    {
+      "id": 60,
+      "category": "Flagship & Blueprints",
+      "question": "Should I upgrade flagship or Energy Core first?"
+    },
+    {
+      "id": 61,
+      "category": "Champions & Heroes",
+      "question": "What are champions?"
+    },
+    {
+      "id": 62,
+      "category": "Champions & Heroes",
+      "question": "How do I unlock champion abilities?"
+    },
+    {
+      "id": 63,
+      "category": "Champions & Heroes",
+      "question": "What does champion star level do?"
+    },
+    {
+      "id": 64,
+      "category": "Champions & Heroes",
+      "question": "How do I get champion fragments?"
+    },
+    {
+      "id": 65,
+      "category": "Champions & Heroes",
+      "question": "What is the best champion for early game?"
+    },
+    {
+      "id": 66,
+      "category": "Champions & Heroes",
+      "question": "What are the best heroes for kinetic ship?"
+    },
+    {
+      "id": 67,
+      "category": "Champions & Heroes",
+      "question": "What are the best heroes for beam ship?"
+    },
+    {
+      "id": 68,
+      "category": "Champions & Heroes",
+      "question": "What are the best heroes for ion ship?"
+    },
+    {
+      "id": 69,
+      "category": "Champions & Heroes",
+      "question": "Do champion bonuses apply to all ships or just one type?"
+    },
+    {
+      "id": 70,
+      "category": "Champions & Heroes",
+      "question": "How do I upgrade champion star level?"
+    },
+    {
+      "id": 71,
+      "category": "Champions & Heroes",
+      "question": "Can I change which champion I use?"
+    },
+    {
+      "id": 72,
+      "category": "Champions & Heroes",
+      "question": "What champion ability is best for fleet combat?"
+    },
+    {
+      "id": 73,
+      "category": "Champions & Heroes",
+      "question": "Do I need duplicates to upgrade champions?"
+    },
+    {
+      "id": 74,
+      "category": "Champions & Heroes",
+      "question": "What is the maximum champion star level?"
+    },
+    {
+      "id": 75,
+      "category": "Champions & Heroes",
+      "question": "Which champion gives the best fleet-wide bonus?"
+    },
+    {
+      "id": 76,
+      "category": "Economy & Resources",
+      "question": "What is the best way to farm credits?"
+    },
+    {
+      "id": 77,
+      "category": "Economy & Resources",
+      "question": "How do I get more alloy?"
+    },
+    {
+      "id": 78,
+      "category": "Economy & Resources",
+      "question": "What is fusion seed used for?"
+    },
+    {
+      "id": 79,
+      "category": "Economy & Resources",
+      "question": "How do I get rare materials?"
+    },
+    {
+      "id": 80,
+      "category": "Economy & Resources",
+      "question": "What building should I upgrade first for F2P?"
+    },
+    {
+      "id": 81,
+      "category": "Economy & Resources",
+      "question": "How do I increase resource production?"
+    },
+    {
+      "id": 82,
+      "category": "Economy & Resources",
+      "question": "What is the fastest way to get flagship blueprints?"
+    },
+    {
+      "id": 83,
+      "category": "Economy & Resources",
+      "question": "Should I spend crystals on resource packs?"
+    },
+    {
+      "id": 84,
+      "category": "Economy & Resources",
+      "question": "How do I get more repair modules?"
+    },
+    {
+      "id": 85,
+      "category": "Economy & Resources",
+      "question": "What is the best mission for farming credits?"
+    },
+    {
+      "id": 86,
+      "category": "Economy & Resources",
+      "question": "Do I need to upgrade refinery for fusion seeds?"
+    },
+    {
+      "id": 87,
+      "category": "Economy & Resources",
+      "question": "How many resource slots should I have?"
+    },
+    {
+      "id": 88,
+      "category": "Economy & Resources",
+      "question": "What is the best use of daily crystals?"
+    },
+    {
+      "id": 89,
+      "category": "Economy & Resources",
+      "question": "Can I trade resources with other players?"
+    },
+    {
+      "id": 90,
+      "category": "Economy & Resources",
+      "question": "How do I save resources efficiently?"
+    },
+    {
+      "id": 91,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "I'm F2P and my ship took major damage, how do I repair it without spending crystals?"
+    },
+    {
+      "id": 92,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "What is the best flagship for a kinetic fleet and which champions should I use with it?"
+    },
+    {
+      "id": 93,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "I have Core 31, should I upgrade to Core 35 or upgrade my flagship first?"
+    },
+    {
+      "id": 94,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "How long does it take to farm fusion seeds for Core 35 if I'm F2P?"
+    },
+    {
+      "id": 95,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "What weapons counter beam ships and which champions boost those weapons?"
+    },
+    {
+      "id": 96,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "My fleet keeps losing to ion ships, what should I change in my fleet composition and champions?"
+    },
+    {
+      "id": 97,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "I just started, what should I prioritize: Energy Core, flagship, or champions?"
+    },
+    {
+      "id": 98,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "What is the complete progression path from Core 31 to Core 40 including all resource requirements?"
+    },
+    {
+      "id": 99,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "I want to build a kinetic fleet, what flagship should I choose, what weapons do I need, and which champions synergize best?"
+    },
+    {
+      "id": 100,
+      "category": "Multi-Intent & Complex Questions",
+      "question": "Compare the total cost and time investment for upgrading Energy Core from 31 to 35 versus upgrading flagship from level 1 to max for F2P players."
+    }
+  ]
+}
