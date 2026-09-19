@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v3.5-seven-layer-reasoning'
+RELEASE='v3.6-progression-aware'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
@@ -122,6 +122,30 @@ def query_domains(q):
     if any(x in ql for x in ['event','glory','killstreak','hunting ground']):
         domains.append('event')
     return domains
+
+SEASON_CONTEXT = {
+    'S1': {'description':'Baseline progression state; all players start here.'},
+    'S2': {'description':'Later progression state; applies after the player/server reaches S2.'},
+    'S3': {'description':'Later progression state; applies after the player/server reaches S3.'}
+}
+
+def season_of_claim(c):
+    raw=str(c.get('Season/Version','')).upper()
+    for season in ('S3','S2','S1'):
+        if season in raw: return season
+    return None
+
+def get_applicable_evidence(claims, player_context=None):
+    if not player_context or not player_context.get('season'):
+        return claims, 'all_seasons'
+    current=str(player_context['season']).upper()
+    if current not in SEASON_CONTEXT:
+        return claims, 'all_seasons'
+    current_claims=[c for c in claims if season_of_claim(c) in (None,current)]
+    transition=[]
+    if current=='S1':
+        transition=[c for c in claims if season_of_claim(c)=='S2' and any(x in c.get('Claim','').lower() for x in ('unlock','requires','available','introduces','level 31','level 32','level 33','level 34','level 35'))]
+    return current_claims+transition, ('S1_with_S2_path' if current=='S1' else current)
 
 def current_scope_relevance(c,current_season='S2'):
     status=str(c.get('Status','')).lower()
@@ -278,12 +302,12 @@ def fallback_answer(question,claims,conflicts=None):
     if conflicts:lines.append('• Uncertainty: a related evidence conflict is preserved for review rather than resolved by assumption.')
     return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected],'uncertainty':'Deterministic fallback used; synthesis model unavailable.'}
 
-def answer(q):
-    critical=relevant_conflicts(q);hits=retrieve(q,10);s=synthesize(q,hits,critical,'answer')
+def answer(q,player_context=None):
+    critical=relevant_conflicts(q);hits=retrieve(q,10);hits,scope=get_applicable_evidence(hits,player_context);s=synthesize(q,hits,critical,'answer')
     if not answer_quality_gate(q,s.get('text',''),hits):
         s=fallback_answer(q,hits,critical)
         s['uncertainty']='Answer-quality gate rejected the synthesis; deterministic evidence-safe answer returned.'
-    return {'question':q,'answer_type':'synthesized_evidence','answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence and passed an evidence-relevance gate. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
+    return {'question':q,'answer_type':'synthesized_evidence','player_context':player_context,'season_scope':scope,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence and passed an evidence-relevance gate. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
 
 class H(BaseHTTPRequestHandler):
     def _json(self,obj,status=200):
