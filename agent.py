@@ -40,12 +40,17 @@ def phrases(s):
     return found
 
 def intent_profile(q):
+    specific=classify_intent(q)
+    if specific=='Fleet Damage/Repair': return 'repair'
+    if specific=='Progression': return 'progression'
+    if specific=='Champions': return 'champions'
+    if specific=='Events': return 'event'
+    if specific=='Economy': return 'economy'
+    if specific=='Combat': return 'combat'
     ql=q.lower()
-    intent='mechanics'
-    if any(x in ql for x in ['best','recommend','should i','which','team','build','strategy']): intent='recommendation'
-    elif any(x in ql for x in ['cost','price','how much','time','hours','days']): intent='calculation'
-    elif any(x in ql for x in ['unlock','requirement','level','upgrade']): intent='progression'
-    return intent
+    if any(x in ql for x in ['best','recommend','should i','which','build','strategy']): return 'recommendation'
+    if any(x in ql for x in ['cost','price','how much','time','hours','days']): return 'calculation'
+    return 'mechanics'
 
 def score(q,c):
     qt=tokens(q)-STOP; ct=tokens(c.get('Claim','')+' '+c.get('Category','')+' '+c.get('Notes',''))
@@ -69,9 +74,39 @@ def score(q,c):
     if intent=='calculation' and any(x in cat for x in ['cost','formula','economy','progress']): s+=1.0
     return s
 
+INTENT_CLASSES = {
+ 'Fleet Damage/Repair':['repair','damaged','destroyed','major damage','minor damage','repair module','repair cabin','repair bay','fix my fleet','heal','recover'],
+ 'Progression':['energy core','level up','unlock','progress','core level','upgrade requirement'],
+ 'Combat':['battle','fight','pvp','gvg','counterattack','command point','beam','kinetic','ionic','ion','style advantage'],
+ 'Economy':['resources','farm','earn','spend','credits','free','f2p'],
+ 'Champions':['champion','hero','team','composition','tier list'],
+ 'Events':['event','glory','killstreak','hunting ground']
+}
+CONSTRAINT_PATTERNS = {
+ 'F2P':['f2p','free to play','ad free','no money','free way','without spending','no spending'],
+ 'Best':['best','optimal','most efficient','priority','prefer'],
+ 'Fast':['fastest','quick','as soon as possible','now','today'],
+ 'Endgame':['late game','endgame','max level','core 30+']
+}
+
+def classify_intent(q):
+    ql=q.lower()
+    # Specific intents must win over broad domains such as Combat/Economy.
+    for intent in ['Fleet Damage/Repair','Progression','Champions','Events','Economy','Combat']:
+        if any(k in ql for k in INTENT_CLASSES[intent]):
+            return intent
+    return 'Unknown'
+
+def extract_constraints(q):
+    ql=q.lower()
+    return [name for name,patterns in CONSTRAINT_PATTERNS.items()
+            if any(p in ql for p in patterns)]
+
 def query_domains(q):
     ql=q.lower()
     domains=[]
+    if classify_intent(q)=='Fleet Damage/Repair': domains.append('damage')
+    
     # Explicit phrase routing prevents unrelated high-frequency terms such as
     # "upgrade" or "best" from dominating a question about repair/damage.
     if any(x in ql for x in ['repair','major damage','minor damage','repair module','repair cabin','auto-repair','auto repair']):
