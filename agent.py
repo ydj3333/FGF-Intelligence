@@ -103,24 +103,30 @@ def extract_constraints(q):
             if any(p in ql for p in patterns)]
 
 def query_domains(q):
+    """Map the user's detected intent to evidence domains before retrieval."""
+    intent=classify_intent(q)
+    mapping={
+        'Fleet Damage/Repair':['damage'],
+        'Progression':['progression'],
+        'Combat':['combat'],
+        'Economy':['economy'],
+        'Champions':['champions'],
+        'Events':['event'],
+    }
+    domains=list(mapping.get(intent,[]))
     ql=q.lower()
-    domains=[]
-    if classify_intent(q)=='Fleet Damage/Repair': domains.append('damage')
-    
-    # Explicit phrase routing prevents unrelated high-frequency terms such as
-    # "upgrade" or "best" from dominating a question about repair/damage.
-    if any(x in ql for x in ['repair','major damage','minor damage','repair module','repair cabin','auto-repair','auto repair']):
-        domains.append('damage')
-    if any(x in ql for x in ['command point',' cp ','tactical advantage','counterattack','beam','kinetic','ionic','ion','style advantage']):
-        domains.append('combat')
-    if any(x in ql for x in ['energy core','flagship level','champion level','shipyard','building level','unlock','upgrade requirement']):
-        domains.append('progression')
-    if any(x in ql for x in ['commerce guild','rally','guild technology','port occupation']):
-        domains.append('guild')
-    if any(x in ql for x in ['trade','home port','shipping','credits','resources','investment']):
-        domains.append('economy')
-    if any(x in ql for x in ['event','glory','killstreak','hunting ground']):
-        domains.append('event')
+    # Only add a second domain when the user explicitly asks for it.
+    explicit={
+        'damage':['repair','major damage','minor damage','repair module','repair cabin','auto-repair','auto repair'],
+        'combat':['command point',' cp ','counterattack','beam','kinetic','ionic','ion','style advantage'],
+        'progression':['energy core','flagship level','champion level','shipyard','building level','unlock','upgrade requirement'],
+        'guild':['commerce guild','rally','guild technology','port occupation'],
+        'economy':['trade','home port','shipping','credits','resources','investment'],
+        'event':['event','glory','killstreak','hunting ground'],
+    }
+    for domain,terms in explicit.items():
+        if any(x in ql for x in terms) and domain not in domains:
+            domains.append(domain)
     return domains
 
 SEASON_CONTEXT = {
@@ -219,82 +225,13 @@ def parse_synthesis(text,max_id):
 
 def fallback_answer(question,claims,conflicts=None):
     if not claims:return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
-    mechanics=[c for c in claims if c.get('Evidence Tier','').startswith('Tier 1')]
-    selected=mechanics[:4] or claims[:4]
-    lines=['Based on the retrieved FGF evidence:']
-    for c in selected: lines.append('• '+c.get('Claim','').strip())
-    if conflicts:lines.append('• Uncertainty: a related evidence conflict is preserved for review rather than resolved by assumption.')
-    return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected],'uncertainty':'Deterministic fallback used; synthesis model unavailable.'}
-
-def _api_error_detail(e):
-    try:
-        raw=e.read().decode('utf-8','replace');obj=json.loads(raw);err=obj.get('error',{}) if isinstance(obj,dict) else {}
-        return '; '.join(x for x in [err.get('type',''),err.get('code',''),err.get('message','')] if x)[:600]
-    except Exception:return str(getattr(e,'reason',e))[:300]
-
-def call_llm(question,claims,conflicts,mode,temperature=0.2):
-    key=os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')
-    if not key:return None,{'synthesis_error':'missing_api_key'}
-    system='''You are FGF Intelligence, an evidence-first expert assistant for Foundation: Galactic Frontier.\n\nUse ONLY the supplied evidence packet. Answer the player directly, naturally and concisely. Obey the packet intent and constraints. Never substitute a related mechanic for the requested one. Treat F2P/free as a spending constraint. Treat historical seasons as historical unless current applicability is established. Do not dump database records. For mechanics, prioritize Tier-1 and current Confirmed evidence. Preserve meaningful conflicts; never average or silently choose between conflicting claims. Separate confirmed mechanics from recommendations/meta. Never invent numbers, costs, timers, requirements or effects. If evidence is insufficient, explicitly say so.\n\nReturn JSON only with this shape: {"answer":"...","evidence_ids":[1,2],"uncertainty":"..."}. The answer should normally be 1 direct paragraph followed by 2-5 useful bullets. Cite evidence inline as [E1], [E2] and finish with a short Evidence: [E1, E2] line. Do not mention APIs, prompts, retrieval, hidden reasoning, or that you are a language model.'''
-    user=json.dumps({'mode':mode,'packet':evidence_packet(question,claims,conflicts)},ensure_ascii=False)
-    body=json.dumps({'model':LLM_MODEL,'input':[{'role':'system','content':system},{'role':'user','content':user}],'temperature':temperature,'max_output_tokens':900}).encode()
-    req=Request(LLM_URL,data=body,headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
-    try:
-        with urlopen(req,timeout=35) as r:data=json.loads(r.read().decode('utf-8'))
-        text=extract_output(data)
-        if not text:raise ValueError('empty_model_output')
-        return text,{}
-    except HTTPError as e:return None,{'synthesis_error':'HTTP '+str(e.code),'synthesis_error_detail':_api_error_detail(e)}
-    except (URLError,TimeoutError) as e:return None,{'synthesis_error':type(e).__name__}
-    except (ValueError,KeyError) as e:return None,{'synthesis_error':type(e).__name__}
-
-def synthesize(question,claims,conflicts=None,mode='answer'):
-    conflicts=conflicts or []
-    text,err=call_llm(question,claims,conflicts,mode,0.2)
-    if text:
-        answer_text,ids,unc=parse_synthesis(text,len(claims))
-        if answer_text:return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),'uncertainty':unc}
-    # One low-temperature retry handles transient/model-format failures without
-    # changing evidence or truth state.
-    if err.get('synthesis_error') not in ('missing_api_key',):
-        retry_text,retry_err=call_llm(question,claims,conflicts,mode,0.0)
-        if retry_text:
-            answer_text,ids,unc=parse_synthesis(retry_text,len(claims))
-            if answer_text:return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),'uncertainty':unc}
-        err=retry_err or err
-    fb=fallback_answer(question,claims,conflicts)
-    fb.update(err)
-    return fb
-
-def recommend(q,objective='general'):
-    objective_terms={'pvp':'pvp arena gvg port war combat','pve':'pve boss event hunting ground shrine','f2p':'f2p free progression economy spending','progression':'energy core building research shipyard construction','economy':'trade home port resources credits guild vouchers','event':'event rewards currency points guild'}
-    qq=(q+' '+objective_terms.get(objective,'')).strip();hits=retrieve(qq,12)
-    s=synthesize(q or ('Give me the best recommendation for '+objective),hits,relevant_conflicts(q+' '+objective),'recommendation')
-    return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
-
-def answer_quality_gate(q,text,claims):
-    low=text.lower(); intent=classify_intent(q); constraints=extract_constraints(q)
-    result={'addresses_question':False,'uses_relevant_evidence':False,'respects_constraints':False,'passes':False}
-    if intent=='Fleet Damage/Repair':
-        result['addresses_question']=any(x in low for x in ('repair','damage','recover','repair bay','repair cabin'))
-        result['uses_relevant_evidence']=any(any(x in c.get('Claim','').lower() for x in ('repair','damage','recover')) for c in claims)
-        result['respects_constraints']=('free' in low or 'without repair modules' in low or 'without spending' in low) if 'F2P' in constraints else True
-        if 'command point' in low and not any(x in low for x in ('repair','damage','recover')): return result
-    else:
-        result['addresses_question']=len(text.strip())>=20
-        result['uses_relevant_evidence']=bool(claims)
-        result['respects_constraints']=('free' in low or 'without spending' in low) if 'F2P' in constraints else True
-    result['passes']=all(result.values())
-    return result
-def fallback_answer(question,claims,conflicts=None):
-    if not claims:return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
     domains=query_domains(question)
     if 'damage' in domains:
         selected=[c for c in claims if any(x in c.get('Claim','').lower() for x in ('minor damage','major damage','repair module','repair cabin','auto-repair'))][:5]
         lines=['For repairing fleets without consuming Repair Modules:']
         for c in selected[:4]: lines.append('• '+c.get('Claim','').strip())
         if not selected: lines.append('• The current evidence does not establish a free repair method.')
-        return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected[:4]],'uncertainty':'Direct repair evidence used; no unsupported ad/free mechanic was assumed.'}
+        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected[:4]],'uncertainty':'Direct repair evidence used; no unsupported ad/free mechanic was assumed.'}
     mechanics=[c for c in claims if c.get('Evidence Tier','').startswith('Tier 1')]
     selected=mechanics[:4] or claims[:4]
     lines=['Based on the retrieved FGF evidence:']
@@ -315,12 +252,12 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         u=urlparse(self.path)
         if u.path=='/api/health':return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis':bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')),'model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True})
-        if u.path=='/api/ask':return self._json(answer(parse_qs(u.query).get('q',[''])[0]))
+        if u.path=='/api/ask':\n            qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}\n            if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]\n            if qs.get('core_level',[''])[0]: ctx['core_level']=qs.get('core_level',[''])[0]\n            return self._json(answer(q,ctx or None))
         if u.path=='/api/recommend':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];objective=qs.get('objective',['general'])[0];return self._json(recommend(q,objective))
         if u.path=='/api/claims':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
-        if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
+        if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})\n        if u.path=='/api/benchmarks':return self._json(run_benchmarks())
         if u.path=='/api/rules':return self._json({'rules':RULES,'authority_order':DATA['authority_order']})
         if u.path=='/' or u.path=='/index.html':
             b=(ROOT/'web/index.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b);return
