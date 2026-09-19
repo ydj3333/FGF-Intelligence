@@ -241,26 +241,54 @@ def exact_cost_question(q):
             ('fusion seed' in ql or 'fusion seeds' in ql or 'core 35' in ql))
 
 def fallback_answer(question,claims,conflicts=None):
+    ql=question.lower()
+
     if exact_cost_question(question):
         exact=[c for c in claims if any(k in c.get('Claim','').lower() for k in ('fusion seed','fusion seeds','cost','core level 35','l35'))]
-        numeric=[c for c in exact if re.search(r'\\b(?:\\d{1,3}(?:,\\d{3})*|\\d+)\\b',c.get('Claim','')) and ('fusion seed' in c.get('Claim','').lower() or 'cost' in c.get('Claim','').lower())]
+        numeric=[c for c in exact if re.search(r'\b(?:\d{1,3}(?:,\d{3})*|\d+)\b',c.get('Claim','')) and ('fusion seed' in c.get('Claim','').lower() or 'cost' in c.get('Claim','').lower())]
         if not numeric:
-            return {'text':'The current evidence does not establish an exact Fusion Seed cost for Energy Core 35. I will not infer or calculate a cost without a sourced level-by-level cost table or direct in-game evidence.','model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in exact[:4]],'uncertainty':'Exact Core 35 Fusion Seed cost is not established in the retrieved evidence.'}
+            return {'text':'The current evidence does not establish an exact Fusion Seed cost for Energy Core 35. I will not infer or substitute another upgrade cost.','model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in exact[:4]],'uncertainty':'Exact Core 35 Fusion Seed cost is not established in the retrieved evidence.'}
 
-    if not claims:return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
-    domains=query_domains(question)
-    if 'damage' in domains:
-        selected=[c for c in claims if any(x in c.get('Claim','').lower() for x in ('minor damage','major damage','repair module','repair cabin','auto-repair'))][:5]
-        lines=['For repairing fleets without consuming Repair Modules:']
-        for c in selected[:4]: lines.append('• '+c.get('Claim','').strip())
-        if not selected: lines.append('• The current evidence does not establish a free repair method.')
-        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected[:4]],'uncertainty':'Direct repair evidence used; no unsupported ad/free mechanic was assumed.'}
+    if not claims:
+        return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
+
+    # Repair questions must answer the player's actual location/action question,
+    # not merely recite the damage taxonomy.
+    if any(k in ql for k in ('repair','where can i repair','where do i repair','repair my fleet','fix my fleet')):
+        repair_claims=[c for c in claims if any(k in c.get('Claim','').lower() for k in
+            ('repair cabin','repair bay','repair module','minor damage','major damage','repair via formation'))]
+        location=[c for c in repair_claims if any(k in c.get('Claim','').lower() for k in
+            ('repair cabin','repair bay','repair via formation'))]
+        minor=[c for c in repair_claims if 'minor damage' in c.get('Claim','').lower() and
+               ('auto' in c.get('Claim','').lower() or 'recover' in c.get('Claim','').lower())]
+        major=[c for c in repair_claims if 'major damage' in c.get('Claim','').lower() and
+               ('repair module' in c.get('Claim','').lower() or 'repair cabin' in c.get('Claim','').lower())]
+        selected=[]
+        for group in (location,minor,major,repair_claims):
+            for c in group:
+                if c not in selected:selected.append(c)
+                if len(selected)>=4:break
+            if len(selected)>=4:break
+
+        lines=['For fleet repair, the evidence distinguishes Minor Damage from Major Damage:']
+        if any('repair cabin' in c.get('Claim','').lower() for c in location):
+            lines.append('• Major Damage is repaired through the Repair Cabin; the Repair Cabin repairs craft with Major Damage.')
+        elif any('repair bay' in c.get('Claim','').lower() for c in location):
+            lines.append('• Major Damage sends the damaged craft to the Repair Bay, where repair requires Repair Modules.')
+        if minor:
+            lines.append('• Minor Damage does not require Repair Modules: it can recover/auto-repair after leaving combat.')
+        if not location and not minor:
+            lines.append('• The retrieved evidence does not establish the exact repair location.')
+        if any(x in ql for x in ('without repair modules','without consuming','ad free','free','no spending')):
+            lines.append('• The evidence supports the Minor Damage auto-recovery path as the no-Repair-Module option; it does not establish a separate ad-based repair mechanic.')
+        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected[:4]],'uncertainty':'Direct repair evidence used; no unsupported repair mechanic was assumed.'}
+
     mechanics=[c for c in claims if c.get('Evidence Tier','').startswith('Tier 1')]
     selected=mechanics[:4] or claims[:4]
     lines=['Based on the retrieved FGF evidence:']
     for c in selected: lines.append('• '+c.get('Claim','').strip())
     if conflicts:lines.append('• Uncertainty: a related evidence conflict is preserved for review rather than resolved by assumption.')
-    return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected],'uncertainty':'Deterministic fallback used; synthesis model unavailable.'}
+    return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected],'uncertainty':'Deterministic fallback used; synthesis model unavailable.'}
 
 def _api_error_detail(e):
     try:
