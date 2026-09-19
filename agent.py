@@ -69,20 +69,47 @@ def score(q,c):
     if intent=='calculation' and any(x in cat for x in ['cost','formula','economy','progress']): s+=1.0
     return s
 
+def query_domains(q):
+    ql=q.lower()
+    domains=[]
+    # Explicit phrase routing prevents unrelated high-frequency terms such as
+    # "upgrade" or "best" from dominating a question about repair/damage.
+    if any(x in ql for x in ['repair','major damage','minor damage','repair module','repair cabin','auto-repair','auto repair']):
+        domains.append('damage')
+    if any(x in ql for x in ['command point',' cp ','tactical advantage','counterattack','beam','kinetic','ionic','ion','style advantage']):
+        domains.append('combat')
+    if any(x in ql for x in ['energy core','flagship level','champion level','shipyard','building level','unlock','upgrade requirement']):
+        domains.append('progression')
+    if any(x in ql for x in ['commerce guild','rally','guild technology','port occupation']):
+        domains.append('guild')
+    if any(x in ql for x in ['trade','home port','shipping','credits','resources','investment']):
+        domains.append('economy')
+    if any(x in ql for x in ['event','glory','killstreak','hunting ground']):
+        domains.append('event')
+    return domains
+
+def claim_relevance(q,c):
+    ql=q.lower(); cl=(c.get('Claim','')+' '+c.get('Category','')+' '+c.get('Notes','')).lower()
+    domains=query_domains(q)
+    if domains:
+        domain_match=any(term in cl for d in domains for term in DOMAIN_TERMS.get(d,[]))
+        # Category/domain mismatch is a hard penalty, not a soft preference.
+        cat=c.get('Category','').lower()
+        if not domain_match and not any(x in cat for x in domains):
+            return False
+    return True
+
 def retrieve(q,limit=10):
     ranked=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True)
-    hits=[c for s,c in ranked if s>0.85 and c.get('Status') not in ('Rejected','Superseded')]
-    out=[];seen=set(); categories=set()
-    # Diversity-aware selection: don't spend the whole evidence packet on
-    # near-duplicate claims from one category.
+    hits=[c for s,c in ranked
+          if s>0.85 and c.get('Status') not in ('Rejected','Superseded')
+          and claim_relevance(q,c)]
+    out=[];seen=set();categories=set()
     for c in hits:
         key=(c.get('Category',''),c.get('Claim','').lower()[:120])
         if key in seen:continue
         seen.add(key)
         cat=c.get('Category','')
-        if len(out)>=4 and cat in categories and len(out)<limit:
-            # still allow it later if it is substantially stronger
-            pass
         out.append(c);categories.add(cat)
         if len(out)>=limit:break
     return out
