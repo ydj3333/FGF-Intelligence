@@ -1,0 +1,32 @@
+{
+  "run_name": "FGF V4 — Global Source Discovery — 6h",
+  "acquired_at": "2026-09-20",
+  "scope": "Whole game: S1/new-server baseline plus S2 overlays; S3/future searched without inference",
+  "policy": {
+    "discovery": "free/native first",
+    "metered_acquisition": "none",
+    "canonical_promotion": false,
+    "tier1_auto_promotion": false,
+    "season_model": "season is player/server state; S1 evidence remains valid for S1 players"
+  },
+  "meaningful_candidates": [
+    {"topic":"Season 2 entry and preservation","scope":"S2","tier":"T2","confidence":"high","source":"official Season 2 FAQ social mirror","status":"candidate"},
+    {"topic":"Season 2 seasonal resources","scope":"S2","tier":"T2","confidence":"high","source":"official Season 2 FAQ social mirror","status":"candidate"},
+    {"topic":"Combat Lab rules","scope":"S2","tier":"T2","confidence":"high","source":"official social post mirror","status":"candidate"},
+    {"topic":"Shared Moonlight rules","scope":"S1/S2 server rollout","tier":"T2","confidence":"high","source":"official social post mirror","status":"candidate"},
+    {"topic":"S2 server-specific event calendar","scope":"S2","tier":"T2","confidence":"high","source":"official X mirror","status":"candidate"},
+    {"topic":"Repair button and Energy Core leaderboard","scope":"S1/S2","tier":"T2","confidence":"high","source":"official App Store version 1.1.153","status":"candidate"},
+    {"topic":"Ruins Raiders cross-server","scope":"S1/S2","tier":"T2","confidence":"high","source":"official App Store version 1.1.153","status":"candidate"},
+    {"topic":"S2 Sivana/Ascendancy/magnetic storms","scope":"S2","tier":"T3","confidence":"medium","source":"third-party press-release coverage","status":"candidate"}
+  ],
+  "cross_checks": {
+    "S2_launch": "confirmed by multiple official-social/store/third-party sources for Sep 14 2026 initial rollout",
+    "S2_servers": "official FAQ says first 1-16; later social posts use 1001-1016 mapping; retain both until server-label normalization is formally resolved",
+    "S3_future": "searched; no reliable game-specific primary evidence found in this cycle; no claims inferred",
+    "Fandom": "search surfaced robots restriction; no content promoted",
+    "Discord": "no accessible primary Discord material captured in this cycle",
+    "YouTube": "relevant current videos surfaced but not promoted without deeper acquisition",
+    "Reddit": "no high-confidence new mechanic evidence retained in this cycle"
+  },
+  "governance": "All new records are candidate evidence only and require cross-check/admin review before canonical publication."
+}
