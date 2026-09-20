@@ -1,29 +1,30 @@
 {
   "run_name": "FGF V4 — Global Source Discovery — 6h",
   "acquired_at": "2026-09-20",
-  "scope": "Whole game: S1/new-server baseline plus S2 overlays; S3/future searched without inference",
-  "policy": {"discovery":"free/native first","metered_acquisition":"none","canonical_promotion":false,"tier1_auto_promotion":false,"season_model":"season is player/server state; S1 evidence remains valid for S1 players"},
+  "scope": "Whole game: S1/new-server baseline plus S2/S3/future overlays",
+  "policy": {"discovery":"free/native first","metered_acquisition":"none","canonical_promotion":false,"tier1_auto_promotion":false,"deduplication":"before deeper extraction"},
   "meaningful_candidates": [
-    {"topic":"Energy Core 31-35 / Fusion Seed rollout","scope":"late-S1/new-server","tier":"T2","confidence":"high","source":"official Sep 9 article","status":"candidate"},
-    {"topic":"Season 2 The Usurper","scope":"S2","tier":"T2/T3","confidence":"medium-high","source":"official/current secondary cross-check","status":"candidate"},
-    {"topic":"S2 Sivana / Ascendancy Court / Magnetic Storms & Resistance","scope":"S2","tier":"T3 pending direct corroboration","confidence":"medium","source":"Saving Content / RPG Gamers","status":"under_review"},
-    {"topic":"Combat Lab testing","scope":"S2 testing / Servers 1001-1016","tier":"T2/T3","confidence":"high","source":"official social/store + patch tracking","status":"candidate"},
-    {"topic":"Ruins Raiders cross-server","scope":"S1/S2 depending server age","tier":"T2/T3","confidence":"high","source":"official store/patch coverage","status":"candidate"},
-    {"topic":"Glory Arena defensive-lineup carryover and pre-settlement lockout","scope":"S1/S2","tier":"T3 pending direct official page capture","confidence":"medium","source":"Sep 14 patch tracking","status":"candidate"},
-    {"topic":"Shared Moonlight","scope":"server rollout Sep 15-27","tier":"T2","confidence":"high","source":"official social mirror / current coverage","status":"candidate"},
-    {"topic":"Steam availability","scope":"whole game / future platform launch","tier":"T2","confidence":"high","source":"official Steam store + official portal","status":"candidate"}
+    {"topic":"Energy Core 31-35 / Fusion Seed rollout","scope":"S1/new-server","tier":"T2/T1 primary source","confidence":"high","source":"https://www.foundation.game/en","status":"candidate"},
+    {"topic":"Shared Moonlight Lunar Ruins excavation rule","scope":"S2; Servers 1001-1016 Sep 15-20; 1017-1247 Sep 21-26","tier":"T2","confidence":"medium","source":"https://twstalker.com/FoundationGF_EN","status":"candidate"},
+    {"topic":"Interstellar Migration early event","scope":"S2/new-server overlay; Servers 1017-1112 Sep 22-28","tier":"T3","confidence":"medium","source":"https://murpo.com/","status":"candidate; official confirmation required"},
+    {"topic":"Combat Lab TPS / permanent Tower Defense / United Frontline / gold Beam Champion preview","scope":"S2/future overlay","tier":"T3","confidence":"low","source":"https://murpo.com/","status":"preview only"},
+    {"topic":"v1.1.139 migration UI","scope":"S1/migration baseline; version 1.1.139.234996","tier":"T3","confidence":"medium","source":"https://apkpure.net/foundation-galactic-frontier/com.games.foundation/download/1.1.139.234996","status":"candidate; verify against official patch notes"},
+    {"topic":"Steam combat craft/platform status","scope":"global/future PC platform","tier":"T1/T2","confidence":"high","source":"https://store.steampowered.com/app/4223760/Foundation_Galactic_Frontier/","status":"candidate; release date still unconfirmed"}
   ],
   "cross_checks": {
-    "S1_baseline":"official news index and Home Port guide remain available; no replacement of S1 mechanics",
-    "Core35":"official Sep 9 article confirms Fusion Seed/Epoch path, L35 cap, L33 fourth Battle Queue; exact individual upgrade costs still not inferred",
-    "S2_launch":"current secondary reports Sep 14 initial S2 rollout; server-label discrepancy remains",
-    "S2_servers":"some sources use 1-16 while current testing material uses 1001-1016; preserve both until normalization",
-    "S3_future":"searched; no reliable game-specific primary evidence found this cycle; no claims inferred",
-    "Fandom":"robots/access restriction prevented reliable content acquisition; no promotion",
-    "Discord":"no accessible primary Discord material captured",
-    "YouTube":"current relevant material was searched but not deeply acquired; no promotion without direct evidence",
-    "Reddit":"search was noisy and yielded no high-confidence new mechanic evidence",
-    "Steam":"store page still says Coming Soon; no launch date inferred"
+    "S1_baseline":"official portal continues to expose Core35/Epoch of Fusion Seed and established guides; S1 baseline retained",
+    "Core35":"official portal confirms Epoch of Fusion Seed, LV35 Buildings and 4th Battle Queue; no individual upgrade costs inferred",
+    "S2_server_scope":"official FAQ/social material uses Servers 1-16 for initial S2 eligibility/rollout language while current testing/social mirrors use Servers 1001-1016; conflict preserved rather than normalized by assumption",
+    "SharedMoonlight":"current social mirror reports Grand Prize selection per Lunar Ruins layer, immediate layer advance on finding the prize, and retained excavation progress when changing the prize",
+    "S2_future":"third-party community source reports Sep 22-28 migration for 1017-1112 and previews future modes/champion; no canonical promotion",
+    "S3_future":"searched separately; no reliable game-specific primary evidence surfaced this cycle; no inference",
+    "Fandom":"access/restriction prevented reliable acquisition; no promotion",
+    "Discord":"no directly accessible primary material captured",
+    "YouTube":"searched; no deep acquisition necessary this cycle",
+    "Reddit":"searched; no sufficiently strong new mechanic evidence survived relevance/authority filtering",
+    "Steam":"official store still says Coming Soon; no launch date inferred",
+    "version_history":"v1.1.139 record captured as third-party version evidence; migration review UI and Beacon Fest noted"
   },
-  "governance": "All new records are candidate evidence only and require cross-check/admin review before canonical publication. Conflicts and source authority are preserved."
+  "persistence": {"supabase_project":"qdoixzfkkmvzjfkhzups","candidate_records_added":4,"evidence_snapshots_added":5,"canonical_promotions":0,"conflicts_recorded":1,"ingestion_run_status":"completed"},
+  "governance": "All new records are candidate evidence only and require cross-check/admin review before canonical publication. Conflicts, scope, source authority, publication/acquisition dates and version metadata are preserved."
 }
