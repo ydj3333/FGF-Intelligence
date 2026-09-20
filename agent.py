@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v4.0.2-benchmark-suite'
+RELEASE='v4.1.0-answer-quality-gate'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 try:
@@ -195,12 +195,60 @@ def current_scope_relevance(c,current_season='S2'):
     status=str(c.get('Status','')).lower()
     return status not in ('rejected','superseded')
 
+def topic_requirements(q):
+    """Return hard topic requirements for high-risk question classes.
+    These requirements prevent semantically adjacent evidence from becoming
+    a substitute answer (for example Flagship costs answering an Energy Core
+    cost question).
+    """
+    ql=q.lower()
+    req=[]
+    if ('fusion seed' in ql or 'fusion seeds' in ql or
+        re.search(r'\\b(?:energy\\s+)?core\\s*(?:3[1-9]|[4-9]0?)\\b', ql) or
+        'energy core' in ql):
+        req.append('energy_core')
+    if any(x in ql for x in ('repair','damaged','destroyed','repair module','repair cabin','repair bay','fix my fleet','recover')):
+        req.append('repair')
+    if any(x in ql for x in ('champion','champions','hero','heroes','ground team','composition','tier list')):
+        req.append('champions')
+    if any(x in ql for x in ('flagship','blueprint','core component','flagship component')):
+        req.append('flagship')
+    if any(x in ql for x in ('credits','resource','resources','farm','earn','spend','economy','trade')):
+        req.append('economy')
+    return list(dict.fromkeys(req))
+
 def claim_relevance(q,c):
-    ql=q.lower(); cl=(c.get('Claim','')+' '+c.get('Category','')+' '+c.get('Notes','')).lower()
+    ql=q.lower()
+    cl=(c.get('Claim','')+' '+c.get('Category','')+' '+c.get('Notes','')).lower()
     domains=query_domains(q)
+    requirements=topic_requirements(q)
+
+    # Hard entity/topic gates first. These are intentionally conservative:
+    # when a question asks for an exact topic, adjacent evidence is rejected.
+    for req in requirements:
+        if req=='energy_core':
+            if not any(x in cl for x in ('energy core','core level','core 31','core 32','core 33','core 34','core 35','fusion seed','fusion seeds','refinery')):
+                return False
+            if any(x in cl for x in ('flagship blueprint','flagship component','champion fragment')) and not any(x in cl for x in ('energy core','core level','fusion seed','fusion seeds')):
+                return False
+        elif req=='repair':
+            if not any(x in cl for x in ('repair','minor damage','major damage','recover','destroyed')):
+                return False
+        elif req=='champions':
+            if not any(x in cl for x in ('champion','hero','ground team','composition','tier list')):
+                return False
+            # Generic Energy-Type mechanics are not champion recommendations.
+            if any(x in ql for x in ('best','optimal','recommended')) and not any(x in cl for x in ('champion','hero','ground team','composition','tier list')):
+                return False
+        elif req=='flagship':
+            if not any(x in cl for x in ('flagship','blueprint','core component')):
+                return False
+        elif req=='economy':
+            if not any(x in cl for x in ('credit','resource','farm','earn','spend','economy','trade','shipping','home port')):
+                return False
+
     if domains:
         domain_match=any(term in cl for d in domains for term in DOMAIN_TERMS.get(d,[]))
-        # Category/domain mismatch is a hard penalty, not a soft preference.
         cat=c.get('Category','').lower()
         if not domain_match and not any(x in cat for x in domains):
             return False
@@ -386,18 +434,83 @@ def recommend(q,objective='general'):
     s=synthesize(q or ('Give me the best recommendation for '+objective),hits,relevant_conflicts(q+' '+objective),'recommendation')
     return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
 
-def answer_quality_gate(q,text,claims):
-    low=text.lower(); intent=classify_intent(q); constraints=extract_constraints(q)
-    result={'addresses_question':False,'uses_relevant_evidence':False,'respects_constraints':False,'passes':False}
+def answer_quality_gate(q,text,claims,evidence_used=None):
+    """Final pre-display validation. A fluent answer is not accepted unless
+    its topic, evidence, constraints and abstention behavior align with the
+    actual question.
+    """
+    low=text.lower()
+    intent=classify_intent(q)
+    constraints=extract_constraints(q)
+    evidence_used=evidence_used or []
+    result={
+        'addresses_question':False,
+        'uses_relevant_evidence':False,
+        'respects_constraints':False,
+        'evidence_ids_valid':False,
+        'no_unrelated_substitution':True,
+        'passes':False
+    }
+
+    # Evidence IDs are optional for legacy fallback answers, but if present
+    # they must point inside the packet and to claims that survive the same
+    # relevance gate as retrieval.
+    valid_ids=[]
+    for x in evidence_used:
+        try:
+            n=int(x)
+            if 1 <= n <= len(claims): valid_ids.append(n)
+        except (TypeError,ValueError):
+            pass
+    result['evidence_ids_valid']=(not evidence_used) or bool(valid_ids)
+    used_claims=[claims[n-1] for n in valid_ids]
+    if used_claims:
+        result['uses_relevant_evidence']=all(claim_relevance(q,c) for c in used_claims)
+    else:
+        result['uses_relevant_evidence']=bool(claims) and any(claim_relevance(q,c) for c in claims)
+
+    requirements=topic_requirements(q)
+
     if intent=='Fleet Damage/Repair':
-        result['addresses_question']=any(x in low for x in ('repair','damage','recover','repair bay','repair cabin'))
-        result['uses_relevant_evidence']=any(any(x in c.get('Claim','').lower() for x in ('repair','damage','recover')) for c in claims)
-        result['respects_constraints']=('free' in low or 'without repair modules' in low or 'without spending' in low) if 'F2P' in constraints else True
-        if 'command point' in low and not any(x in low for x in ('repair','damage','recover')): return result
+        result['addresses_question']=any(x in low for x in ('repair','damage','recover','repair bay','repair cabin','repair module'))
+        if 'F2P' in constraints:
+            result['respects_constraints']=any(x in low for x in ('free','without repair modules','without spending','no-cost','no cost'))
+        else:
+            result['respects_constraints']=True
+        # CP is not a repair answer unless the answer also clearly explains it
+        # only as prevention/context; it must never replace the repair response.
+        if 'command point' in low and not any(x in low for x in ('repair','damage','recover')):
+            result['no_unrelated_substitution']=False
+    elif intent=='Champions':
+        result['addresses_question']=any(x in low for x in ('champion','hero','team','composition'))
+        result['respects_constraints']=('best' in low or 'recommended' in low or 'evidence' in low) if 'Best' in constraints else True
     else:
         result['addresses_question']=len(text.strip())>=20
-        result['uses_relevant_evidence']=bool(claims)
-        result['respects_constraints']=('free' in low or 'without spending' in low) if 'F2P' in constraints else True
+        result['respects_constraints']=True
+
+    # Exact-cost questions are high-risk: exact cost OR explicit evidence
+    # insufficiency. Never accept an answer that substitutes another system's
+    # cost.
+    if exact_cost_question(q):
+        explicit_abstention=any(x in low for x in (
+            'not established','does not establish','do not have the exact',
+            'don’t have the exact','not in my evidence','insufficient evidence',
+            'cannot establish','not available in the evidence'
+        ))
+        numeric_core_claim=any(
+            re.search(r'\\b\\d{1,3}(?:,\\d{3})*\\b', c.get('Claim',''))
+            and any(x in c.get('Claim','').lower() for x in ('fusion seed','fusion seeds','core 35','core level'))
+            for c in used_claims
+        )
+        result['addresses_question']=explicit_abstention or numeric_core_claim
+        if any(x in low for x in ('flagship blueprint','flagship cost','flagship component','champion fragment')):
+            result['no_unrelated_substitution']=False
+        result['respects_constraints']=True
+
+    # A topic gate is mandatory for all high-risk questions.
+    if requirements and not any(claim_relevance(q,c) for c in claims):
+        result['uses_relevant_evidence']=False
+
     result['passes']=all(result.values())
     return result
 def run_benchmark_suite_100(start=0,count=20):
@@ -445,6 +558,77 @@ def run_benchmark_suite_100(start=0,count=20):
         'note':'This suite measures routing/retrieval readiness. It does not declare unsupported game facts true; synthesis/abstention quality is evaluated separately.'
     }
 
+def run_quality_benchmarks():
+    tests=[
+        {
+            'id':'Q01',
+            'question':"what's the best ways to repair your fleets ad free way",
+            'must_intent':'Fleet Damage/Repair',
+            'must_constraints':['F2P','Best'],
+            'must_contain':['repair'],
+            'must_not_contain':['command points']
+        },
+        {
+            'id':'Q02',
+            'question':'How do I repair my fleet?',
+            'must_intent':'Fleet Damage/Repair',
+            'must_constraints':[],
+            'must_contain':['repair'],
+            'must_not_contain':[]
+        },
+        {
+            'id':'Q03',
+            'question':'How much does Core 35 cost in fusion seeds?',
+            'must_intent':'Progression',
+            'must_constraints':[],
+            'must_contain':['core 35','fusion seed'],
+            'must_not_contain':['flagship blueprint','flagship cost']
+        },
+        {
+            'id':'Q04',
+            'question':'best heroes for kinetic ship',
+            'must_intent':'Champions',
+            'must_constraints':['Best'],
+            'must_contain':['champion'],
+            'must_not_contain':['5% damage bonus']
+        },
+        {
+            'id':'Q05',
+            'question':'What does Kinetic counter?',
+            'must_intent':'Combat',
+            'must_constraints':[],
+            'must_contain':[],
+            'must_not_contain':['repair cabin']
+        }
+    ]
+    rows=[]
+    for t in tests:
+        q=t['question']
+        hits=retrieve(q,10)
+        s=synthesize(q,hits,relevant_conflicts(q),'benchmark')
+        gate=answer_quality_gate(q,s.get('text',''),hits,s.get('evidence_used',[]))
+        text_out=s.get('text','').lower()
+        rows.append({
+            'id':t['id'],
+            'question':q,
+            'intent':classify_intent(q),
+            'intent_ok':classify_intent(q)==t['must_intent'],
+            'constraints':extract_constraints(q),
+            'constraints_ok':all(x in extract_constraints(q) for x in t['must_constraints']),
+            'quality_gate':gate,
+            'answer':s.get('text',''),
+            'must_contain_ok':all(x in text_out for x in t['must_contain']),
+            'must_not_contain_ok':all(x not in text_out for x in t['must_not_contain']),
+            'passed':(
+                classify_intent(q)==t['must_intent'] and
+                all(x in extract_constraints(q) for x in t['must_constraints']) and
+                gate.get('passes',False) and
+                all(x in text_out for x in t['must_contain']) and
+                all(x not in text_out for x in t['must_not_contain'])
+            )
+        })
+    return {'version':RELEASE,'total':len(rows),'passed':sum(1 for x in rows if x['passed']),'failed':sum(1 for x in rows if not x['passed']),'results':rows}
+
 def run_benchmarks():
     tests=[
         ("what's the best ways to repair your fleets ad free way","Fleet Damage/Repair",["F2P","Best"],["repair","damage"]),
@@ -464,9 +648,13 @@ def run_benchmarks():
 
 def answer(q,player_context=None):
     critical=relevant_conflicts(q);hits=retrieve(q,10);hits,scope=get_applicable_evidence(hits,player_context);s=synthesize(q,hits,critical,'answer')
-    if not answer_quality_gate(q,s.get('text',''),hits):
+    gate=answer_quality_gate(q,s.get('text',''),hits,s.get('evidence_used',[]))
+    if not gate['passes']:
         s=fallback_answer(q,hits,critical)
+        s['quality_gate']=gate
         s['uncertainty']='Answer-quality gate rejected the synthesis; deterministic evidence-safe answer returned.'
+    else:
+        s['quality_gate']=gate
     return {'question':q,'answer_type':'synthesized_evidence','player_context':player_context,'season_scope':scope,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence and passed an evidence-relevance gate. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
 
 class H(BaseHTTPRequestHandler):
@@ -474,7 +662,9 @@ class H(BaseHTTPRequestHandler):
         b=json.dumps(obj,ensure_ascii=False).encode();self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b)
     def do_GET(self):
         u=urlparse(self.path)
-        if u.path=='/api/health':return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis':bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')),'model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True})
+        if u.path=='/api/health':
+            configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':'configured_not_runtime_verified' if configured else 'missing_api_key','model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
@@ -486,6 +676,7 @@ class H(BaseHTTPRequestHandler):
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
         if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
         if u.path=='/api/benchmarks':return self._json(run_benchmarks())
+        if u.path=='/api/benchmarks/quality':return self._json(run_quality_benchmarks())
         if u.path=='/api/benchmarks/100':
             qs=parse_qs(u.query);start=int(qs.get('start',['0'])[0]);count=int(qs.get('count',['20'])[0]);return self._json(run_benchmark_suite_100(start,count))
         if u.path=='/api/rules':return self._json({'rules':RULES,'authority_order':DATA['authority_order']})
