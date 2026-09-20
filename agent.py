@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v4.0-intent-sovereign'
+RELEASE='v4.0.2-benchmark-suite'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
@@ -380,6 +380,46 @@ def answer_quality_gate(q,text,claims):
         result['respects_constraints']=('free' in low or 'without spending' in low) if 'F2P' in constraints else True
     result['passes']=all(result.values())
     return result
+def run_benchmark_suite_100():
+    suite=json.loads((ROOT/'data/benchmarks_v4_100.json').read_text(encoding='utf-8'))
+    category_intent={
+        'Combat & Fleet Mechanics':'Combat',
+        'Fleet Repair & Recovery':'Fleet Damage/Repair',
+        'Energy Core & Progression':'Progression',
+        'Flagship & Blueprints':'Progression',
+        'Champions & Heroes':'Champions',
+        'Economy & Resources':'Economy',
+        'Multi-Intent & Complex Questions':'Multi-Intent'
+    }
+    rows=[]
+    for item in suite['questions']:
+        q=item['question']
+        expected=category_intent[item['category']]
+        detected=classify_intent(q)
+        constraints=extract_constraints(q)
+        hits=retrieve(q,8)
+        rows.append({
+            'id':item['id'],
+            'category':item['category'],
+            'question':q,
+            'expected_intent_family':expected,
+            'detected_intent':detected,
+            'intent_match':(expected=='Multi-Intent' or detected==expected),
+            'constraints':constraints,
+            'evidence_count':len(hits),
+            'top_evidence':hits[:3],
+            'evidence_retrieved':bool(hits)
+        })
+    return {
+        'version':RELEASE,
+        'suite':suite['title'],
+        'total':len(rows),
+        'intent_matches':sum(1 for x in rows if x['intent_match']),
+        'evidence_retrieved':sum(1 for x in rows if x['evidence_retrieved']),
+        'results':rows,
+        'note':'This suite measures routing/retrieval readiness. It does not declare unsupported game facts true; synthesis/abstention quality is evaluated separately.'
+    }
+
 def run_benchmarks():
     tests=[
         ("what's the best ways to repair your fleets ad free way","Fleet Damage/Repair",["F2P","Best"],["repair","damage"]),
@@ -421,6 +461,7 @@ class H(BaseHTTPRequestHandler):
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
         if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
         if u.path=='/api/benchmarks':return self._json(run_benchmarks())
+        if u.path=='/api/benchmarks/100':return self._json(run_benchmark_suite_100())
         if u.path=='/api/rules':return self._json({'rules':RULES,'authority_order':DATA['authority_order']})
         if u.path=='/' or u.path=='/index.html':
             b=(ROOT/'web/index.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b);return
