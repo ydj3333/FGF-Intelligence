@@ -462,6 +462,9 @@ class KnowledgeAnalyzer:
             "average_confidence": round(
                 sum(a.confidence_score for a in self.analyses.values()) / total, 4
             ),
+            "conflict_count": conflict_count,
+            "superseded_count": superseded_count,
+            "current_count": current_count,
         }
 
     def export_report(self) -> Dict:
