@@ -1,6 +1,6 @@
 {
   "schema_version": "4.1",
-  "last_reviewed": "2026-09-19",
+  "last_reviewed": "2026-09-20",
   "project_name": "FGF Intelligence",
   "target": "0.01% FGF intelligence standard",
   "operating_principle": "Monitor the whole game, not a single season. S1 is the baseline for new servers; S2 and later seasons are server/version-scoped overlays. Every acquisition cycle checks the global source families; season-specific findings are tagged, never generalized.",
@@ -187,11 +187,12 @@
   "monitoring": {
     "name": "FGF V4 — Global Source Discovery — 6h",
     "provider": "Automation + free/native discovery layer",
-    "status": "Firecrawl recurring monitor disabled to protect zero-cost target",
-    "cadence": "every 6 hours",
+    "status": "Daily ChatGPT automation active; paid Firecrawl recurring monitor disabled by default",
+    "cadence": "daily",
     "timezone": "Asia/Kolkata",
-    "scope": "all FGF seasons/server states; mechanics, progression, resource/Power formulas, events, buildings, Champions, Flagships, Technology, economy, PvP, ports, bugs, fixes, patches, guides, testing, official announcements, social, Reddit, Discord, YouTube/videos/playlists, images and store updates",
+    "scope": "all FGF seasons/server states; official sources first, then strong community sources; deduplicate, classify, cross-check and flag admin review",
     "paid_firecrawl_estimated_monthly_credits": 0,
-    "budget_rule": "Keep recurring acquisition at zero paid credits by default. Use Firecrawl/TinyFish only for targeted deep acquisition when a source cannot be handled by free/native discovery; record any metered use in the control log before scaling it."
+    "budget_rule": "Keep recurring acquisition at zero paid credits by default. Use Firecrawl/TinyFish only for targeted deep acquisition when a source cannot be handled by free/native discovery; record any metered use in the control log before scaling it.",
+    "automation": "FGF Daily Intelligence Check"
   }
 }
