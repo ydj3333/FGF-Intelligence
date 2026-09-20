@@ -9,7 +9,7 @@ from knowledge_analyzer import KnowledgeAnalyzer
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v5.0.0-player-state'
+RELEASE='v5.1.0-event-calendar'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -116,7 +116,7 @@ DOMAIN_TERMS={
  'combat':['command points','style advantage','beam','kinetic','ion','war frenzy','counterattack'],
  'guild':['commerce guild','rally','guild technology','port occupation'],
  'economy':['trade shipping','home port','credits','resources','investment'],
- 'event':['glory','hunting ground','killstreak','event','arms race']
+ 'event':['glory','hunting ground','killstreak','event','arms race','shared moonlight','shadow moonlight','moonlight battlepass','bingo bash','lunar soil','moonsoil','moonlit treasures','full moon charge-up','calendar','schedule','weekday','monday','tuesday','wednesday','thursday','friday','saturday','sunday']
 }
 STOP={'what','when','where','how','does','do','is','are','the','a','an','to','of','for','and','or','i','my','you','your','can','has','have','with','on','in'}
 
@@ -267,6 +267,29 @@ def current_scope_relevance(c,current_season='S2'):
     status=str(c.get('Status','')).lower()
     return status not in ('rejected','superseded')
 
+def is_shared_moonlight_question(q):
+    ql=q.lower()
+    return any(x in ql for x in (
+        'shared moonlight','shadow moonlight','moonlight event',
+        'moonlight battlepass','moonsoil','lunar soil','moonlit treasures',
+        'full moon charge-up','bingo bash'
+    ))
+
+def is_event_schedule_question(q):
+    ql=q.lower()
+    schedule_terms=('which day','what day','weekday','schedule','calendar','monday','tuesday',
+                    'wednesday','thursday','friday','saturday','sunday','daily rotation',
+                    'day-by-day','day by day','when is','what is on')
+    return is_shared_moonlight_question(q) and any(x in ql for x in schedule_terms)
+
+def shared_moonlight_schedule_claims(claims):
+    out=[]
+    for c in claims:
+        text=(c.get('Claim','')+' '+c.get('Notes','')).lower()
+        if 'shared moonlight' in text and any(x in text for x in ('september 15','september 21','calendar','server')):
+            out.append(c)
+    return out
+
 def topic_requirements(q):
     """Return hard topic requirements for high-risk question classes.
     These requirements prevent semantically adjacent evidence from becoming
@@ -295,6 +318,14 @@ def claim_relevance(q,c):
     domains=query_domains(q)
     requirements=topic_requirements(q)
 
+    if is_event_schedule_question(q):
+        result['addresses_question']=(
+            any(x in low for x in ('september 15','september 21','september 27','server 1001','server 1017','in-game calendar','not established','not available'))
+        )
+        result['respects_constraints']=True
+        if any(x in low for x in ('speedup','computational component')) and not any(x in low for x in ('not established','not available','calendar')):
+            result['no_unrelated_substitution']=False
+
     # Hard entity/topic gates first. These are intentionally conservative:
     # when a question asks for an exact topic, adjacent evidence is rejected.
     for req in requirements:
@@ -317,6 +348,9 @@ def claim_relevance(q,c):
                 return False
         elif req=='economy':
             if not any(x in cl for x in ('credit','resource','farm','earn','spend','economy','trade','shipping','home port')):
+                return False
+        elif req=='shared_moonlight':
+            if not any(x in cl for x in ('shared moonlight','moonlight','moonsoil','lunar soil','moonlit treasures','bingo bash','full moon charge-up')):
                 return False
 
     if domains:
@@ -388,6 +422,27 @@ def exact_cost_question(q):
 
 def fallback_answer(question,claims,conflicts=None):
     ql=question.lower()
+
+    # Event-calendar questions get a dedicated deterministic path. This prevents
+    # generic event claims (or unrelated Monday mechanics) from being presented
+    # as a day-by-day Shared Moonlight schedule when no such evidence exists.
+    if is_event_schedule_question(question):
+        schedule=shared_moonlight_schedule_claims(claims)
+        lines=['Shared Moonlight schedule (verified current evidence):']
+        for c in schedule:
+            claim=c.get('Claim','').strip()
+            if claim:
+                lines.append('• '+claim)
+        lines.append('• Exact weekday task mapping (for example, “Monday = Speedups”) is not established in the current evidence.')
+        lines.append('• Season 2 event schedules vary by server; use the in-game calendar for your server before saving or spending resources for a specific day.')
+        if any(x in ql for x in ('shortcut','hack','focus','what should i do','what to do')):
+            guide=[c for c in claims if c.get('Source')== 'User-provided detailed Shared Moonlight guide summary — Krypton test-server guide, Sep 2026']
+            guide=sorted(guide,key=lambda c: 0 if 'priority sequence' in c.get('Claim','').lower() else 1)
+            if guide:
+                lines.append('• F2P shortcut from the detailed guide: claim daily rewards, collect free event resources, delay shop spending until the shop is understood, prioritize limited/rare rewards, manage Moonsoil Diggers carefully, and treat paid features as optional.')
+            lines.append('• Do not move generic Monday Speedup/Computational Component advice into Shared Moonlight unless the calendar evidence explicitly links it to this event.')
+        return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in schedule[:6]],'uncertainty':'Exact weekday rotation is not established; server-specific in-game calendar remains authoritative.'}
+
 
     if exact_cost_question(question):
         exact=[c for c in claims if any(k in c.get('Claim','').lower() for k in ('fusion seed','fusion seeds','cost','core level 35','l35'))]
@@ -469,7 +524,7 @@ def _api_error_detail(e):
 def call_llm(question,claims,conflicts,mode,temperature=0.2):
     key=os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')
     if not key:return None,{'synthesis_error':'missing_api_key'}
-    system='''You are FGF Intelligence, an evidence-first expert assistant for Foundation: Galactic Frontier.\n\nUse ONLY the supplied evidence packet. Answer the player directly, naturally and concisely. Obey the packet intent and constraints. Never substitute a related mechanic for the requested one. Treat F2P/free as a spending constraint. Treat historical seasons as historical unless current applicability is established. Do not dump database records. For mechanics, prioritize Tier-1 and current Confirmed evidence. Preserve meaningful conflicts; never average or silently choose between conflicting claims. Separate confirmed mechanics from recommendations/meta. Never invent numbers, costs, timers, requirements or effects. If evidence is insufficient, explicitly say so.\n\nReturn JSON only with this shape: {"answer":"...","evidence_ids":[1,2],"uncertainty":"..."}. The answer should normally be 1 direct paragraph followed by 2-5 useful bullets. Cite evidence inline as [E1], [E2] and finish with a short Evidence: [E1, E2] line. Do not mention APIs, prompts, retrieval, hidden reasoning, or that you are a language model.'''
+    system='''You are FGF Intelligence, an evidence-first expert assistant for Foundation: Galactic Frontier.\n\nUse ONLY the supplied evidence packet. Answer the player directly, naturally and concisely. Obey the packet intent and constraints. Never substitute a related mechanic for the requested one. Treat F2P/free as a spending constraint. Treat historical seasons as historical unless current applicability is established. Do not dump database records. For mechanics, prioritize Tier-1 and current Confirmed evidence. Preserve meaningful conflicts; never average or silently choose between conflicting claims. For event-calendar questions, use server/date-specific schedule evidence and never infer a weekday rotation from generic recurring-event claims. If a weekday mapping is absent, say so explicitly. Separate confirmed mechanics from recommendations/meta. Never invent numbers, costs, timers, requirements or effects. If evidence is insufficient, explicitly say so.\n\nReturn JSON only with this shape: {"answer":"...","evidence_ids":[1,2],"uncertainty":"..."}. The answer should normally be 1 direct paragraph followed by 2-5 useful bullets. Cite evidence inline as [E1], [E2] and finish with a short Evidence: [E1, E2] line. Do not mention APIs, prompts, retrieval, hidden reasoning, or that you are a language model.'''
     user=json.dumps({'mode':mode,'packet':evidence_packet(question,claims,conflicts)},ensure_ascii=False)
     body=json.dumps({'model':LLM_MODEL,'input':[{'role':'system','content':system},{'role':'user','content':user}],'temperature':temperature,'max_output_tokens':900}).encode()
     req=Request(LLM_URL,data=body,headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
