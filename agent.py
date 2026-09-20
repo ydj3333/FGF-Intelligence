@@ -782,7 +782,7 @@ def answer(q,player_context=None):
         s['uncertainty']='Answer-quality gate rejected the synthesis; deterministic evidence-safe answer returned.'
     else:
         s['quality_gate']=gate
-    return {'question':q,'answer_type':'synthesized_evidence','player_context':player_context,'season_scope':scope,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence and passed an evidence-relevance gate. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
+    return {'question':q,'answer_type':'evidence_fallback' if s.get('model')=='evidence-fallback' else 'synthesized_evidence','player_context':player_context,'season_scope':scope,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence and passed an evidence-relevance gate. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
 
 
 
