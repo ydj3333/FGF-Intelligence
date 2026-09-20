@@ -15,23 +15,90 @@ try:
 except Exception:
     CONFLICT_REVIEWS={}
 
+def _supabase_headers():
+    if not SUPABASE_SECRET:
+        return None
+    return {
+        'apikey':SUPABASE_SECRET,
+        'Authorization':'Bearer '+SUPABASE_SECRET,
+        'Content-Type':'application/json',
+        'Accept':'application/json'
+    }
+
+def load_remote_conflict_reviews():
+    headers=_supabase_headers()
+    if not headers:
+        return {}
+    try:
+        req=Request(
+            SUPABASE_URL+'/rest/v1/conflict_reviews?select=conflict_id,decision,evidence,notes,reviewer,decided_at&order=decided_at.desc',
+            headers=headers, method='GET')
+        with urlopen(req,timeout=3) as r:
+            rows=json.loads(r.read().decode('utf-8') or '[]')
+        return {str(x.get('conflict_id')):{
+            'conflict_id':str(x.get('conflict_id')),
+            'decision':str(x.get('decision','')),
+            'evidence':str(x.get('evidence','')),
+            'notes':str(x.get('notes','')),
+            'reviewer':str(x.get('reviewer','admin')),
+            'reviewed_at':str(x.get('decided_at',''))
+        } for x in rows if x.get('conflict_id')}
+    except Exception:
+        return {}
+
+def apply_conflict_review_to_memory(review):
+    for c in CONFLICTS:
+        if c.get('Conflict ID')==review['conflict_id']:
+            c['Review Status']=review['decision']
+            c['Reviewer Evidence']=review.get('evidence','')
+            c['Reviewer Notes']=review.get('notes','')
+            c['Reviewer']=review.get('reviewer','admin')
+            c['Reviewed At']=review.get('reviewed_at','')
+            break
+
 def save_conflict_review(review):
     CONFLICT_REVIEWS[review['conflict_id']]=review
     try:
         CONFLICT_REVIEWS_FILE.write_text(json.dumps(CONFLICT_REVIEWS,ensure_ascii=False,indent=2)+'\n')
     except Exception:
         pass
-    for c in CONFLICTS:
-        if c.get('Conflict ID')==review['conflict_id']:
-            c['Review Status']=review['decision']
-            c['Reviewer Evidence']=review.get('evidence','')
-            c['Reviewer Notes']=review.get('notes','')
-            c['Reviewed At']=review.get('reviewed_at','')
-            break
+    apply_conflict_review_to_memory(review)
+
+    headers=_supabase_headers()
+    if not headers:
+        return False
+    try:
+        payload={
+            'conflict_id':review['conflict_id'],
+            'decision':review['decision'],
+            'evidence':review.get('evidence',''),
+            'notes':review.get('notes',''),
+            'reviewer':review.get('reviewer','admin'),
+            'decided_at':review.get('reviewed_at','') or None
+        }
+        req=Request(
+            SUPABASE_URL+'/rest/v1/conflict_reviews?on_conflict=conflict_id',
+            data=json.dumps(payload,ensure_ascii=False).encode('utf-8'),
+            headers={**headers,'Prefer':'resolution=merge-duplicates,return=minimal'},
+            method='POST')
+        with urlopen(req,timeout=4):
+            pass
+        return True
+    except Exception:
+        return False
+
+_REMOTE_REVIEWS=load_remote_conflict_reviews()
+if _REMOTE_REVIEWS:
+    CONFLICT_REVIEWS.update(_REMOTE_REVIEWS)
+    for _review in _REMOTE_REVIEWS.values():
+        apply_conflict_review_to_memory(_review)
 
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
 LLM_URL=os.getenv('FGF_LLM_API_URL','https://api.openai.com/v1/responses')
+SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
+SUPABASE_SECRET=os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+ADMIN_TOKEN=os.getenv('FGF_ADMIN_TOKEN')
 
 # v3.3 uses a layered retrieval/reasoning stack rather than pretending that
 # an untrained neural network can safely learn game truth by itself.
@@ -696,11 +763,13 @@ class H(BaseHTTPRequestHandler):
                 allowed={'confirm','reject','supersede','keep_under_review'}
                 if decision not in allowed:
                     return self._json({'ok':False,'error':'Invalid decision'},400)
-                review={'conflict_id':cid,'decision':decision,'evidence':str(body.get('evidence','')).strip(),'notes':str(body.get('notes','')).strip(),'reviewed_at':str(body.get('reviewed_at','')).strip()}
+                if ADMIN_TOKEN and self.headers.get('X-FGF-Admin-Token','') != ADMIN_TOKEN:
+                    return self._json({'ok':False,'error':'Admin authorization required'},401)
+                review={'conflict_id':cid,'decision':decision,'evidence':str(body.get('evidence','')).strip(),'notes':str(body.get('notes','')).strip(),'reviewer':str(body.get('reviewer','admin')).strip() or 'admin','reviewed_at':str(body.get('reviewed_at','')).strip()}
                 if not any(c.get('Conflict ID')==cid for c in CONFLICTS):
                     return self._json({'ok':False,'error':'Unknown conflict ID'},404)
-                save_conflict_review(review)
-                return self._json({'ok':True,'review':review,'message':'Review captured. Historical claims remain preserved; final promotion/supersession remains auditable.'})
+                durable=save_conflict_review(review)
+                return self._json({'ok':True,'review':review,'durable':durable,'storage':'supabase+local_fallback' if durable else 'local_fallback','message':'Review captured. Historical claims remain preserved; final promotion/supersession remains auditable.'})
             except Exception as e:
                 return self._json({'ok':False,'error':str(e)},400)
         self.send_error(404)
