@@ -27,6 +27,13 @@ class ClaimAnalysis:
     quality_tier: ClaimQuality
     coverage_score: float
     confidence_score: float
+
+    # Separate diagnostic dimensions. These are not quality penalties.
+    has_preserved_conflict: bool
+    is_superseded: bool
+    is_current: bool
+    contradictions: List[int]
+
     issues: List[str]
     suggestions: List[str]
     related_claims: List[int]
@@ -127,6 +134,10 @@ class KnowledgeAnalyzer:
         contradictions = self._find_contradictions(claim)
         related = self._find_related_claims(claim)
 
+        is_superseded = status == "superseded"
+        is_current = status == "confirmed"
+        has_preserved_conflict = bool(contradictions)
+
         if not text or len(text) < 25:
             issues.append("too_short")
             suggestions.append("add_specificity")
@@ -147,23 +158,20 @@ class KnowledgeAnalyzer:
             issues.append("under_review")
             suggestions.append("verify_or_resolve")
 
-        if contradictions:
+        # Conflict is a diagnostic dimension, never a quality-tier penalty.
+        if has_preserved_conflict:
             issues.append("has_preserved_conflict")
-            suggestions.append("review_and_resolve_or_preserve_conflict")
+            suggestions.append("review_conflict_context")
 
         if len(related) >= 4:
             issues.append("high_related_claim_density")
             suggestions.append("check_for_duplicate_or_complementary_claims")
 
-        quality_score = self._score_quality(claim, contradictions)
-        confidence_score = self._score_confidence(claim, contradictions)
+        # These scores are independent dimensions.
+        quality_score = self._score_quality(claim)
+        confidence_score = self._score_confidence(claim)
         coverage_score = self._score_coverage(claim, related)
-
-        # A conflict is a diagnostic issue, not permission to call the claim false.
-        if contradictions:
-            quality_tier = ClaimQuality.PROBLEMATIC
-        else:
-            quality_tier = self._map_quality_tier(quality_score)
+        quality_tier = self._map_quality_tier(quality_score)
 
         return ClaimAnalysis(
             claim_id=_claim_id(claim),
@@ -171,12 +179,16 @@ class KnowledgeAnalyzer:
             quality_tier=quality_tier,
             coverage_score=coverage_score,
             confidence_score=confidence_score,
-            issues=issues,
+            has_preserved_conflict=has_preserved_conflict,
+            is_superseded=is_superseded,
+            is_current=is_current,
+            contradictions=[_claim_id(c) for c in contradictions if _claim_id(c) >= 0],
+            issues=list(dict.fromkeys(issues)),
             suggestions=list(dict.fromkeys(suggestions)),
             related_claims=[_claim_id(c) for c in related if _claim_id(c) >= 0],
         )
 
-    def _score_quality(self, claim: Dict, contradictions: List[Dict]) -> float:
+    def _score_quality(self, claim: Dict) -> float:
         tier = _tier(claim)
         score = TIER_BASE.get(tier, 0.10)
 
@@ -198,14 +210,10 @@ class KnowledgeAnalyzer:
             "verified", "tested", "confirmed"
         }:
             score += 0.07
-        if contradictions:
-            score *= 0.65
-        if _status(claim) in {"rejected", "superseded"}:
-            score *= 0.15
-
+        # Conflict and historical status are separate diagnostics.
         return round(max(0.0, min(score, 1.0)), 4)
 
-    def _score_confidence(self, claim: Dict, contradictions: List[Dict]) -> float:
+    def _score_confidence(self, claim: Dict) -> float:
         tier = _tier(claim)
         score = TIER_BASE.get(tier, 0.10)
 
@@ -224,13 +232,7 @@ class KnowledgeAnalyzer:
         if str(claim.get("Verification Status", "")).lower() in {"verified", "tested"}:
             score += 0.06
 
-        if contradictions:
-            score -= 0.20
-        if _status(claim) in {"rejected", "superseded"}:
-            score = min(score, 0.10)
-        elif _status(claim) == "under review":
-            score -= 0.10
-
+        # Confidence is independent from conflict/current-truth status.
         return round(max(0.0, min(score, 1.0)), 4)
 
     def _score_coverage(self, claim: Dict, related: List[Dict]) -> float:
@@ -265,37 +267,111 @@ class KnowledgeAnalyzer:
     def _find_contradictions(self, claim: Dict) -> List[Dict]:
         """Conservative contradiction detector.
 
-        It only flags explicit polarity/value collisions within closely related
-        claims. It does not infer contradiction from unrelated words appearing
-        anywhere in the corpus.
+        Explicit polarity collisions require close topic overlap. Numerical
+        disagreement additionally requires the same entity anchor and the same
+        normalized relation. This prevents Core 8 vs Core 9 from being treated
+        as a contradiction merely because both contain numbers.
         """
         text = _text(claim).lower()
         cid = _claim_id(claim)
+        category = str(claim.get("Category", "")).strip().lower()
         results = []
+
+        polarity_pairs = (
+            ("increases", "decreases"),
+            ("increase", "decrease"),
+            ("higher", "lower"),
+            ("more", "less"),
+            ("requires", "does not require"),
+            ("required", "not required"),
+            ("unlocks", "does not unlock"),
+            ("available", "unavailable"),
+            ("yes", "no"),
+        )
+
+        def entity_anchors(value: str) -> set:
+            words = {
+                "core", "level", "stage", "tier", "building", "ship", "hero",
+                "champion", "flagship", "port", "chapter", "queue", "wave",
+                "slot", "node", "research", "technology", "tech", "mission",
+                "zone",
+            }
+            anchors = set()
+            for word in words:
+                anchors.update(
+                    f"{word} {n}"
+                    for n in re.findall(rf"\\b{re.escape(word)}\\s+(\\d+)\\b", value)
+                )
+            return anchors
+
+        def value_numbers(value: str) -> List[str]:
+            tokens = re.findall(r"[a-z]+|\\d+(?:\\.\\d+)?", value)
+            value_words = {
+                "requires", "require", "costs", "cost", "uses", "use", "gives",
+                "grants", "provides", "produces", "damage", "speed", "percent",
+                "seconds", "minutes", "hours", "alloy", "seed", "seeds",
+            }
+            values = []
+            for i, token in enumerate(tokens):
+                if not re.fullmatch(r"\\d+(?:\\.\\d+)?", token):
+                    continue
+                prev = tokens[i - 1] if i else ""
+                nxt = tokens[i + 1] if i + 1 < len(tokens) else ""
+                if prev in value_words or nxt in value_words or float(token) >= 100:
+                    values.append(token)
+            return values
+
+        def relation_signature(value: str) -> str:
+            tokens = re.findall(r"[a-z]+|\\d+(?:\\.\\d+)?", value)
+            value_words = {
+                "requires", "require", "costs", "cost", "uses", "use", "gives",
+                "grants", "provides", "produces", "damage", "speed", "percent",
+                "seconds", "minutes", "hours", "alloy", "seed", "seeds",
+            }
+            out = []
+            for i, token in enumerate(tokens):
+                if re.fullmatch(r"\\d+(?:\\.\\d+)?", token):
+                    prev = tokens[i - 1] if i else ""
+                    nxt = tokens[i + 1] if i + 1 < len(tokens) else ""
+                    if prev in value_words or nxt in value_words or float(token) >= 100:
+                        out.append("<value>")
+                    else:
+                        out.append(token)
+                elif token not in STOPWORDS:
+                    out.append(token)
+            return " ".join(out)
 
         for other in self.claims:
             if _claim_id(other) == cid:
                 continue
-            other_text = _text(other).lower()
 
-            # Require substantial lexical/topic overlap first.
+            other_text = _text(other).lower()
+            other_category = str(other.get("Category", "")).strip().lower()
+
+            if category and other_category and category != other_category:
+                continue
+
             a, b = _tokens(text), _tokens(other_text)
             if len(a & b) < 3:
                 continue
 
-            pairs = (
-                ("increases", "decreases"),
-                ("increase", "decrease"),
-                ("higher", "lower"),
-                ("more", "less"),
-                ("requires", "does not require"),
-                ("required", "not required"),
-                ("unlocks", "does not unlock"),
-                ("available", "unavailable"),
-                ("yes", "no"),
+            polarity_conflict = any(
+                (x in text and y in other_text) or
+                (y in text and x in other_text)
+                for x, y in polarity_pairs
             )
-            if any((x in text and y in other_text) or
-                   (y in text and x in other_text) for x, y in pairs):
+
+            numeric_conflict = False
+            nums_a = value_numbers(text)
+            nums_b = value_numbers(other_text)
+            if nums_a and nums_b and nums_a != nums_b:
+                anchors_a = entity_anchors(text)
+                anchors_b = entity_anchors(other_text)
+                same_relation = relation_signature(text) == relation_signature(other_text)
+                if same_relation and anchors_a and anchors_a == anchors_b:
+                    numeric_conflict = True
+
+            if polarity_conflict or numeric_conflict:
                 results.append(other)
 
         return results
