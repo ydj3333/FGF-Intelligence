@@ -1,11 +1,16 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FGF Intelligence — Live Candidate</title><style>
 body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:#08111f;color:#edf4ff}header{padding:28px 5vw;border-bottom:1px solid #20334f;background:#0d1a2c}main{max-width:1280px;margin:auto;padding:24px 5vw}input,select{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;border:1px solid #314968;background:#0e1b2d;color:#fff;font-size:16px;margin:6px 0}button{padding:11px 16px;border:0;border-radius:10px;background:#76b7ff;color:#06101c;font-weight:800;cursor:pointer;margin:6px 5px 6px 0}.card{background:#0d192b;border:1px solid #243a57;border-radius:14px;padding:16px;margin:12px 0}.tier1{border-color:#4ecb91}.conflict{border-color:#ff956e}.muted{color:#a9b8cf}.claim{font-size:17px;line-height:1.45}.small{font-size:13px}.pill{display:inline-block;border:1px solid #3a5575;border-radius:999px;padding:3px 8px;font-size:12px;margin:2px}.kpi{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}.k{padding:12px 16px;background:#102039;border-radius:12px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{background:#14243a;color:#dce9f9}.tab.active{background:#76b7ff;color:#06101c}.hidden{display:none}.source{color:#c5d6ff}.warn{background:#2a1915}.hero{padding:20px;border:1px solid #2a4766;border-radius:16px;background:linear-gradient(135deg,#0d1b2e,#10253d)}.answer{font-size:18px;line-height:1.6;white-space:pre-wrap}.evidence{border-left:3px solid #4ecb91;padding-left:12px}.error{border-color:#ff5f5f;background:#2a1515}
 </style></head><body><header><h1>🚀 FGF Intelligence</h1><div class="muted">Evidence-first • Tier-1 prioritized • S2 • continuously evolving</div></header><main>
-<div id="kpi" class="kpi"></div><div class="tabs"><button class="tab active" onclick="show('ask',this)">Ask FGF</button><button class="tab" onclick="show('recommend',this)">Recommendations</button><button class="tab" onclick="show('knowledge',this)">Knowledge</button><button class="tab" onclick="show('conflicts',this)">Conflicts</button></div>
+<div id="kpi" class="kpi"></div><div class="tabs"><button class="tab active" onclick="show('ask',this)">Ask FGF</button><button class="tab" onclick="show('recommend',this)">Recommendations</button><button class="tab" onclick="show('knowledge',this)">Knowledge</button><button class="tab" onclick="show('tools',this)">Builders & Calculators</button><button class="tab" onclick="show('conflicts',this)">Conflicts</button></div>
 <section id="ask"><div class="hero"><h2>Ask the game</h2><p class="muted">Ask mechanics, rules, costs, systems, events or strategy. The engine retrieves evidence before answering.</p><input id="q" placeholder="e.g. What happens when a fleet has Major Damage?"/><button onclick="ask()">Ask FGF</button></div><div id="answer"></div></section>
 <section id="recommend" class="hidden"><div class="card"><h2>Decision support</h2><input id="rq" placeholder="e.g. What should I prioritize next?"/><select id="obj"><option value="general">General</option><option value="progression">Fast progression</option><option value="f2p">F2P efficiency</option><option value="pvp">PvP / GvG</option><option value="pve">PvE / Events</option><option value="economy">Economy / Trade</option><option value="event">Event optimization</option></select><button onclick="recommend()">Recommend</button></div><div id="recs"></div></section>
 <section id="knowledge" class="hidden"><div class="card"><h2>Search knowledge</h2><input id="kq" placeholder="Search claims..."/><button onclick="searchClaims()">Search</button></div><div id="knowledgeResults"></div></section>
-<section id="conflicts" class="hidden"><div id="conflictResults"></div></section>
+<section id="tools" class="hidden">
+<div class="card"><h2>🛠️ Evidence-aware tools</h2><p class="muted">These tools calculate or plan only from mechanics established in the current evidence layer. Unknown costs/timers are left unknown.</p></div>
+<div class="card"><h3>Fleet Repair Planner</h3><select id="damageType"><option value="minor">Minor Damage</option><option value="major">Major Damage</option></select><input id="repairModules" type="number" min="0" value="0" placeholder="Repair Modules available"/><label><input id="inCombat" type="checkbox" style="width:auto"> Currently in combat</label><br><button onclick="repairTool()">Calculate repair path</button><div id="repairResult"></div></div>
+<div class="card"><h3>Fleet Synergy Builder</h3><select id="fleetStyle"><option>Beam</option><option>Kinetic</option><option>Ion</option></select><input id="champ1" placeholder="Champion 1"/><input id="champ2" placeholder="Champion 2"/><input id="champ3" placeholder="Champion 3"/><button onclick="fleetTool()">Build lineup</button><div id="fleetResult"></div></div>
+<div class="card"><h3>Energy Core Progression Planner</h3><input id="coreNow" type="number" min="1" value="1" placeholder="Current Core"/><input id="coreTarget" type="number" min="1" value="30" placeholder="Target Core"/><select id="coreSeason"><option>S1</option><option>S2</option><option>S3</option></select><button onclick="progressionTool()">Build progression plan</button><div id="progressionResult"></div></div>
+</section><section id="conflicts" class="hidden"><div id="conflictResults"></div></section>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function card(c){return `<div class="card ${String(c['Evidence Tier']||'').startsWith('Tier 1')?'tier1':''}"><div class="claim">${esc(c.Claim)}</div><div class="small"><span class=pill>${esc(c.Category)}</span><span class=pill>${esc(c['Evidence Tier'])}</span><span class=pill>${esc(c.Confidence)}</span><span class=pill>${esc(c.Status)}</span></div><p class="source small">${esc(c.Source)} ${esc(c.Timestamp||'')}</p><p class="muted small">${esc(c.Notes)}</p></div>`}
@@ -39,6 +44,8 @@ async function searchClaims(){let q=document.getElementById('kq').value.trim();i
 async function loadConflicts(){
  try{
   let a=await getJSON('/api/conflicts');
+  const admin=await getJSON('/api/admin/status').catch(()=>({admin_configured:false}));
+  window.fgfAdminConfigured=!!admin.admin_configured;
   let rows=a.results||[];
   document.getElementById('conflictResults').innerHTML='<h2>Evidence Conflict Resolution Desk</h2><p class="muted">Review each preserved conflict. Choose a decision, add your evidence/notes, then submit. Historical claims are never deleted.</p>'+
   rows.map(x=>`<div class="card conflict">
@@ -64,12 +71,29 @@ async function loadConflicts(){
   </div>`).join('');
  }catch(e){document.getElementById('conflictResults').innerHTML=`<div class="card error">${esc(e.message)}</div>`}
 }
+function toolHTML(title,body){return '<div class="card"><b>'+esc(title)+'</b><p>'+esc(body)+'</p></div>'}
+async function repairTool(){
+ const d=document.getElementById('damageType').value,m=document.getElementById('repairModules').value,combat=document.getElementById('inCombat').checked;
+ try{const a=await getJSON('/api/tools/repair?damage='+encodeURIComponent(d)+'&repair_modules='+encodeURIComponent(m)+'&in_combat='+combat);document.getElementById('repairResult').innerHTML=toolHTML('Repair path',a.action||a.error)+(a.evidence_basis||[]).map(x=>'<div class="evidence small">'+esc(x)+'</div>').join('')}catch(e){document.getElementById('repairResult').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}
+}
+async function fleetTool(){
+ const style=document.getElementById('fleetStyle').value,cs=[document.getElementById('champ1').value,document.getElementById('champ2').value,document.getElementById('champ3').value];
+ try{const u='/api/tools/fleet-builder?style='+encodeURIComponent(style)+'&champion='+cs.map(encodeURIComponent).join('&champion=');const a=await getJSON(u);document.getElementById('fleetResult').innerHTML=toolHTML('Synergy result',(a.synergy_bonus||a.error||'')+' Matched: '+(a.matched_champions??0)+'/3')+(a.note?'<p class="muted small">'+esc(a.note)+'</p>':'')+(a.champions||[]).map(x=>'<div class="evidence"><b>'+esc(x.champion)+'</b><div class="small">'+esc(x.evidence||'No direct style evidence found')+'</div></div>').join('')}catch(e){document.getElementById('fleetResult').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}
+}
+async function progressionTool(){
+ const c=document.getElementById('coreNow').value,t=document.getElementById('coreTarget').value,se=document.getElementById('coreSeason').value;
+ try{const a=await getJSON('/api/tools/progression?core_level='+encodeURIComponent(c)+'&target_level='+encodeURIComponent(t)+'&season='+se);document.getElementById('progressionResult').innerHTML=toolHTML('Progression plan','Core '+c+' → '+t)+(a.known_milestones||[]).map(x=>'<div class="evidence">'+esc(x)+'</div>').join('')+'<p class="muted small">'+esc(a.cost_note||'')+'</p>'+(a.evidence||[]).slice(0,8).map(x=>'<div class="evidence small">'+esc(x.claim)+' <span class="pill">'+esc(x.tier)+'</span></div>').join('')}catch(e){document.getElementById('progressionResult').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}
+}
+
 async function submitConflict(cid){
  const status=document.getElementById('status-'+cid);
  status.textContent='Saving…';
+ if(!window.fgfAdminConfigured){status.textContent='✕ Admin endpoint is disabled until server auth is configured.';status.style.color='#ff5f5f';return}
+ let token=sessionStorage.getItem('fgf_admin_token');
+ if(!token){token=prompt('Enter FGF admin token');if(!token)return;sessionStorage.setItem('fgf_admin_token',token)}
  const payload={conflict_id:cid,decision:document.getElementById('decision-'+cid).value,evidence:document.getElementById('evidence-'+cid).value,notes:document.getElementById('notes-'+cid).value,reviewed_at:new Date().toISOString()};
  try{
-  const r=await fetch('/api/conflicts/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const r=await fetch('/api/conflicts/review',{method:'POST',headers:{'Content-Type':'application/json','X-FGF-Admin-Token':token},body:JSON.stringify(payload)});
   const a=await r.json();
   if(!r.ok||!a.ok)throw new Error(a.error||'Review submission failed');
   status.textContent='✓ Resolution captured';
