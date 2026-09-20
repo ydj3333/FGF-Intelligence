@@ -89,6 +89,22 @@ class TestKnowledgeAnalyzer(unittest.TestCase):
         self.assertEqual(result.contradictions, [])
         self.assertFalse(result.has_preserved_conflict)
 
+    def test_three_shared_generic_keywords_are_not_related(self):
+        claim1 = {
+            "id": 1,
+            "Claim": "Research speed increases in the Research Office.",
+            "Category": "Technology",
+            "Evidence Tier": "Tier 1",
+        }
+        claim2 = {
+            "id": 2,
+            "Claim": "Research speed increases in the Research Academy.",
+            "Category": "Technology",
+            "Evidence Tier": "Tier 1",
+        }
+        result = KnowledgeAnalyzer([claim1, claim2]).analyze_claim(claim1)
+        self.assertEqual(result.related_claims, [])
+
     def test_numerical_disagreement_requires_entity_alignment(self):
         claim1 = {
             "id": 1, "Claim": "Core 8 requires 5000 alloy",
