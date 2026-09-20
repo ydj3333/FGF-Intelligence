@@ -885,6 +885,17 @@ class H(BaseHTTPRequestHandler):
                 profile,error=_player_profile_from_db(pid)
                 if error:return self._json({'ok':False,'durable':False,'error':error},503)
                 return self._json({'ok':True,'durable':True,'profile':profile})
+        if u.path=='/api/v5/player':
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n>65536:return self._json({'ok':False,'error':'Request too large'},413)
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                profile,error=validate_player_profile(body)
+                if error:return self._json({'ok':False,'error':error},400)
+                ok,detail=_save_player_profile_to_db(profile)
+                if not ok:return self._json({'ok':False,'durable':False,'error':detail},503)
+                return self._json({'ok':True,'durable':True,'profile':profile})
+            except Exception as e:return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/player/profile':
             qs=parse_qs(u.query);pid=qs.get('player_id',[''])[0].strip()
             if not pid:return self._json({'ok':False,'error':'player_id is required'},400)
