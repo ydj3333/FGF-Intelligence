@@ -4,6 +4,8 @@ from urllib.parse import urlparse, parse_qs
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
+from gap_detector import GapDetector
+from knowledge_analyzer import KnowledgeAnalyzer
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
