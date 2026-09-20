@@ -22,9 +22,6 @@ Captured 2026-09-20 from current public Foundation: Galactic Frontier announceme
 - Killing Effect
 - Festival crew choice: Holly Nico, Murphy Riley, or Boka Lape
 
-## Ranking rule announced
-For the Combat Lab material associated with the announcement, rankings are based on highest stage cleared and clear time; identical results are ordered by who achieved them first.
-
 ## Important calendar limitation
 The developer announced that with Season 2, event schedules vary more between servers and players should use the in-game calendar for their specific server. Do not infer a universal Monday–Sunday event rotation from generic calendar-cycle claims.
 
