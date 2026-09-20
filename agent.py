@@ -10,6 +10,9 @@ DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v4.1.0-answer-quality-gate'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
+SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
+SUPABASE_SECRET=os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+ADMIN_TOKEN=os.getenv('FGF_ADMIN_TOKEN')
 try:
     CONFLICT_REVIEWS=json.loads(CONFLICT_REVIEWS_FILE.read_text()) if CONFLICT_REVIEWS_FILE.exists() else {}
 except Exception:
