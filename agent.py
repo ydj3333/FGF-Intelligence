@@ -310,6 +310,8 @@ def topic_requirements(q):
         req.append('flagship')
     if any(x in ql for x in ('credits','resource','resources','farm','earn','spend','economy','trade')):
         req.append('economy')
+    if is_shared_moonlight_question(q):
+        req.append('shared_moonlight')
     return list(dict.fromkeys(req))
 
 def claim_relevance(q,c):
@@ -317,14 +319,6 @@ def claim_relevance(q,c):
     cl=(c.get('Claim','')+' '+c.get('Category','')+' '+c.get('Notes','')).lower()
     domains=query_domains(q)
     requirements=topic_requirements(q)
-
-    if is_event_schedule_question(q):
-        result['addresses_question']=(
-            any(x in low for x in ('september 15','september 21','september 27','server 1001','server 1017','in-game calendar','not established','not available'))
-        )
-        result['respects_constraints']=True
-        if any(x in low for x in ('speedup','computational component')) and not any(x in low for x in ('not established','not available','calendar')):
-            result['no_unrelated_substitution']=False
 
     # Hard entity/topic gates first. These are intentionally conservative:
     # when a question asks for an exact topic, adjacent evidence is rejected.
@@ -597,6 +591,12 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
         result['uses_relevant_evidence']=bool(claims) and any(claim_relevance(q,c) for c in claims)
 
     requirements=topic_requirements(q)
+
+    if is_event_schedule_question(q):
+        result['addresses_question']=any(x in low for x in ('september 15','september 21','september 27','server 1001','server 1017','in-game calendar','not established','not available'))
+        result['respects_constraints']=True
+        if any(x in low for x in ('speedup','computational component')) and not any(x in low for x in ('not established','not available','calendar')):
+            result['no_unrelated_substitution']=False
 
     if intent=='Fleet Damage/Repair':
         result['addresses_question']=any(x in low for x in ('repair','damage','recover','repair bay','repair cabin','repair module'))
