@@ -474,7 +474,7 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
     if intent=='Fleet Damage/Repair':
         result['addresses_question']=any(x in low for x in ('repair','damage','recover','repair bay','repair cabin','repair module'))
         if 'F2P' in constraints:
-            result['respects_constraints']=any(x in low for x in ('free','without repair modules','without spending','no-cost','no cost'))
+            result['respects_constraints']=any(x in low for x in ('free','without repair modules','without spending','no-cost','no cost','no-repair-module','no repair module'))
         else:
             result['respects_constraints']=True
         # CP is not a repair answer unless the answer also clearly explains it
@@ -511,7 +511,7 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
     if requirements and not any(claim_relevance(q,c) for c in claims):
         result['uses_relevant_evidence']=False
 
-    result['passes']=all(result.values())
+    result['passes']=all(v for k,v in result.items() if k!='passes')
     return result
 def run_benchmark_suite_100(start=0,count=20):
     suite=json.loads((ROOT/'data/benchmarks_v4_100.json').read_text(encoding='utf-8'))
