@@ -123,9 +123,39 @@ class KnowledgeAnalyzer:
             id(claim): (_claim_id(claim) if _claim_id(claim) >= 0 else index)
             for index, claim in enumerate(self.claims, start=1)
         }
+        # Cache lexical primitives once; full-corpus analysis is pairwise and
+        # must not repeatedly tokenize the same 930+ claims.
+        self._text_cache = {id(c): _text(c) for c in self.claims}
+        self._tokens_cache = {id(c): _tokens(self._text_cache[id(c)]) for c in self.claims}
+        self._category_cache = {
+            id(c): str(c.get("Category", c.get("category", ""))).strip().lower()
+            for c in self.claims
+        }
+        self._token_index: Dict[str, set] = {}
+        for claim in self.claims:
+            claim_ref = id(claim)
+            for token in self._tokens_cache[claim_ref]:
+                self._token_index.setdefault(token, set()).add(claim_ref)
 
     def _id_for(self, claim: Dict) -> int:
         return self._internal_ids.get(id(claim), _claim_id(claim))
+
+    def _cached_text(self, claim: Dict) -> str:
+        return self._text_cache.get(id(claim), _text(claim))
+
+    def _cached_tokens(self, claim: Dict) -> set:
+        return self._tokens_cache.get(id(claim), _tokens(self._cached_text(claim)))
+
+    def _cached_category(self, claim: Dict) -> str:
+        return self._category_cache.get(
+            id(claim), str(claim.get("Category", claim.get("category", ""))).strip().lower()
+        )
+
+    def _candidate_claims(self, claim: Dict) -> List[Dict]:
+        refs = set()
+        for token in self._cached_tokens(claim):
+            refs.update(self._token_index.get(token, set()))
+        return [c for c in self.claims if id(c) in refs]
 
     def analyze_all(self) -> Dict[int, ClaimAnalysis]:
         for claim in self.claims:
@@ -139,7 +169,7 @@ class KnowledgeAnalyzer:
         suggestions: List[str] = []
         tier = _tier(claim)
         status = _status(claim)
-        text = _text(claim)
+        text = self._cached_text(claim)
         cid = self._id_for(claim)
 
         contradictions = self._find_contradictions(claim)
@@ -276,16 +306,10 @@ class KnowledgeAnalyzer:
         return round(min(score, 1.0), 4)
 
     def _find_contradictions(self, claim: Dict) -> List[Dict]:
-        """Conservative contradiction detector.
-
-        Explicit polarity collisions require close topic overlap. Numerical
-        disagreement additionally requires the same entity anchor and the same
-        normalized relation. This prevents Core 8 vs Core 9 from being treated
-        as a contradiction merely because both contain numbers.
-        """
-        text = _text(claim).lower()
+        """Conservative contradiction detector using cached candidate claims."""
+        text = self._cached_text(claim).lower()
         cid = self._id_for(claim)
-        category = str(claim.get("Category", "")).strip().lower()
+        category = self._cached_category(claim)
         results = []
 
         polarity_pairs = (
@@ -352,18 +376,18 @@ class KnowledgeAnalyzer:
                     out.append(token)
             return " ".join(out)
 
-        for other in self.claims:
+        base_tokens = self._cached_tokens(claim)
+        for other in self._candidate_claims(claim):
             if self._id_for(other) == cid:
                 continue
 
-            other_text = _text(other).lower()
-            other_category = str(other.get("Category", "")).strip().lower()
+            other_text = self._cached_text(other).lower()
+            other_category = self._cached_category(other)
 
             if category and other_category and category != other_category:
                 continue
 
-            a, b = _tokens(text), _tokens(other_text)
-            if len(a & b) < 3:
+            if len(base_tokens & self._cached_tokens(other)) < 3:
                 continue
 
             polarity_conflict = any(
@@ -389,34 +413,27 @@ class KnowledgeAnalyzer:
 
     def _find_related_claims(self, claim: Dict, limit: int = 12) -> List[Dict]:
         cid = self._id_for(claim)
-        base = _tokens(_text(claim))
+        base = self._cached_tokens(claim)
         if not base:
             return []
 
         scored: List[Tuple[float, Dict]] = []
-        for other in self.claims:
-            if _claim_id(other) == cid:
+        for other in self._candidate_claims(claim):
+            if self._id_for(other) == cid:
                 continue
-            other_tokens = _tokens(_text(other))
-            if not other_tokens:
+            other_tokens = self._cached_tokens(other)
+            inter = len(base & other_tokens)
+            if inter < 4:
                 continue
 
-            inter = len(base & other_tokens)
             union = len(base | other_tokens)
             jaccard = inter / max(union, 1)
-            same_category = (
-                bool(claim.get("Category"))
-                and str(other.get("Category", "")).lower()
-                == str(claim.get("Category", "")).lower()
+            same_category = bool(self._cached_category(claim)) and (
+                self._cached_category(other) == self._cached_category(claim)
             )
             category_bonus = 0.10 if same_category else 0.0
 
-            # Three shared generic keywords are not enough to call claims related.
-            # Require stronger lexical alignment; same-category claims may use a
-            # slightly lower Jaccard threshold, but still need >= 4 shared tokens.
-            if inter >= 4 and (
-                jaccard >= 0.20 or (same_category and jaccard >= 0.14)
-            ):
+            if jaccard >= 0.20 or (same_category and jaccard >= 0.14):
                 scored.append((jaccard + category_bonus, other))
 
         scored.sort(key=lambda x: x[0], reverse=True)
