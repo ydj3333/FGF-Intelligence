@@ -885,6 +885,8 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/benchmarks/100':
             qs=parse_qs(u.query);start=int(qs.get('start',['0'])[0]);count=int(qs.get('count',['20'])[0]);return self._json(run_benchmark_suite_100(start,count))
         if u.path=='/api/rules':return self._json({'rules':RULES,'authority_order':DATA['authority_order']})
+        if u.path=='/v5':
+            b=(ROOT/'web/v5.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b);return
         if u.path=='/' or u.path=='/index.html':
             b=(ROOT/'web/index.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b);return
         self.send_error(404)
