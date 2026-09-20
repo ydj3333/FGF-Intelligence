@@ -925,8 +925,9 @@ class H(BaseHTTPRequestHandler):
             return self._json(progression_planner(qs.get('core_level',['1'])[0],qs.get('target_level',['30'])[0],qs.get('season',['S1'])[0]))
         if u.path=='/api/benchmarks':return self._json(run_benchmarks())
         if u.path=='/api/admin/knowledge-quality':
-            analyses=KnowledgeAnalyzer(CLAIMS).analyze_all()
-            return self._json(KnowledgeAnalyzer(CLAIMS).export_report())
+            analyzer=KnowledgeAnalyzer(CLAIMS)
+            analyzer.analyze_all()
+            return self._json(analyzer.export_report())
         if u.path=='/api/admin/gaps':
             qs=parse_qs(u.query)
             failed=qs.get('q',[])
