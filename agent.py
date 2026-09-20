@@ -380,8 +380,10 @@ def answer_quality_gate(q,text,claims):
         result['respects_constraints']=('free' in low or 'without spending' in low) if 'F2P' in constraints else True
     result['passes']=all(result.values())
     return result
-def run_benchmark_suite_100():
+def run_benchmark_suite_100(start=0,count=20):
     suite=json.loads((ROOT/'data/benchmarks_v4_100.json').read_text(encoding='utf-8'))
+    start=max(0,int(start)); count=max(1,min(25,int(count)))
+    selected=suite['questions'][start:start+count]
     category_intent={
         'Combat & Fleet Mechanics':'Combat',
         'Fleet Repair & Recovery':'Fleet Damage/Repair',
@@ -392,7 +394,7 @@ def run_benchmark_suite_100():
         'Multi-Intent & Complex Questions':'Multi-Intent'
     }
     rows=[]
-    for item in suite['questions']:
+    for item in selected:
         q=item['question']
         expected=category_intent[item['category']]
         detected=classify_intent(q)
@@ -414,6 +416,9 @@ def run_benchmark_suite_100():
         'version':RELEASE,
         'suite':suite['title'],
         'total':len(rows),
+        'suite_total':len(suite['questions']),
+        'start':start,
+        'count':len(rows),
         'intent_matches':sum(1 for x in rows if x['intent_match']),
         'evidence_retrieved':sum(1 for x in rows if x['evidence_retrieved']),
         'results':rows,
@@ -461,7 +466,8 @@ class H(BaseHTTPRequestHandler):
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
         if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
         if u.path=='/api/benchmarks':return self._json(run_benchmarks())
-        if u.path=='/api/benchmarks/100':return self._json(run_benchmark_suite_100())
+        if u.path=='/api/benchmarks/100':
+            qs=parse_qs(u.query);start=int(qs.get('start',['0'])[0]);count=int(qs.get('count',['20'])[0]);return self._json(run_benchmark_suite_100(start,count))
         if u.path=='/api/rules':return self._json({'rules':RULES,'authority_order':DATA['authority_order']})
         if u.path=='/' or u.path=='/index.html':
             b=(ROOT/'web/index.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b);return
