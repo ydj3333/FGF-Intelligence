@@ -431,9 +431,19 @@ class KnowledgeAnalyzer:
 
         quality_counts: Dict[str, int] = {}
         issue_counts: Dict[str, int] = {}
+        conflict_count = 0
+        superseded_count = 0
+        current_count = 0
+
         for analysis in self.analyses.values():
             key = analysis.quality_tier.value
             quality_counts[key] = quality_counts.get(key, 0) + 1
+            if analysis.has_preserved_conflict:
+                conflict_count += 1
+            if analysis.is_superseded:
+                superseded_count += 1
+            if analysis.is_current:
+                current_count += 1
             for issue in analysis.issues:
                 issue_counts[issue] = issue_counts.get(issue, 0) + 1
 
