@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v4.1.0-answer-quality-gate'
+RELEASE='v5.0.0-player-state'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -791,6 +791,60 @@ def progression_planner(core_level=1,target_level=30,season='S1'):
         known.append('Energy Core 35 is documented as the current cap in the Epoch of Fusion Seed progression evidence.')
     return {'ok':True,'season':season,'current_core':cur,'target_core':target,'known_milestones':known,'evidence':milestones[:12],'exact_costs_included':False,'cost_note':'Exact per-level Fusion Seed costs are not inserted unless established by evidence.'}
 
+
+# V5 Player State persistence
+PLAYER_PROFILE_ALLOWED_SEASONS={'S1','S2','S3'}
+def _player_profile_from_db(player_id):
+    headers=_supabase_headers()
+    if not headers:
+        return None, 'Supabase server credential is not configured.'
+    try:
+        from urllib.parse import quote
+        req=Request(SUPABASE_URL+'/rest/v1/player_profiles?player_id=eq.'+quote(str(player_id),safe='')+'&select=player_id,season,core_level,flagship_level,champion_levels,fleet_styles,resources,preferences,updated_at',
+                    headers=headers,method='GET')
+        with urlopen(req,timeout=4) as r:
+            rows=json.loads(r.read().decode('utf-8') or '[]')
+        return (rows[0] if rows else None), None
+    except Exception as e:
+        return None, str(e)
+
+def _save_player_profile_to_db(profile):
+    headers=_supabase_headers()
+    if not headers:
+        return False,'Supabase server credential is not configured.'
+    payload={'player_id':str(profile['player_id']),'season':profile.get('season','S1'),'core_level':profile.get('core_level'),'flagship_level':profile.get('flagship_level'),
+             'champion_levels':profile.get('champion_levels') or {},'fleet_styles':profile.get('fleet_styles') or [],
+             'resources':profile.get('resources') or {},'preferences':profile.get('preferences') or {}}
+    try:
+        req=Request(SUPABASE_URL+'/rest/v1/player_profiles?on_conflict=player_id',
+                    data=json.dumps(payload,ensure_ascii=False).encode('utf-8'),
+                    headers={**headers,'Prefer':'resolution=merge-duplicates,return=representation'},method='POST')
+        with urlopen(req,timeout=4) as r:
+            rows=json.loads(r.read().decode('utf-8') or '[]')
+        return bool(rows),''
+    except Exception as e:
+        return False,str(e)
+
+def validate_player_profile(body):
+    p=dict(body or {}); pid=str(p.get('player_id','')).strip()
+    if not pid or len(pid)>128:return None,'player_id is required and must be <=128 characters.'
+    season=str(p.get('season','S1')).upper()
+    if season not in PLAYER_PROFILE_ALLOWED_SEASONS:return None,'season must be S1, S2, or S3.'
+    def intval(name,lo=1,hi=100):
+        v=p.get(name)
+        if v is None:return None
+        try:v=int(v)
+        except Exception:raise ValueError(name+' must be an integer')
+        if v<lo or v>hi:raise ValueError(name+' is outside the allowed range')
+        return v
+    try:
+        return {'player_id':pid,'season':season,'core_level':intval('core_level',1,35),'flagship_level':intval('flagship_level',1,100),
+                'champion_levels':p.get('champion_levels') if isinstance(p.get('champion_levels'),dict) else {},
+                'fleet_styles':p.get('fleet_styles') if isinstance(p.get('fleet_styles'),list) else [],
+                'resources':p.get('resources') if isinstance(p.get('resources'),dict) else {},
+                'preferences':p.get('preferences') if isinstance(p.get('preferences'),dict) else {}},None
+    except ValueError as e:return None,str(e)
+
 class H(BaseHTTPRequestHandler):
     def _json(self,obj,status=200):
         b=json.dumps(obj,ensure_ascii=False).encode();self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b)
@@ -811,6 +865,12 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
         if u.path=='/api/admin/status':
             return self._json({'admin_configured':bool(ADMIN_TOKEN),'review_endpoint_enabled':bool(ADMIN_TOKEN),'auth_scheme':'X-FGF-Admin-Token or Bearer token','message':'Admin review writes are disabled until FGF_ADMIN_TOKEN is configured.' if not ADMIN_TOKEN else 'Admin review authentication is configured.'})
+        if u.path=='/api/player/profile':
+            qs=parse_qs(u.query);pid=qs.get('player_id',[''])[0].strip()
+            if not pid:return self._json({'ok':False,'error':'player_id is required'},400)
+            profile,error=_player_profile_from_db(pid)
+            if error:return self._json({'ok':False,'durable':False,'error':error},503)
+            return self._json({'ok':True,'durable':True,'profile':profile})
         if u.path=='/api/tools/repair':
             qs=parse_qs(u.query)
             return self._json(repair_planner(qs.get('damage',['minor'])[0],qs.get('repair_modules',['0'])[0],qs.get('in_combat',['false'])[0].lower()=='true'))
@@ -830,6 +890,17 @@ class H(BaseHTTPRequestHandler):
         self.send_error(404)
     def do_POST(self):
         u=urlparse(self.path)
+        if u.path=='/api/player/profile':
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n>65536:return self._json({'ok':False,'error':'Request too large'},413)
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                profile,error=validate_player_profile(body)
+                if error:return self._json({'ok':False,'error':error},400)
+                ok,detail=_save_player_profile_to_db(profile)
+                if not ok:return self._json({'ok':False,'durable':False,'error':detail},503)
+                return self._json({'ok':True,'durable':True,'profile':profile})
+            except Exception as e:return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/conflicts/review':
             try:
                 n=int(self.headers.get('Content-Length','0'))
