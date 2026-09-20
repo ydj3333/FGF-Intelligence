@@ -9,6 +9,26 @@ ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v4.0.2-benchmark-suite'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
+CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
+try:
+    CONFLICT_REVIEWS=json.loads(CONFLICT_REVIEWS_FILE.read_text()) if CONFLICT_REVIEWS_FILE.exists() else {}
+except Exception:
+    CONFLICT_REVIEWS={}
+
+def save_conflict_review(review):
+    CONFLICT_REVIEWS[review['conflict_id']]=review
+    try:
+        CONFLICT_REVIEWS_FILE.write_text(json.dumps(CONFLICT_REVIEWS,ensure_ascii=False,indent=2)+'\n')
+    except Exception:
+        pass
+    for c in CONFLICTS:
+        if c.get('Conflict ID')==review['conflict_id']:
+            c['Review Status']=review['decision']
+            c['Reviewer Evidence']=review.get('evidence','')
+            c['Reviewer Notes']=review.get('notes','')
+            c['Reviewed At']=review.get('reviewed_at','')
+            break
+
 AUTH={x:i for i,x in enumerate(DATA['authority_order'])}
 LLM_MODEL=os.getenv('FGF_LLM_MODEL','gpt-5.6-luna')
 LLM_URL=os.getenv('FGF_LLM_API_URL','https://api.openai.com/v1/responses')
@@ -472,6 +492,28 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/' or u.path=='/index.html':
             b=(ROOT/'web/index.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b);return
         self.send_error(404)
+    def do_POST(self):
+        u=urlparse(self.path)
+        if u.path=='/api/conflicts/review':
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                cid=str(body.get('conflict_id','')).strip()
+                decision=str(body.get('decision','')).strip()
+                if not cid or not decision:
+                    return self._json({'ok':False,'error':'conflict_id and decision are required'},400)
+                allowed={'confirm','reject','supersede','keep_under_review'}
+                if decision not in allowed:
+                    return self._json({'ok':False,'error':'Invalid decision'},400)
+                review={'conflict_id':cid,'decision':decision,'evidence':str(body.get('evidence','')).strip(),'notes':str(body.get('notes','')).strip(),'reviewed_at':str(body.get('reviewed_at','')).strip()}
+                if not any(c.get('Conflict ID')==cid for c in CONFLICTS):
+                    return self._json({'ok':False,'error':'Unknown conflict ID'},404)
+                save_conflict_review(review)
+                return self._json({'ok':True,'review':review,'message':'Review captured. Historical claims remain preserved; final promotion/supersession remains auditable.'})
+            except Exception as e:
+                return self._json({'ok':False,'error':str(e)},400)
+        self.send_error(404)
+
     def log_message(self,*a):pass
 
 if __name__=='__main__':
