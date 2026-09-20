@@ -300,12 +300,12 @@ class KnowledgeAnalyzer:
             for word in words:
                 anchors.update(
                     f"{word} {n}"
-                    for n in re.findall(rf"\\b{re.escape(word)}\\s+(\\d+)\\b", value)
+                    for n in re.findall(rf"\b{re.escape(word)}\s+(\d+)\b", value)
                 )
             return anchors
 
         def value_numbers(value: str) -> List[str]:
-            tokens = re.findall(r"[a-z]+|\\d+(?:\\.\\d+)?", value)
+            tokens = re.findall(r"[a-z]+|\d+(?:\.\d+)?", value)
             value_words = {
                 "requires", "require", "costs", "cost", "uses", "use", "gives",
                 "grants", "provides", "produces", "damage", "speed", "percent",
@@ -313,7 +313,7 @@ class KnowledgeAnalyzer:
             }
             values = []
             for i, token in enumerate(tokens):
-                if not re.fullmatch(r"\\d+(?:\\.\\d+)?", token):
+                if not re.fullmatch(r"\d+(?:\.\d+)?", token):
                     continue
                 prev = tokens[i - 1] if i else ""
                 nxt = tokens[i + 1] if i + 1 < len(tokens) else ""
@@ -322,7 +322,7 @@ class KnowledgeAnalyzer:
             return values
 
         def relation_signature(value: str) -> str:
-            tokens = re.findall(r"[a-z]+|\\d+(?:\\.\\d+)?", value)
+            tokens = re.findall(r"[a-z]+|\d+(?:\.\d+)?", value)
             value_words = {
                 "requires", "require", "costs", "cost", "uses", "use", "gives",
                 "grants", "provides", "produces", "damage", "speed", "percent",
@@ -330,7 +330,7 @@ class KnowledgeAnalyzer:
             }
             out = []
             for i, token in enumerate(tokens):
-                if re.fullmatch(r"\\d+(?:\\.\\d+)?", token):
+                if re.fullmatch(r"\d+(?:\.\d+)?", token):
                     prev = tokens[i - 1] if i else ""
                     nxt = tokens[i + 1] if i + 1 < len(tokens) else ""
                     if prev in value_words or nxt in value_words or float(token) >= 100:
