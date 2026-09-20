@@ -403,11 +403,19 @@ class KnowledgeAnalyzer:
             inter = len(base & other_tokens)
             union = len(base | other_tokens)
             jaccard = inter / max(union, 1)
-            category_bonus = (
-                0.10 if str(other.get("Category", "")).lower()
-                == str(claim.get("Category", "")).lower() else 0.0
+            same_category = (
+                bool(claim.get("Category"))
+                and str(other.get("Category", "")).lower()
+                == str(claim.get("Category", "")).lower()
             )
-            if inter >= 3:
+            category_bonus = 0.10 if same_category else 0.0
+
+            # Three shared generic keywords are not enough to call claims related.
+            # Require stronger lexical alignment; same-category claims may use a
+            # slightly lower Jaccard threshold, but still need >= 4 shared tokens.
+            if inter >= 4 and (
+                jaccard >= 0.20 or (same_category and jaccard >= 0.14)
+            ):
                 scored.append((jaccard + category_bonus, other))
 
         scored.sort(key=lambda x: x[0], reverse=True)
