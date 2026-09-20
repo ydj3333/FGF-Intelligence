@@ -1,12 +1,16 @@
 """Run the Knowledge Analyzer against the repository's current machine-readable corpus."""
 import json
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from knowledge_analyzer import KnowledgeAnalyzer
 
 
 def main():
-    root = Path(__file__).resolve().parents[1]
+    root = ROOT
     with (root / "data" / "knowledge.json").open(encoding="utf-8") as fh:
         data = json.load(fh)
 
