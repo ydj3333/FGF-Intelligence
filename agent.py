@@ -113,7 +113,7 @@ def classify_intent(q):
     ql=q.lower()
     # Recommendation/player-roster language is more specific than a damage-type
     # token such as "kinetic". Never let the energy type hijack a hero question.
-    if (re.search(r'\\b(?:hero|heroes|champion|champions)\\b', ql)
+    if (re.search(r'\b(?:hero|heroes|champion|champions)\b', ql)
         and any(x in ql for x in ('best','optimal','recommended','team','composition','tier list'))):
         return 'Champions'
     # Match multi-word phrases normally, but match short tokens as whole words.
