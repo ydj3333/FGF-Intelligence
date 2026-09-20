@@ -860,11 +860,31 @@ class H(BaseHTTPRequestHandler):
             return self._json(answer(q,ctx or None))
         if u.path=='/api/recommend':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];objective=qs.get('objective',['general'])[0];return self._json(recommend(q,objective))
+        if u.path=='/api/v5/priority':
+            qs=parse_qs(u.query);pid=qs.get('player_id',[''])[0].strip();profile,error=_player_profile_from_db(pid) if pid else (None,'player_id is required')
+            if error:return self._json({'ok':False,'error':error},503)
+            core=int((profile or {}).get('core_level') or 1)
+            priorities=[]
+            if core<33:priorities.append({'priority':'Energy Core progression','reason':'Core 33 is an evidence-backed milestone for the fourth Battle Queue.','evidence':'Current official progression evidence'})
+            if core<35:priorities.append({'priority':'Energy Core 35 milestone','reason':'Core 35 is the currently established modeled cap.','evidence':'Current official progression evidence'})
+            priorities.append({'priority':'Keep research/construction active','reason':'Avoid idle progression time.','evidence':'Daily progression evidence'})
+            return self._json({'ok':True,'priorities':priorities,'profile':profile})
+        if u.path=='/api/v5/evidence':
+            qs=parse_qs(u.query);q=qs.get('q',[''])[0];hits=retrieve(q,12)
+            return self._json({'results':[{'claim':c.get('Claim',''),'tier':c.get('Evidence Tier',''),'confidence':c.get('Confidence',''),'source':c.get('Source',''),'status':c.get('Status','')} for c in hits]})
         if u.path=='/api/claims':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
         if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
         if u.path=='/api/admin/status':
             return self._json({'admin_configured':bool(ADMIN_TOKEN),'review_endpoint_enabled':bool(ADMIN_TOKEN),'auth_scheme':'X-FGF-Admin-Token or Bearer token','message':'Admin review writes are disabled until FGF_ADMIN_TOKEN is configured.' if not ADMIN_TOKEN else 'Admin review authentication is configured.'})
+        if u.path=='/api/v5/player':
+            qs=parse_qs(u.query)
+            if self.command=='GET':
+                pid=qs.get('player_id',[''])[0].strip()
+                if not pid:return self._json({'ok':False,'error':'player_id is required'},400)
+                profile,error=_player_profile_from_db(pid)
+                if error:return self._json({'ok':False,'durable':False,'error':error},503)
+                return self._json({'ok':True,'durable':True,'profile':profile})
         if u.path=='/api/player/profile':
             qs=parse_qs(u.query);pid=qs.get('player_id',[''])[0].strip()
             if not pid:return self._json({'ok':False,'error':'player_id is required'},400)
@@ -874,9 +894,19 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/tools/repair':
             qs=parse_qs(u.query)
             return self._json(repair_planner(qs.get('damage',['minor'])[0],qs.get('repair_modules',['0'])[0],qs.get('in_combat',['false'])[0].lower()=='true'))
+        if u.path=='/api/v5/synergy':
+            qs=parse_qs(u.query);r=fleet_builder(qs.get('style',[''])[0],qs.get('champion',[]))
+            r['synergy_bonus_percent']=20 if r.get('matched_champions')==3 else (10 if r.get('matched_champions')==2 else 0)
+            r['matched']=[x['champion'] for x in r.get('champions',[]) if x.get('evidence_style')]
+            return self._json(r)
         if u.path=='/api/tools/fleet-builder':
             qs=parse_qs(u.query); champs=[x for x in qs.get('champion',[])]
             return self._json(fleet_builder(qs.get('style',[''])[0],champs))
+        if u.path=='/api/v5/progression':
+            qs=parse_qs(u.query);r=progression_planner(qs.get('core_level',['1'])[0],qs.get('target_level',['30'])[0],qs.get('season',['S1'])[0])
+            r['levels']=max(0,int(qs.get('target_level',['30'])[0])-int(qs.get('core_level',['1'])[0])) if str(qs.get('target_level',['30'])[0]).isdigit() and str(qs.get('core_level',['1'])[0]).isdigit() else 0
+            r['exact_cost_status']='not_established' if not r.get('exact_costs_included') else 'established'
+            return self._json(r)
         if u.path=='/api/tools/progression':
             qs=parse_qs(u.query)
             return self._json(progression_planner(qs.get('core_level',['1'])[0],qs.get('target_level',['30'])[0],qs.get('season',['S1'])[0]))
