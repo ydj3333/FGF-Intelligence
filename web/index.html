@@ -36,5 +36,44 @@ function renderAsk(a){let html='';if(a.answer){html+=`<div class="card"><b>FGF I
 async function ask(){let q=document.getElementById('q').value.trim();if(!q)return;document.getElementById('answer').innerHTML='<div class="card">Thinking… retrieving evidence and synthesizing an answer.</div>';try{let a=await getJSON('/api/ask?q='+encodeURIComponent(q));document.getElementById('answer').innerHTML=renderAsk(a)}catch(e){document.getElementById('answer').innerHTML=`<div class="card error"><b>Unable to answer</b><p>${esc(e.message)}</p></div>`}}
 async function recommend(){let q=document.getElementById('rq').value.trim(),o=document.getElementById('obj').value;if(!q)return;document.getElementById('recs').innerHTML='<div class="card">Building recommendation…</div>';try{let a=await getJSON('/api/recommend?q='+encodeURIComponent(q)+'&objective='+o);document.getElementById('recs').innerHTML=`<div class=card><b>Decision support</b><p class=muted>${esc(a.disclaimer||'')}</p></div>`+(a.answer?`<div class="card"><div class=answer>${esc(a.answer)}</div></div>`:'')+(a.results?.length?a.results.map(card).join(''):'<div class="card">No recommendation results were returned.</div>')}catch(e){document.getElementById('recs').innerHTML=`<div class="card error"><b>Unable to build recommendation</b><p>${esc(e.message)}</p></div>`}}
 async function searchClaims(){let q=document.getElementById('kq').value.trim();if(!q)return;try{let a=await getJSON('/api/claims?q='+encodeURIComponent(q)+'&limit=30');document.getElementById('knowledgeResults').innerHTML=(a.results||[]).map(card).join('')||'<div class="card">No matching claims found.</div>'}catch(e){document.getElementById('knowledgeResults').innerHTML=`<div class="card error">${esc(e.message)}</div>`}}
-async function loadConflicts(){try{let a=await getJSON('/api/conflicts');document.getElementById('conflictResults').innerHTML='<h2>Evidence conflicts</h2>'+(a.results||[]).map(x=>`<div class="card conflict"><h3>${esc(x.Topic)}</h3><p><b>Tier 1:</b> ${esc(x['Tier-1 evidence'])}</p><p class=muted>${esc(x.Notes)}</p></div>`).join('')}catch(e){document.getElementById('conflictResults').innerHTML=`<div class="card error">${esc(e.message)}</div>`}}
+async function loadConflicts(){
+ try{
+  let a=await getJSON('/api/conflicts');
+  let rows=a.results||[];
+  document.getElementById('conflictResults').innerHTML='<h2>Evidence Conflict Resolution Desk</h2><p class="muted">Review each preserved conflict. Choose a decision, add your evidence/notes, then submit. Historical claims are never deleted.</p>'+
+  rows.map(x=>\`<div class="card conflict">
+    <h3>\${esc(x['Conflict ID'])} — \${esc(x.Topic)}</h3>
+    <p><b>Existing claim:</b> \${esc(x['Existing / Tier-2 claim'])}</p>
+    <p><b>Higher-authority evidence:</b> \${esc(x['Tier-1 evidence'])}</p>
+    <p><b>Current decision:</b> \${esc(x.Decision||'Unresolved')}</p>
+    <p><b>Impact:</b> <span class="pill">\${esc(x.Impact)}</span> <span class="pill">\${esc(x.Status)}</span></p>
+    <p class="muted">\${esc(x.Notes)}</p>
+    <label><b>Your decision</b></label>
+    <select id="decision-\${esc(x['Conflict ID'])}">
+      <option value="keep_under_review">Keep under review</option>
+      <option value="confirm">Confirm higher-authority/current evidence</option>
+      <option value="reject">Reject current decision / retain opposing claim</option>
+      <option value="supersede">Supersede with new evidence</option>
+    </select>
+    <label><b>Evidence / source</b></label>
+    <textarea id="evidence-\${esc(x['Conflict ID'])}" placeholder="Paste screenshot details, page reference, video timestamp, official source, or other evidence…" style="width:100%;min-height:90px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
+    <label><b>Reviewer notes</b></label>
+    <textarea id="notes-\${esc(x['Conflict ID'])}" placeholder="Explain why you made this decision…" style="width:100%;min-height:70px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
+    <button onclick="submitConflict('\${esc(x['Conflict ID'])}')">Submit resolution</button>
+    <span id="status-\${esc(x['Conflict ID'])}" class="muted small"></span>
+  </div>\`).join('');
+ }catch(e){document.getElementById('conflictResults').innerHTML=\`<div class="card error">\${esc(e.message)}</div>\`}
+}
+async function submitConflict(cid){
+ const status=document.getElementById('status-'+cid);
+ status.textContent='Saving…';
+ const payload={conflict_id:cid,decision:document.getElementById('decision-'+cid).value,evidence:document.getElementById('evidence-'+cid).value,notes:document.getElementById('notes-'+cid).value,reviewed_at:new Date().toISOString()};
+ try{
+  const r=await fetch('/api/conflicts/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const a=await r.json();
+  if(!r.ok||!a.ok)throw new Error(a.error||'Review submission failed');
+  status.textContent='✓ Resolution captured';
+  status.style.color='#4ecb91';
+ }catch(e){status.textContent='✕ '+e.message;status.style.color='#ff5f5f'}
+}
 init();document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});</script></main></body></html>
