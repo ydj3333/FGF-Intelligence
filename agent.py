@@ -924,6 +924,16 @@ class H(BaseHTTPRequestHandler):
             qs=parse_qs(u.query)
             return self._json(progression_planner(qs.get('core_level',['1'])[0],qs.get('target_level',['30'])[0],qs.get('season',['S1'])[0]))
         if u.path=='/api/benchmarks':return self._json(run_benchmarks())
+        if u.path=='/api/admin/knowledge-quality':
+            analyses=KnowledgeAnalyzer(CLAIMS).analyze_all()
+            return self._json(KnowledgeAnalyzer(CLAIMS).export_report())
+        if u.path=='/api/admin/gaps':
+            qs=parse_qs(u.query)
+            failed=qs.get('q',[])
+            if not failed:
+                failed=[str(x.get('question','')) for x in run_benchmark_suite_100(0,100).get('results',[]) if x.get('answerable') is False or x.get('gap')]
+            detector=GapDetector(CLAIMS, failed_questions=failed)
+            return self._json({'ok':True,**detector.get_summary()})
         if u.path=='/api/benchmarks/quality':return self._json(run_quality_benchmarks())
         if u.path=='/api/benchmarks/100':
             qs=parse_qs(u.query);start=int(qs.get('start',['0'])[0]);count=int(qs.get('count',['20'])[0]);return self._json(run_benchmark_suite_100(start,count))
