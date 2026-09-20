@@ -926,8 +926,15 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/benchmarks':return self._json(run_benchmarks())
         if u.path=='/api/admin/knowledge-quality':
             analyzer=KnowledgeAnalyzer(CLAIMS)
-            analyzer.analyze_all()
-            return self._json(analyzer.export_report())
+            detail = 'detail=1' in u.query or 'detail=true' in u.query
+            analyzer.analyze_all(include_related=detail)
+            if detail:
+                return self._json(analyzer.export_report())
+            return self._json({
+                'summary': analyzer.get_summary(),
+                'analysis_mode': 'full' if detail else 'fast',
+                'detail_hint': '/api/admin/knowledge-quality?detail=1',
+            })
         if u.path=='/api/admin/gaps':
             qs=parse_qs(u.query)
             failed=qs.get('q',[])
