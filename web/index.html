@@ -41,28 +41,28 @@ async function loadConflicts(){
   let a=await getJSON('/api/conflicts');
   let rows=a.results||[];
   document.getElementById('conflictResults').innerHTML='<h2>Evidence Conflict Resolution Desk</h2><p class="muted">Review each preserved conflict. Choose a decision, add your evidence/notes, then submit. Historical claims are never deleted.</p>'+
-  rows.map(x=>\`<div class="card conflict">
-    <h3>\${esc(x['Conflict ID'])} — \${esc(x.Topic)}</h3>
-    <p><b>Existing claim:</b> \${esc(x['Existing / Tier-2 claim'])}</p>
-    <p><b>Higher-authority evidence:</b> \${esc(x['Tier-1 evidence'])}</p>
-    <p><b>Current decision:</b> \${esc(x.Decision||'Unresolved')}</p>
-    <p><b>Impact:</b> <span class="pill">\${esc(x.Impact)}</span> <span class="pill">\${esc(x.Status)}</span></p>
-    <p class="muted">\${esc(x.Notes)}</p>
+  rows.map(x=>`<div class="card conflict">
+    <h3>${esc(x['Conflict ID'])} — ${esc(x.Topic)}</h3>
+    <p><b>Existing claim:</b> ${esc(x['Existing / Tier-2 claim'])}</p>
+    <p><b>Higher-authority evidence:</b> ${esc(x['Tier-1 evidence'])}</p>
+    <p><b>Current decision:</b> ${esc(x.Decision||'Unresolved')}</p>
+    <p><b>Impact:</b> <span class="pill">${esc(x.Impact)}</span> <span class="pill">${esc(x.Status)}</span></p>
+    <p class="muted">${esc(x.Notes)}</p>
     <label><b>Your decision</b></label>
-    <select id="decision-\${esc(x['Conflict ID'])}">
+    <select id="decision-${esc(x['Conflict ID'])}">
       <option value="keep_under_review">Keep under review</option>
       <option value="confirm">Confirm higher-authority/current evidence</option>
       <option value="reject">Reject current decision / retain opposing claim</option>
       <option value="supersede">Supersede with new evidence</option>
     </select>
     <label><b>Evidence / source</b></label>
-    <textarea id="evidence-\${esc(x['Conflict ID'])}" placeholder="Paste screenshot details, page reference, video timestamp, official source, or other evidence…" style="width:100%;min-height:90px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
+    <textarea id="evidence-${esc(x['Conflict ID'])}" placeholder="Paste screenshot details, page reference, video timestamp, official source, or other evidence…" style="width:100%;min-height:90px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
     <label><b>Reviewer notes</b></label>
-    <textarea id="notes-\${esc(x['Conflict ID'])}" placeholder="Explain why you made this decision…" style="width:100%;min-height:70px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
-    <button onclick="submitConflict('\${esc(x['Conflict ID'])}')">Submit resolution</button>
-    <span id="status-\${esc(x['Conflict ID'])}" class="muted small"></span>
-  </div>\`).join('');
- }catch(e){document.getElementById('conflictResults').innerHTML=\`<div class="card error">\${esc(e.message)}</div>\`}
+    <textarea id="notes-${esc(x['Conflict ID'])}" placeholder="Explain why you made this decision…" style="width:100%;min-height:70px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
+    <button onclick="submitConflict('${esc(x['Conflict ID'])}')">Submit resolution</button>
+    <span id="status-${esc(x['Conflict ID'])}" class="muted small"></span>
+  </div>`).join('');
+ }catch(e){document.getElementById('conflictResults').innerHTML=`<div class="card error">${esc(e.message)}</div>`}
 }
 async function submitConflict(cid){
  const status=document.getElementById('status-'+cid);
