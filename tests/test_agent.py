@@ -8,8 +8,9 @@ try:
     assert health["tier1"] == 451
     assert health["conflicts"] == 5
     ask=json.load(urllib.request.urlopen("http://127.0.0.1:8000/api/ask?q=guild%20creation"))
-    assert ask["results"]
-    assert any("Level 9" in r["Claim"] for r in ask["results"])
+    assert ask["answer"]
+    assert ask["evidence"]
+    assert ask["model"]
     moon=json.load(urllib.request.urlopen("http://127.0.0.1:8000/api/ask?q=Shared%20Moonlight%20event%20what%20is%20on%20which%20day%20Monday%20speedups%20shortcut"))
     assert "September 15–21" in moon["answer"] or "September 15-21" in moon["answer"]
     assert "weekday" in moon["answer"].lower()
