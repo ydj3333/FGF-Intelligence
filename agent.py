@@ -909,7 +909,7 @@ class H(BaseHTTPRequestHandler):
         u=urlparse(self.path)
         if u.path=='/api/health':
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
-            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':'configured_not_runtime_verified' if configured else 'missing_api_key','model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True})
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':'configured_not_runtime_verified' if configured else 'missing_api_key','model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'knowledge_generated':DATA.get('generated')})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
