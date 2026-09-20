@@ -727,6 +727,70 @@ def answer(q,player_context=None):
         s['quality_gate']=gate
     return {'question':q,'answer_type':'synthesized_evidence','player_context':player_context,'season_scope':scope,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'critical_conflicts':critical,'rules_applied':RULES[:4],'note':'Answer is synthesized from retrieved evidence and passed an evidence-relevance gate. Tier 1 is preferred for mechanics; conflicts and uncertainty are preserved.'}
 
+
+
+def _find_champion_style(name):
+    nl=str(name).strip().lower()
+    if not nl: return None
+    candidates=[]
+    for c in CLAIMS:
+        cl=str(c.get('Claim','')).lower()
+        if nl in cl and any(x in cl for x in ('beam','kinetic','ion','ionic')):
+            candidates.append(c)
+    return candidates[0] if candidates else None
+
+def repair_planner(damage='minor', repair_modules=0, in_combat=False):
+    d=str(damage).strip().lower()
+    try: modules=max(0,int(repair_modules))
+    except (TypeError,ValueError): modules=0
+    if d not in ('minor','major'):
+        return {'ok':False,'error':'damage must be minor or major'}
+    if in_combat:
+        return {'ok':True,'damage':d,'action':'Finish/leave combat before repair processing.','repair_modules_required':(d=='major'),'evidence_basis':['Minor Damage can immediately recover after leaving battle without Repair Modules.','Major Damage requires Repair Modules and is handled through the repair system.']}
+    if d=='minor':
+        return {'ok':True,'damage':'minor','action':'Leave combat; Minor Damage can recover immediately without consuming Repair Modules.','repair_modules_required':False,'repair_modules_to_consume':0,'evidence_basis':['Minor Damage can immediately recover after leaving battle without Repair Modules.']}
+    if modules>0:
+        return {'ok':True,'damage':'major','action':'Use the Repair/Repair Cabin workflow and spend Repair Modules on the Major Damage.','repair_modules_required':True,'repair_modules_available':modules,'repair_modules_to_consume':'Not established per ship in current evidence.','evidence_basis':['Major Damage requires Repair Modules.','Repair Cabin repairs craft with Major Damage.']}
+    return {'ok':True,'damage':'major','action':'Major Damage cannot be repaired without Repair Modules in the current evidence. Obtain/allocate Repair Modules before repair.','repair_modules_required':True,'repair_modules_available':0,'evidence_basis':['Major Damage requires Repair Modules.']}
+
+def fleet_builder(style='', champions=None):
+    style=str(style).strip().lower()
+    aliases={'ion':'Ion','ionic':'Ion','beam':'Beam','kinetic':'Kinetic'}
+    canonical=aliases.get(style)
+    if not canonical:
+        return {'ok':False,'error':'style must be Beam, Kinetic, or Ion'}
+    champs=[str(x).strip() for x in (champions or []) if str(x).strip()][:3]
+    if len(champs)!=3:
+        return {'ok':False,'error':'Provide exactly 3 Champions.'}
+    rows=[]
+    for name in champs:
+        c=_find_champion_style(name)
+        rows.append({'champion':name,'evidence_style':canonical if c and canonical.lower() in str(c.get('Claim','')).lower() else None,'evidence':c.get('Claim','') if c else None})
+    matched=sum(1 for x in rows if x['evidence_style']==canonical)
+    bonus='+20% ATK, DEF and INT' if matched==3 else ('+10% ATK, DEF and INT' if matched==2 else 'No matching-style synergy bonus established for this lineup')
+    return {'ok':True,'style':canonical,'champions':rows,'matched_champions':matched,'synergy_bonus':bonus,'rule':'2 matching Champions grant +10%; 3 matching Champions grant +20%.','note':'Champion-to-style assignment is evidence-dependent; this builder does not invent an assignment when the corpus does not establish one.'}
+
+def progression_planner(core_level=1,target_level=30,season='S1'):
+    try:
+        cur=max(1,int(core_level)); target=max(cur,int(target_level))
+    except (TypeError,ValueError):
+        return {'ok':False,'error':'core_level and target_level must be integers'}
+    if target>35:
+        return {'ok':False,'error':'Current modeled Energy Core ceiling is 35; higher levels are not established.'}
+    q=f'Energy Core level {cur} to {target} requirements upgrades unlocks'
+    hits=retrieve(q,20)
+    milestones=[]
+    for c in hits:
+        cl=str(c.get('Claim','')).lower()
+        if 'energy core' in cl or 'core level' in cl or 'fusion seed' in cl or 'battle queue' in cl:
+            milestones.append({'claim':c.get('Claim',''),'tier':c.get('Evidence Tier',''),'confidence':c.get('Confidence',''),'status':c.get('Status',''),'source':c.get('Source','')})
+    known=[]
+    if cur<33<=target:
+        known.append('Energy Core 33 is documented as unlocking the fourth Battle Queue in the current official progression evidence.')
+    if cur<35<=target:
+        known.append('Energy Core 35 is documented as the current cap in the Epoch of Fusion Seed progression evidence.')
+    return {'ok':True,'season':season,'current_core':cur,'target_core':target,'known_milestones':known,'evidence':milestones[:12],'exact_costs_included':False,'cost_note':'Exact per-level Fusion Seed costs are not inserted unless established by evidence.'}
+
 class H(BaseHTTPRequestHandler):
     def _json(self,obj,status=200):
         b=json.dumps(obj,ensure_ascii=False).encode();self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b)
@@ -745,6 +809,17 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/claims':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
         if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
+        if u.path=='/api/admin/status':
+            return self._json({'admin_configured':bool(ADMIN_TOKEN),'review_endpoint_enabled':bool(ADMIN_TOKEN),'auth_scheme':'X-FGF-Admin-Token or Bearer token','message':'Admin review writes are disabled until FGF_ADMIN_TOKEN is configured.' if not ADMIN_TOKEN else 'Admin review authentication is configured.'})
+        if u.path=='/api/tools/repair':
+            qs=parse_qs(u.query)
+            return self._json(repair_planner(qs.get('damage',['minor'])[0],qs.get('repair_modules',['0'])[0],qs.get('in_combat',['false'])[0].lower()=='true'))
+        if u.path=='/api/tools/fleet-builder':
+            qs=parse_qs(u.query); champs=[x for x in qs.get('champion',[])]
+            return self._json(fleet_builder(qs.get('style',[''])[0],champs))
+        if u.path=='/api/tools/progression':
+            qs=parse_qs(u.query)
+            return self._json(progression_planner(qs.get('core_level',['1'])[0],qs.get('target_level',['30'])[0],qs.get('season',['S1'])[0]))
         if u.path=='/api/benchmarks':return self._json(run_benchmarks())
         if u.path=='/api/benchmarks/quality':return self._json(run_quality_benchmarks())
         if u.path=='/api/benchmarks/100':
@@ -766,9 +841,17 @@ class H(BaseHTTPRequestHandler):
                 allowed={'confirm','reject','supersede','keep_under_review'}
                 if decision not in allowed:
                     return self._json({'ok':False,'error':'Invalid decision'},400)
-                if ADMIN_TOKEN and self.headers.get('X-FGF-Admin-Token','') != ADMIN_TOKEN:
+                if not ADMIN_TOKEN:
+                    return self._json({'ok':False,'error':'Admin review is disabled: FGF_ADMIN_TOKEN is not configured on the server.'},503)
+                supplied=self.headers.get('X-FGF-Admin-Token','')
+                if not supplied:
+                    supplied=self.headers.get('Authorization','')
+                    if supplied.lower().startswith('bearer '): supplied=supplied[7:].strip()
+                if supplied != ADMIN_TOKEN:
                     return self._json({'ok':False,'error':'Admin authorization required'},401)
-                review={'conflict_id':cid,'decision':decision,'evidence':str(body.get('evidence','')).strip(),'notes':str(body.get('notes','')).strip(),'reviewer':str(body.get('reviewer','admin')).strip() or 'admin','reviewed_at':str(body.get('reviewed_at','')).strip()}
+                if n > 65536:
+                    return self._json({'ok':False,'error':'Request too large'},413)
+                review={'conflict_id':cid,'decision':decision,'evidence':str(body.get('evidence','')).strip(),'notes':str(body.get('notes','')).strip(),'reviewer':'authenticated-admin','reviewed_at':str(body.get('reviewed_at','')).strip()}
                 if not any(c.get('Conflict ID')==cid for c in CONFLICTS):
                     return self._json({'ok':False,'error':'Unknown conflict ID'},404)
                 durable=save_conflict_review(review)
