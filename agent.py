@@ -435,7 +435,7 @@ def fallback_answer(question,claims,conflicts=None):
             if guide:
                 lines.append('• F2P shortcut from the detailed guide: claim daily rewards, collect free event resources, delay shop spending until the shop is understood, prioritize limited/rare rewards, manage Moonsoil Diggers carefully, and treat paid features as optional.')
             lines.append('• Do not move generic Monday Speedup/Computational Component advice into Shared Moonlight unless the calendar evidence explicitly links it to this event.')
-        return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in schedule[:6]],'uncertainty':'Exact weekday rotation is not established; server-specific in-game calendar remains authoritative.'}
+        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in schedule[:6]],'uncertainty':'Exact weekday rotation is not established; server-specific in-game calendar remains authoritative.'}
 
 
     if exact_cost_question(question):
