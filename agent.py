@@ -927,11 +927,17 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/admin/knowledge-quality':
             analyzer=KnowledgeAnalyzer(CLAIMS)
             detail = 'detail=1' in u.query or 'detail=true' in u.query
-            analyzer.analyze_all(include_related=detail)
+            analyzer.analyze_all(
+                include_related=detail,
+                include_conflicts=detail,
+            )
             if detail:
                 return self._json(analyzer.export_report())
+            summary = analyzer.get_summary()
+            summary['conflict_count'] = None
+            summary['conflict_status'] = 'not_computed_in_fast_mode'
             return self._json({
-                'summary': analyzer.get_summary(),
+                'summary': summary,
                 'analysis_mode': 'full' if detail else 'fast',
                 'detail_hint': '/api/admin/knowledge-quality?detail=1',
             })
