@@ -20,3 +20,5 @@ jobs:
         run: python -m unittest tests/test_knowledge_analyzer.py -v
       - name: Analyze full repository corpus
         run: python scripts/run_knowledge_quality.py
+      - name: Run FGF agent smoke tests
+        run: python tests/test_agent.py
