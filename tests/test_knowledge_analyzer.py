@@ -120,6 +120,29 @@ class TestKnowledgeAnalyzer(unittest.TestCase):
         result_with = KnowledgeAnalyzer([base, other]).analyze_claim(base)
         self.assertEqual(result_with.confidence_score, result_without.confidence_score)
 
+    def test_corpus_without_explicit_ids_is_analyzed(self):
+        claims = [
+            {
+                "Claim": "Core 8 requires 5000 alloy",
+                "Category": "Progression",
+                "Evidence Tier": "Tier 1",
+                "Source": "Official source",
+            },
+            {
+                "Claim": "Core 8 requires 6000 alloy",
+                "Category": "Progression",
+                "Evidence Tier": "Tier 1",
+                "Source": "Official source",
+            },
+        ]
+        analyzer = KnowledgeAnalyzer(claims)
+        analyses = analyzer.analyze_all()
+        self.assertEqual(len(analyses), 2)
+        self.assertIn(1, analyses)
+        self.assertIn(2, analyses)
+        self.assertTrue(analyses[1].has_preserved_conflict)
+        self.assertIn(2, analyses[1].contradictions)
+
     def test_missing_source_is_flagged(self):
         claim = {"id": 3, "Claim": "Some mechanic exists.", "tier": 3}
         result = KnowledgeAnalyzer([claim]).analyze_claim(claim)
