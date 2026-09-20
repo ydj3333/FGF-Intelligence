@@ -139,6 +139,7 @@ class KnowledgeAnalyzer:
         tier = _tier(claim)
         status = _status(claim)
         text = _text(claim)
+        cid = self._id_for(claim)
 
         contradictions = self._find_contradictions(claim)
         related = self._find_related_claims(claim)
