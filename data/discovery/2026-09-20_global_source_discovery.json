@@ -2,31 +2,28 @@
   "run_name": "FGF V4 — Global Source Discovery — 6h",
   "acquired_at": "2026-09-20",
   "scope": "Whole game: S1/new-server baseline plus S2 overlays; S3/future searched without inference",
-  "policy": {
-    "discovery": "free/native first",
-    "metered_acquisition": "none",
-    "canonical_promotion": false,
-    "tier1_auto_promotion": false,
-    "season_model": "season is player/server state; S1 evidence remains valid for S1 players"
-  },
+  "policy": {"discovery":"free/native first","metered_acquisition":"none","canonical_promotion":false,"tier1_auto_promotion":false,"season_model":"season is player/server state; S1 evidence remains valid for S1 players"},
   "meaningful_candidates": [
-    {"topic":"Season 2 entry and preservation","scope":"S2","tier":"T2","confidence":"high","source":"official Season 2 FAQ social mirror","status":"candidate"},
-    {"topic":"Season 2 seasonal resources","scope":"S2","tier":"T2","confidence":"high","source":"official Season 2 FAQ social mirror","status":"candidate"},
-    {"topic":"Combat Lab rules","scope":"S2","tier":"T2","confidence":"high","source":"official social post mirror","status":"candidate"},
-    {"topic":"Shared Moonlight rules","scope":"S1/S2 server rollout","tier":"T2","confidence":"high","source":"official social post mirror","status":"candidate"},
-    {"topic":"S2 server-specific event calendar","scope":"S2","tier":"T2","confidence":"high","source":"official X mirror","status":"candidate"},
-    {"topic":"Repair button and Energy Core leaderboard","scope":"S1/S2","tier":"T2","confidence":"high","source":"official App Store version 1.1.153","status":"candidate"},
-    {"topic":"Ruins Raiders cross-server","scope":"S1/S2","tier":"T2","confidence":"high","source":"official App Store version 1.1.153","status":"candidate"},
-    {"topic":"S2 Sivana/Ascendancy/magnetic storms","scope":"S2","tier":"T3","confidence":"medium","source":"third-party press-release coverage","status":"candidate"}
+    {"topic":"Energy Core 31-35 / Fusion Seed rollout","scope":"late-S1/new-server","tier":"T2","confidence":"high","source":"official Sep 9 article","status":"candidate"},
+    {"topic":"Season 2 The Usurper","scope":"S2","tier":"T2/T3","confidence":"medium-high","source":"official/current secondary cross-check","status":"candidate"},
+    {"topic":"S2 Sivana / Ascendancy Court / Magnetic Storms & Resistance","scope":"S2","tier":"T3 pending direct corroboration","confidence":"medium","source":"Saving Content / RPG Gamers","status":"under_review"},
+    {"topic":"Combat Lab testing","scope":"S2 testing / Servers 1001-1016","tier":"T2/T3","confidence":"high","source":"official social/store + patch tracking","status":"candidate"},
+    {"topic":"Ruins Raiders cross-server","scope":"S1/S2 depending server age","tier":"T2/T3","confidence":"high","source":"official store/patch coverage","status":"candidate"},
+    {"topic":"Glory Arena defensive-lineup carryover and pre-settlement lockout","scope":"S1/S2","tier":"T3 pending direct official page capture","confidence":"medium","source":"Sep 14 patch tracking","status":"candidate"},
+    {"topic":"Shared Moonlight","scope":"server rollout Sep 15-27","tier":"T2","confidence":"high","source":"official social mirror / current coverage","status":"candidate"},
+    {"topic":"Steam availability","scope":"whole game / future platform launch","tier":"T2","confidence":"high","source":"official Steam store + official portal","status":"candidate"}
   ],
   "cross_checks": {
-    "S2_launch": "confirmed by multiple official-social/store/third-party sources for Sep 14 2026 initial rollout",
-    "S2_servers": "official FAQ says first 1-16; later social posts use 1001-1016 mapping; retain both until server-label normalization is formally resolved",
-    "S3_future": "searched; no reliable game-specific primary evidence found in this cycle; no claims inferred",
-    "Fandom": "search surfaced robots restriction; no content promoted",
-    "Discord": "no accessible primary Discord material captured in this cycle",
-    "YouTube": "relevant current videos surfaced but not promoted without deeper acquisition",
-    "Reddit": "no high-confidence new mechanic evidence retained in this cycle"
+    "S1_baseline":"official news index and Home Port guide remain available; no replacement of S1 mechanics",
+    "Core35":"official Sep 9 article confirms Fusion Seed/Epoch path, L35 cap, L33 fourth Battle Queue; exact individual upgrade costs still not inferred",
+    "S2_launch":"current secondary reports Sep 14 initial S2 rollout; server-label discrepancy remains",
+    "S2_servers":"some sources use 1-16 while current testing material uses 1001-1016; preserve both until normalization",
+    "S3_future":"searched; no reliable game-specific primary evidence found this cycle; no claims inferred",
+    "Fandom":"robots/access restriction prevented reliable content acquisition; no promotion",
+    "Discord":"no accessible primary Discord material captured",
+    "YouTube":"current relevant material was searched but not deeply acquired; no promotion without direct evidence",
+    "Reddit":"search was noisy and yielded no high-confidence new mechanic evidence",
+    "Steam":"store page still says Coming Soon; no launch date inferred"
   },
-  "governance": "All new records are candidate evidence only and require cross-check/admin review before canonical publication."
+  "governance": "All new records are candidate evidence only and require cross-check/admin review before canonical publication. Conflicts and source authority are preserved."
 }
