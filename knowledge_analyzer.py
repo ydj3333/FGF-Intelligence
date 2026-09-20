@@ -157,7 +157,10 @@ class KnowledgeAnalyzer:
             refs.update(self._token_index.get(token, set()))
         return [c for c in self.claims if id(c) in refs]
 
-    def analyze_all(self) -> Dict[int, ClaimAnalysis]:
+    def analyze_all(self, include_related: bool = True) -> Dict[int, ClaimAnalysis]:
+        # Related-claim discovery is the expensive diagnostic. Production admin
+        # summary endpoints may disable it; full corpus reports keep it enabled.
+        self._include_related = include_related
         for claim in self.claims:
             cid = self._id_for(claim)
             if cid >= 0:
@@ -173,7 +176,11 @@ class KnowledgeAnalyzer:
         cid = self._id_for(claim)
 
         contradictions = self._find_contradictions(claim)
-        related = self._find_related_claims(claim)
+        related = (
+            self._find_related_claims(claim)
+            if getattr(self, "_include_related", True)
+            else []
+        )
 
         is_superseded = status == "superseded"
         is_current = status == "confirmed"
