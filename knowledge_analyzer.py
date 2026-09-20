@@ -88,9 +88,10 @@ def _status(claim: Dict) -> str:
 
 
 def _text(claim: Dict) -> str:
+    # Category is a separate alignment signal; do not inject it into lexical
+    # overlap, otherwise every same-category claim gains an artificial token.
     return str(
         claim.get("Claim", claim.get("claim", "")) + " " +
-        claim.get("Category", "") + " " +
         claim.get("Notes", "")
     ).strip()
 
