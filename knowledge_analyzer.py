@@ -116,10 +116,19 @@ class KnowledgeAnalyzer:
         self.claims = claims
         self.sources = sources or []
         self.analyses: Dict[int, ClaimAnalysis] = {}
+        # Some canonical corpus exports do not carry an explicit claim ID.
+        # Assign deterministic 1-based internal IDs without mutating the corpus.
+        self._internal_ids = {
+            id(claim): (_claim_id(claim) if _claim_id(claim) >= 0 else index)
+            for index, claim in enumerate(self.claims, start=1)
+        }
+
+    def _id_for(self, claim: Dict) -> int:
+        return self._internal_ids.get(id(claim), _claim_id(claim))
 
     def analyze_all(self) -> Dict[int, ClaimAnalysis]:
         for claim in self.claims:
-            cid = _claim_id(claim)
+            cid = self._id_for(claim)
             if cid >= 0:
                 self.analyses[cid] = self.analyze_claim(claim)
         return self.analyses
@@ -174,7 +183,7 @@ class KnowledgeAnalyzer:
         quality_tier = self._map_quality_tier(quality_score)
 
         return ClaimAnalysis(
-            claim_id=_claim_id(claim),
+            claim_id=cid,
             quality_score=quality_score,
             quality_tier=quality_tier,
             coverage_score=coverage_score,
@@ -182,10 +191,10 @@ class KnowledgeAnalyzer:
             has_preserved_conflict=has_preserved_conflict,
             is_superseded=is_superseded,
             is_current=is_current,
-            contradictions=[_claim_id(c) for c in contradictions if _claim_id(c) >= 0],
+            contradictions=[self._id_for(c) for c in contradictions if self._id_for(c) >= 0],
             issues=list(dict.fromkeys(issues)),
             suggestions=list(dict.fromkeys(suggestions)),
-            related_claims=[_claim_id(c) for c in related if _claim_id(c) >= 0],
+            related_claims=[self._id_for(c) for c in related if self._id_for(c) >= 0],
         )
 
     def _score_quality(self, claim: Dict) -> float:
@@ -273,7 +282,7 @@ class KnowledgeAnalyzer:
         as a contradiction merely because both contain numbers.
         """
         text = _text(claim).lower()
-        cid = _claim_id(claim)
+        cid = self._id_for(claim)
         category = str(claim.get("Category", "")).strip().lower()
         results = []
 
@@ -342,7 +351,7 @@ class KnowledgeAnalyzer:
             return " ".join(out)
 
         for other in self.claims:
-            if _claim_id(other) == cid:
+            if self._id_for(other) == cid:
                 continue
 
             other_text = _text(other).lower()
@@ -377,7 +386,7 @@ class KnowledgeAnalyzer:
         return results
 
     def _find_related_claims(self, claim: Dict, limit: int = 12) -> List[Dict]:
-        cid = _claim_id(claim)
+        cid = self._id_for(claim)
         base = _tokens(_text(claim))
         if not base:
             return []
