@@ -1,0 +1,85 @@
+{
+  "run_id": "2026-09-22-global-source-discovery-09",
+  "acquired_at": "2026-09-22T01:32:03+05:30",
+  "scope": ["S1/new-server baseline", "S2", "S3/future overlays"],
+  "method": "free/native web discovery first; deduplicated before deeper extraction",
+  "canonical_tier1_promotions": 0,
+  "findings": [
+    {
+      "topic": "S2 official FAQ / lifecycle",
+      "tier": "T1-primary-derived",
+      "confidence": "high",
+      "source": "https://imginn.com/p/Dc55mb-FK3y/",
+      "published": "2026-09-05",
+      "scope": "S2 initial rollout Servers 1-16",
+      "notes": "S2 starts Sep 14; current initial schedule through Dec 7; permanent Champions and ships retained; unfinished S1 content cannot continue; retroactive rewards; Resistance Crystals and Magnetic Ore are seasonal and removed at S2 end; migration suspended during S2."
+    },
+    {
+      "topic": "S2 operational testing",
+      "tier": "T1-primary-derived",
+      "confidence": "high",
+      "source": "https://imginn.com/p/DdLDOwklDej/",
+      "published": "2026-09-12",
+      "scope": "Servers 1001-1016",
+      "notes": "S2 testing, Shared Moonlight, Combat Lab, Ruins Raiders cross-server, Repair button, Energy Core leaderboard tie-break, Fusion Seed production increase while Core is Overloaded."
+    },
+    {
+      "topic": "Shared Moonlight",
+      "tier": "T2",
+      "confidence": "medium-high",
+      "source": "https://en.softonic.com/articles/foundation-galactic-frontier-launches-shared-moonlight-not-polymorphs-foundation",
+      "published": "2026-09-16",
+      "scope": "Servers 1001-1247",
+      "notes": "Phase 1001-1016 Sep 15-21; 1017-1247 Sep 21-27; sign-ins, Bingo Bash, Moonlight Battlepass, Lunar Soil Prospecting 100 layers, Moonlit Treasures, Full Moon Charge-Up raffles; rewards include ship skin, frames, kill effect and crew choice."
+    },
+    {
+      "topic": "Android version signal",
+      "tier": "T3",
+      "confidence": "medium",
+      "source": "https://apkpure.net/th/foundation-galactic-frontier/com.games.foundation/versions",
+      "published": "2026-09-16",
+      "scope": "Android",
+      "version": "1.1.155.240733",
+      "notes": "Reports S2 testing on 1001-1016 and Shared Moonlight. Treat as third-party version evidence, not authoritative current-version truth."
+    },
+    {
+      "topic": "S1/Core35 baseline",
+      "tier": "T2",
+      "confidence": "medium",
+      "source": "https://murpo.com/news/core-35-arrives",
+      "published": "2026-08-09; updated 2026-09-12",
+      "scope": "Core35 / beta rollout",
+      "notes": "Fusion Seeds, five buildings, research trees, Champion/Flagship caps and four deployable flagships; secondary corroboration only."
+    },
+    {
+      "topic": "Steam status",
+      "tier": "T1-primary",
+      "confidence": "high",
+      "source": "https://www.foundation.game/en/news/foundation-galactic-frontier-steam-version-coming-soon",
+      "published": "2026-01-23",
+      "scope": "Steam",
+      "notes": "Official announcement says Steam version coming soon; SteamDB still reports Coming soon as of latest record. No launch date inferred."
+    },
+    {
+      "topic": "Gift codes",
+      "tier": "T3",
+      "confidence": "low-medium",
+      "source": "https://www.mrguider.org/codes/foundation-galactic-frontier-codes/",
+      "published": "2026-09-08; updated 2026-09-18",
+      "scope": "September 2026",
+      "notes": "CHEERS100K and S2SupplyDrop reported active; community-only evidence, not canonical."
+    }
+  ],
+  "conflicts": [
+    "S2 server labeling: official FAQ says 1-16 while operational/testing notice uses 1001-1016.",
+    "Third-party Android version 1.1.155.240733 is not treated as authoritative over official store data.",
+    "Shared Moonlight secondary sources report Sep 27 end for 1017-1247; preserve until direct primary confirmation."
+  ],
+  "s3_future_gap": "No sufficiently reliable new primary S3/future-season mechanics surfaced in this cycle.",
+  "persistence": {
+    "github": true,
+    "supabase": "read/check completed; direct SQL persistence blocked by tool safety checks",
+    "notion": false
+  },
+  "security_note": "Supabase security advisor currently reports 28 public tables with RLS enabled but no policies; remediation requires deliberate policy design and was not applied automatically."
+}
