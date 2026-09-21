@@ -356,10 +356,17 @@ def claim_relevance(q,c):
             return False
     return True
 
-def retrieve(q,limit=10):
+def retrieve(q,limit=10,include_candidates=False):
+    """Retrieve evidence with an explicit production-truth boundary.
+
+    Normal answer retrieval uses CURRENT lifecycle claims only. Candidate/
+    Under Review evidence is available only to explicit evidence/recommendation
+    surfaces that can label it as unverified.
+    """
     ranked=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True)
     hits=[c for s,c in ranked
-          if s>0.85 and c.get('Status') not in ('Rejected','Superseded')
+          if s>0.85
+          and (include_candidates or normalize_state(c.get('Status')) == 'current')
           and current_scope_relevance(c) and claim_relevance(q,c)]
     out=[];seen=set();categories=set()
     for c in hits:
@@ -568,7 +575,7 @@ def synthesize(question,claims,conflicts=None,mode='answer'):
 
 def recommend(q,objective='general'):
     objective_terms={'pvp':'pvp arena gvg port war combat','pve':'pve boss event hunting ground shrine','f2p':'f2p free progression economy spending','progression':'energy core building research shipyard construction','economy':'trade home port resources credits guild vouchers','event':'event rewards currency points guild'}
-    qq=(q+' '+objective_terms.get(objective,'')).strip();hits=retrieve(qq,12)
+    qq=(q+' '+objective_terms.get(objective,'')).strip();hits=retrieve(qq,12,include_candidates=True)
     s=synthesize(q or ('Give me the best recommendation for '+objective),hits,relevant_conflicts(q+' '+objective),'recommendation')
     return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
 
@@ -944,7 +951,7 @@ class H(BaseHTTPRequestHandler):
             priorities.append({'priority':'Keep research/construction active','reason':'Avoid idle progression time.','evidence':'Daily progression evidence'})
             return self._json({'ok':True,'priorities':priorities,'profile':profile})
         if u.path=='/api/v5/evidence':
-            qs=parse_qs(u.query);q=qs.get('q',[''])[0];hits=retrieve(q,12)
+            qs=parse_qs(u.query);q=qs.get('q',[''])[0];hits=retrieve(q,12,include_candidates=True)
             return self._json({'results':[{'claim':c.get('Claim',''),'tier':c.get('Evidence Tier',''),'confidence':c.get('Confidence',''),'source':c.get('Source',''),'status':c.get('Status','')} for c in hits]})
         if u.path=='/api/claims':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
