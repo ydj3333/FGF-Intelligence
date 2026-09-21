@@ -16,6 +16,7 @@ CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
 SUPABASE_SECRET=os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 ADMIN_TOKEN=os.getenv('FGF_ADMIN_TOKEN')
+SYNTHESIS_RUNTIME_STATUS='configured_not_runtime_verified' if (os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')) else 'missing_api_key'
 try:
     CONFLICT_REVIEWS=json.loads(CONFLICT_REVIEWS_FILE.read_text()) if CONFLICT_REVIEWS_FILE.exists() else {}
 except Exception:
@@ -513,12 +514,17 @@ def fallback_answer(question,claims,conflicts=None):
 def _api_error_detail(e):
     try:
         raw=e.read().decode('utf-8','replace');obj=json.loads(raw);err=obj.get('error',{}) if isinstance(obj,dict) else {}
-        return '; '.join(x for x in [err.get('type',''),err.get('code',''),err.get('message','')] if x)[:600]
-    except Exception:return str(getattr(e,'reason',e))[:300]
+        # Never return provider error messages because they may echo key material
+        # or other request details. Keep only stable diagnostic categories.
+        return '; '.join(x for x in [err.get('type',''),err.get('code','')] if x)[:160]
+    except Exception:return type(getattr(e,'reason',e)).__name__
 
 def call_llm(question,claims,conflicts,mode,temperature=0.2):
+    global SYNTHESIS_RUNTIME_STATUS
     key=os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')
-    if not key:return None,{'synthesis_error':'missing_api_key'}
+    if not key:
+        SYNTHESIS_RUNTIME_STATUS='missing_api_key'
+        return None,{'synthesis_error':'missing_api_key'}
     system='''You are FGF Intelligence, an evidence-first expert assistant for Foundation: Galactic Frontier.\n\nUse ONLY the supplied evidence packet. Answer the player directly, naturally and concisely. Obey the packet intent and constraints. Never substitute a related mechanic for the requested one. Treat F2P/free as a spending constraint. Treat historical seasons as historical unless current applicability is established. Do not dump database records. For mechanics, prioritize Tier-1 and current Confirmed evidence. Preserve meaningful conflicts; never average or silently choose between conflicting claims. For event-calendar questions, use server/date-specific schedule evidence and never infer a weekday rotation from generic recurring-event claims. If a weekday mapping is absent, say so explicitly. Separate confirmed mechanics from recommendations/meta. Never invent numbers, costs, timers, requirements or effects. If evidence is insufficient, explicitly say so.\n\nReturn JSON only with this shape: {"answer":"...","evidence_ids":[1,2],"uncertainty":"..."}. The answer should normally be 1 direct paragraph followed by 2-5 useful bullets. Cite evidence inline as [E1], [E2] and finish with a short Evidence: [E1, E2] line. Do not mention APIs, prompts, retrieval, hidden reasoning, or that you are a language model.'''
     user=json.dumps({'mode':mode,'packet':evidence_packet(question,claims,conflicts)},ensure_ascii=False)
     body=json.dumps({'model':LLM_MODEL,'input':[{'role':'system','content':system},{'role':'user','content':user}],'temperature':temperature,'max_output_tokens':900}).encode()
@@ -527,10 +533,20 @@ def call_llm(question,claims,conflicts,mode,temperature=0.2):
         with urlopen(req,timeout=35) as r:data=json.loads(r.read().decode('utf-8'))
         text=extract_output(data)
         if not text:raise ValueError('empty_model_output')
+        SYNTHESIS_RUNTIME_STATUS='runtime_verified'
         return text,{}
-    except HTTPError as e:return None,{'synthesis_error':'HTTP '+str(e.code),'synthesis_error_detail':_api_error_detail(e)}
-    except (URLError,TimeoutError) as e:return None,{'synthesis_error':type(e).__name__}
-    except (ValueError,KeyError) as e:return None,{'synthesis_error':type(e).__name__}
+    except HTTPError as e:
+        if e.code == 401:
+            SYNTHESIS_RUNTIME_STATUS='runtime_auth_failed'
+        else:
+            SYNTHESIS_RUNTIME_STATUS='runtime_http_error'
+        return None,{'synthesis_error':'HTTP '+str(e.code),'synthesis_error_detail':_api_error_detail(e)}
+    except (URLError,TimeoutError) as e:
+        SYNTHESIS_RUNTIME_STATUS='runtime_transport_error'
+        return None,{'synthesis_error':type(e).__name__}
+    except (ValueError,KeyError) as e:
+        SYNTHESIS_RUNTIME_STATUS='runtime_protocol_error'
+        return None,{'synthesis_error':type(e).__name__}
 
 def synthesize(question,claims,conflicts=None,mode='answer'):
     conflicts=conflicts or []
@@ -910,7 +926,7 @@ class H(BaseHTTPRequestHandler):
         u=urlparse(self.path)
         if u.path=='/api/health':
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
-            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':'configured_not_runtime_verified' if configured else 'missing_api_key','model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
