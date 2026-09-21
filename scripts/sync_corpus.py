@@ -12,7 +12,8 @@ Usage:
 
 Required environment:
   FGF_SUPABASE_URL or SUPABASE_URL
-  FGF_SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_ROLE_KEY
+  FGF_SUPABASE_SECRET_KEY (preferred) or FGF_SUPABASE_SERVICE_ROLE_KEY
+  SUPABASE_SECRET_KEY / SUPABASE_SERVICE_ROLE_KEY are also accepted.
 """
 
 from __future__ import annotations
@@ -39,11 +40,16 @@ def norm(value: Any) -> str:
 
 def env_credentials():
     base = os.getenv("FGF_SUPABASE_URL") or os.getenv("SUPABASE_URL")
-    key = os.getenv("FGF_SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    key = (
+        os.getenv("FGF_SUPABASE_SECRET_KEY")
+        or os.getenv("SUPABASE_SECRET_KEY")
+        or os.getenv("FGF_SUPABASE_SERVICE_ROLE_KEY")
+        or os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    )
     if not base or not key:
         raise RuntimeError(
             "Missing Supabase credentials; set FGF_SUPABASE_URL and "
-            "FGF_SUPABASE_SERVICE_ROLE_KEY."
+            "FGF_SUPABASE_SECRET_KEY (preferred) or the legacy service-role key."
         )
     return base.rstrip("/"), key
 
@@ -78,8 +84,6 @@ def build_claim(row: Dict[str, Any], old_by_key: Dict[str, Dict[str, Any]]) -> D
 
     metadata = row.get("metadata") if isinstance(row.get("metadata"), dict) else {}
     existing = old_by_key.get(str(row.get("claim_key", "")), {})
-    # Supabase fields are authoritative; existing snapshot fields are retained
-    # only where the canonical row has not supplied the richer representation.
     merged = dict(existing)
     merged.update(metadata)
     merged.update({
@@ -95,23 +99,18 @@ def build_claim(row: Dict[str, Any], old_by_key: Dict[str, Dict[str, Any]]) -> D
         "Status": row.get("status", ""),
         "Verification Status": metadata.get(
             "Verification Status",
-            "Needs Review" if str(row.get("status", "")).lower() in
-            ("under review", "candidate", "needs review") else "Unknown",
+            "Needs Review" if str(row.get("status", "")).lower()
+            in ("under review", "candidate", "needs review") else "Unknown",
         ),
         "Timestamp": metadata.get("Timestamp", existing.get("Timestamp", "")),
-        "Notes": metadata.get(
-            "Notes",
-            existing.get("Notes", ""),
-        ),
+        "Notes": metadata.get("Notes", existing.get("Notes", "")),
         "Claim Type": row.get("claim_type", ""),
         "claim_key": row.get("claim_key", ""),
         "supabase_id": row.get("id", ""),
     })
-
-    # Keep lifecycle metadata additive and deterministic.
     lifecycle = lifecycle_metadata(merged)
     merged["metadata"] = {
-        **(metadata if isinstance(metadata, dict) else {}),
+        **metadata,
         **lifecycle,
     }
     return merged
@@ -120,7 +119,6 @@ def build_claim(row: Dict[str, Any], old_by_key: Dict[str, Dict[str, Any]]) -> D
 def validate(rows: List[Dict[str, Any]]) -> None:
     keys = [str(r.get("claim_key", "")) for r in rows]
     claims = [norm(r.get("claim")) for r in rows]
-
     if any(not x for x in keys):
         raise RuntimeError("Supabase export contains a claim without claim_key.")
     if len(keys) != len(set(keys)):
@@ -128,7 +126,6 @@ def validate(rows: List[Dict[str, Any]]) -> None:
     if len(claims) != len(set(claims)):
         dupes = sorted({x for x in claims if claims.count(x) > 1})[:5]
         raise RuntimeError(f"Supabase export contains duplicate normalized claims: {dupes}")
-
     for row in rows:
         if not row.get("claim"):
             raise RuntimeError(f"Claim {row.get('claim_key')} has empty claim text.")
@@ -163,12 +160,10 @@ def export(check_only: bool = False) -> Dict[str, Any]:
     old_by_key = {
         str(c.get("claim_key")): c for c in old_claims if c.get("claim_key")
     }
-
     rows = fetch_rows(base, key)
     validate(rows)
     claims = [build_claim(row, old_by_key) for row in rows]
     state_counts = summarize_states(claims)
-
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     digest = checksum(claims)
     manifest = {
@@ -185,7 +180,6 @@ def export(check_only: bool = False) -> Dict[str, Any]:
         "generated": generated,
         "synced_at_utc": datetime.now(timezone.utc).isoformat(),
     }
-
     result = {
         "supabase_claims": len(rows),
         "snapshot_claims": len(old_claims),
@@ -195,7 +189,6 @@ def export(check_only: bool = False) -> Dict[str, Any]:
         "check": check_only,
         "changed": canonical_json(old_claims) != canonical_json(claims),
     }
-
     if check_only:
         return result
 
@@ -206,7 +199,6 @@ def export(check_only: bool = False) -> Dict[str, Any]:
     stats["total_claims"] = len(claims)
     stats["tier1_claims"] = manifest["tier1_count"]
     output["stats"] = stats
-
     KNOWLEDGE.write_text(
         json.dumps(output, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
