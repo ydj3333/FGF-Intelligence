@@ -1,0 +1,23 @@
+{
+  "run": 8,
+  "date": "2026-09-21",
+  "scope": "whole-game: S1/new-server baseline + S2 + S3/future overlays",
+  "method": "free/native-first web discovery; cross-check; deduplicate; no automatic Tier-1 promotion",
+  "findings": [
+    {"topic":"Shared Moonlight / Lunar Ruins","scope":"S2/event; servers 1001-1016 Sep 15-21, 1017-1247 Sep 21-27 (secondary mirrors differ by one day)","evidence_tier":"T2 candidate","confidence":"medium","source":"https://ngntipkolamrenang.twstalker.com/FoundationGF_EN","acquired":"2026-09-21","notes":"Official-account mirror reports Grand Prize selection per layer; finding it advances immediately; changing prize preserves excavation progress."},
+    {"topic":"Interstellar Migration","scope":"servers 1017-1112; Sep 22-28","evidence_tier":"T3","confidence":"medium-low","source":"https://murpo.com/news/klara-game-news-66d6ec599251e1f6cf71","acquired":"2026-09-21","notes":"Secondary community report; six 16-server migration groups and schedule. Also reports S2 testing on servers 1-16, conflicting with operational 1001-1016 material."},
+    {"topic":"S2 official FAQ","scope":"S2; servers 1-16 baseline and eligible servers >=90 days","evidence_tier":"T2 candidate","confidence":"high","source":"https://imginn.com/p/Dc55mb-FK3y/","acquired":"2026-09-21","notes":"Official social-account mirror: S2 Sep 14-Dec 7 for servers 1-16; four phases; automatic entry to Siwenna."},
+    {"topic":"Core 35","scope":"S1/progression baseline","evidence_tier":"T2/T3 corroboration","confidence":"medium","source":"https://www.foundation.game/en","acquired":"2026-09-21","notes":"Official portal confirms Epoch of Fusion Seed, LV35 Buildings & 4th Battle Queue; detailed mechanics require direct source extraction."},
+    {"topic":"App version","scope":"current version signals","evidence_tier":"T2/T3","confidence":"medium","source":"https://foxdata.com/en/app-marketing-analytics/6737595599/as/GB/foundation-galactic-frontier/","acquired":"2026-09-21","notes":"FoxData reports 1.1.153 updated Sep 16; APKPure separately reports 1.1.155.240733 Sep 16. Version conflict preserved; neither promoted to canonical solely from mirrors."},
+    {"topic":"Future features","scope":"future/S3 signal","evidence_tier":"T3","confidence":"low","source":"https://murpo.com/","acquired":"2026-09-21","notes":"Community bulletin teaser mentions Combat Lab TPS, permanent Tower Defense, United Frontline return, new gold Beam Champion; release details under wraps. Not canonical."},
+    {"topic":"Player issue","scope":"event/community","evidence_tier":"T3","confidence":"low","source":"https://www.reddit.com/r/FoundationGFrontier/comments/1qwela3/foundation_exploration_event/","acquired":"2026-09-21","notes":"Player reports exploration reward exchange locked despite successful participation; possible bug or misunderstanding. Requires primary corroboration."}
+  ],
+  "conflicts": [
+    {"id":"S2-server-scope","status":"open","details":"Primary/official-social FAQ mirror says initial S2 servers 1-16; current operational/test material says 1001-1016. Preserve both with source scope; do not normalize by assumption."},
+    {"id":"app-version","status":"open","details":"Third-party stores report 1.1.153 and 1.1.155.240733 around Sep 16. Official store should be preferred when directly available."},
+    {"id":"Shared-Moonlight-dates","status":"open","details":"Secondary sources differ on whether server 1017-1247 ends Sep 26 or Sep 27. Preserve source-specific dates until primary confirmation."}
+  ],
+  "s3_future_gap": "No sufficiently reliable new primary S3/future-season mechanics found in this cycle.",
+  "tier1_promotions": 0,
+  "governance": "Candidate evidence only; no canonical claims overwritten or promoted automatically."
+}
