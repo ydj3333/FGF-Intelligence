@@ -6,10 +6,11 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 from gap_detector import GapDetector
 from knowledge_analyzer import KnowledgeAnalyzer
+from claim_lifecycle import summarize_states, normalize_state
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v5.1.0-event-calendar'
+RELEASE='v5.2.0-core-lifecycle'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -909,7 +910,7 @@ class H(BaseHTTPRequestHandler):
         u=urlparse(self.path)
         if u.path=='/api/health':
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
-            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':'configured_not_runtime_verified' if configured else 'missing_api_key','model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'knowledge_generated':DATA.get('generated')})
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':'configured_not_runtime_verified' if configured else 'missing_api_key','model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
@@ -932,6 +933,8 @@ class H(BaseHTTPRequestHandler):
         if u.path=='/api/claims':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];lim=int(qs.get('limit',['50'])[0]);res=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True) if q else [(0,c) for c in CLAIMS];return self._json({'results':[c for s,c in res[:lim]]})
         if u.path=='/api/conflicts':return self._json({'results':CONFLICTS})
+        if u.path=='/api/admin/lifecycle':
+            return self._json({'ok':True,'states':summarize_states(CLAIMS),'production_current':sum(1 for c in CLAIMS if normalize_state(c.get('Status')) == 'current'),'candidate_count':sum(1 for c in CLAIMS if normalize_state(c.get('Status')) == 'candidate')})
         if u.path=='/api/admin/status':
             return self._json({'admin_configured':bool(ADMIN_TOKEN),'review_endpoint_enabled':bool(ADMIN_TOKEN),'auth_scheme':'X-FGF-Admin-Token or Bearer token','message':'Admin review writes are disabled until FGF_ADMIN_TOKEN is configured.' if not ADMIN_TOKEN else 'Admin review authentication is configured.'})
         if u.path=='/api/v5/player':
