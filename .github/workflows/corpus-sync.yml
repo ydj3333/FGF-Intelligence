@@ -1,0 +1,92 @@
+name: FGF Corpus Synchronization
+
+on:
+  schedule:
+    - cron: '15 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: fgf-corpus-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Verify Supabase sync secret
+        env:
+          SUPABASE_SECRET: ${{ secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SUPABASE_SECRET" ]; then
+            echo "::error::Configure FGF_SUPABASE_SECRET_KEY (preferred) or FGF_SUPABASE_SERVICE_ROLE_KEY in GitHub Actions secrets."
+            exit 1
+          fi
+
+      - name: Synchronize canonical claim corpus
+        env:
+          FGF_SUPABASE_URL: https://qdoixzfkkmvzjfkhzups.supabase.co
+          FGF_SUPABASE_SECRET_KEY: ${{ secrets.FGF_SUPABASE_SECRET_KEY }}
+          FGF_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/sync_corpus.py
+
+      - name: Run lifecycle and corpus tests
+        run: |
+          python -m unittest             tests/test_claim_lifecycle.py             tests/test_sync_corpus.py             tests/test_knowledge_analyzer.py -v
+
+      - name: Run agent smoke tests
+        run: python tests/test_agent.py
+
+      - name: Run corpus quality analysis
+        run: python scripts/run_knowledge_quality.py
+
+      - name: Commit synchronized corpus
+        id: commit
+        run: |
+          set -euo pipefail
+          git config user.name 'FGF Intelligence Bot'
+          git config user.email 'fgf-intelligence-bot@users.noreply.github.com'
+          git add data/knowledge.json data/knowledge_manifest.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No corpus changes."
+          else
+            git commit -m "chore: synchronize canonical FGF knowledge corpus"
+            git push origin main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger Render deployment for synchronized corpus
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$RENDER_DEPLOY_HOOK_URL"
+          curl --fail --show-error --silent --request POST "$RENDER_DEPLOY_HOOK_URL"
+
+      - name: Verify production health after deployment
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          for i in {1..30}; do
+            code=$(curl -s -o /tmp/health.json -w "%{http_code}" https://fgf-intelligence.onrender.com/api/health || true)
+            if [ "$code" = "200" ]; then
+              cat /tmp/health.json
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Render did not become healthy within the wait window."
+          exit 1
