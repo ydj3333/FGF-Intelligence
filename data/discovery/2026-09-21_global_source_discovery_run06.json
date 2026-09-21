@@ -1,0 +1,22 @@
+{
+  "run": "FGF V4 Global Source Discovery",
+  "cycle": 6,
+  "acquired_at": "2026-09-21T07:39:48+05:30",
+  "scope": ["S1/new-server baseline", "S2", "S3/future overlays"],
+  "discovery_policy": "free/native first; deduplicate before deeper extraction; no automatic Tier-1 promotion",
+  "sources_checked": ["official portal/news/store", "official social mirrors", "Reddit/player search", "YouTube search", "Steam/store search", "third-party guides/forums", "FGF Wiki/Encyclopedia/Fandom search"],
+  "new_findings": [
+    {"topic":"Shared Moonlight/Lunar Ruins","tier":"T2 candidate","scope":"S2; servers 1001-1016 Sep 15-20 and 1017-1247 Sep 21-26","finding":"Choose a Grand Prize per excavation layer; uncovering it advances immediately; changing the Grand Prize before discovery preserves excavation progress.","source":"https://twstalker.com/FoundationGF_EN"},
+    {"topic":"S2 rollout","tier":"T2 candidate","scope":"S2; servers 1001-1016","finding":"Official social mirror reports S2 testing/playability rollout on servers 1001-1016 and Shared Moonlight maintenance/event details.","source":"https://imginn.com/p/DdLDOwklDej/"},
+    {"topic":"Current store patch notes","tier":"T2 candidate","scope":"Current version history","finding":"App Store listing contains current S2 testing, Shared Moonlight, Combat Lab, Ruins Raiders cross-server, Repair button, and Energy Core leaderboard tie-break notes.","source":"https://apps.apple.com/us/app/foundation-galactic-frontier/id6737595599"},
+    {"topic":"Third-party current version signal","tier":"T3","scope":"September 2026","finding":"Third-party APK source signals a newer build than the App Store listing; retained only as version evidence and not canonicalized.","source":"https://www.topuplive.com/news/foundation-galactic-frontier-codes.html"},
+    {"topic":"Core 35","tier":"T3 corroboration","scope":"S1/new-server baseline","finding":"Third-party Frontier News reiterates Core 35, Fusion Seeds, five buildings, new research trees and raised champion/flagship caps; official evidence remains preferred.","source":"https://murpo.com/news/core-35-arrives"},
+    {"topic":"S2 migration timeline","tier":"T3 corroboration","scope":"S2","finding":"Community source records Sep 1 migration event, Sep 7 preview and Sep 14 playable S2 for 1001-1016; it also contains gift-code and future-feature claims that remain unverified.","source":"https://murpo.com/news/season-2-delayed-no-longer-arriving-in-august"}
+  ],
+  "conflicts": [
+    {"type":"server_scope","status":"open","details":"Some rollout documentation refers to Servers 1-16 while current operational material refers to Servers 1001-1016. Preserve both with source/version scope; do not normalize by assumption."}
+  ],
+  "future_search": {"S3": "no reliable new primary mechanics surfaced this cycle; recorded as search gap"},
+  "promotion": {"canonical_tier1": 0},
+  "notes": "Lower-tier repeated claims remain corroboration only. No claim was promoted to canonical Tier 1 automatically."
+}
