@@ -107,7 +107,7 @@ def temporal_scope(claim: Dict[str, Any]) -> TemporalScope:
         valid_from=pick("valid_from", "validFrom"),
         valid_until=pick("valid_until", "validUntil"),
         server_scope=pick("server_scope", "serverScope"),
-        season_scope=pick("season_scope", "seasonScope", "season"),
+        season_scope=pick("season_scope", "seasonScope", "Season/Version", "season"),
         version_scope=pick("version_scope", "versionScope", "version"),
     )
 
