@@ -1,0 +1,51 @@
+{
+  "cycle": "FGF V4 Global Source Discovery",
+  "run": 7,
+  "acquired_at": "2026-09-21T13:34:24+05:30",
+  "scope": ["S1/new-server baseline", "S2 overlay", "S3/future-season overlays"],
+  "discovery_policy": "free/native first; deduplicate before deeper extraction; no automatic Tier-1 promotion",
+  "new_observations": [
+    {
+      "topic": "Shared Moonlight / Lunar Ruins",
+      "source": "https://twstalker.com/FoundationGF_EN",
+      "source_status": "mirror of official social account",
+      "tier": "T2",
+      "confidence": "medium",
+      "server_scope": "1017-1247",
+      "publication_date": "2026-09-21",
+      "finding": "Players choose a Grand Prize before excavating each Lunar Ruins layer; uncovering it advances immediately; changing the selected Grand Prize does not reset excavation progress.",
+      "canonical": false
+    },
+    {
+      "topic": "S1/event bug signal",
+      "source": "https://www.reddit.com/r/FoundationGFrontier/comments/1qwela3/foundation_exploration_event/",
+      "source_status": "player report",
+      "tier": "T3",
+      "confidence": "low",
+      "publication_date": "2026-09-20",
+      "finding": "A player reports successful exploration participation but locked Reward Exchange/no exchangeable rewards; another player suggests checking in-game mail/support.",
+      "canonical": false,
+      "needs_corroboration": true
+    },
+    {
+      "topic": "FGF Wiki source family",
+      "source": "https://fgfwiki.com/",
+      "tier": "T2",
+      "confidence": "medium",
+      "finding": "Active encyclopedia exposes strategy guides, hero tier list, flagship guides/decks, event walkthroughs, calculators, active codes and an LLM knowledge base. Targeted S2 pages were not surfaced by this search index.",
+      "canonical": false
+    }
+  ],
+  "cross_checks": {
+    "shared_moonlight": "Current official-social mirror agrees with recent secondary coverage on the 1017-1247 phase.",
+    "s3_future": "No reliable new primary S3/future-season mechanics surfaced in this cycle; recorded as a search gap rather than inferred.",
+    "server_scope_conflict": "The existing S2 1-16 vs 1001-1016 discrepancy remains preserved and unresolved."
+  },
+  "persistence": {
+    "supabase_project": "qdoixzfkkmvzjfkhzups",
+    "project_name": "FGF-V4-Intelligence",
+    "ingestion_recorded": true,
+    "automatic_tier1_promotions": 0
+  },
+  "security_note": "Supabase security advisor continues to report RLS disabled on 26 public tables. No automatic RLS remediation was applied because policies must be designed before enabling RLS."
+}
