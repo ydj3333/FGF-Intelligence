@@ -1,0 +1,19 @@
+{
+  "run": 10,
+  "date": "2026-09-22",
+  "scope": ["S1/new-server baseline", "S2", "S3/future-season"],
+  "findings": [
+    {"source":"https://funplus.com/foundation-galactic-frontier-soars-into-season-two/","tier":"T1","confidence":"high","scope":"S2 / Servers 1-16","finding":"Sivana, Ascendancy Court, Magnetic Storms & Resistance, Aromabloom Trade War, Steam integration"},
+    {"source":"https://twstalker.com/FoundationGF_EN","tier":"T2","confidence":"high","scope":"Shared Moonlight / 1017-1247","finding":"Lunar Ruins; choose Grand Prize; 100 layers; every 5th layer special; unused Moonsoil Diggers convert to 10 Credits; event schedule is reported as Sep 21-26 in this post"},
+    {"source":"https://twstalker.com/FoundationGF_EN","tier":"T2","confidence":"high","scope":"migration / 1017-1112","finding":"Interstellar Migration round; groups of 16 servers; scheduled before S2 for those servers"},
+    {"source":"https://murpo.com/news/klara-community-news-629891cad3ce7c4503fc","tier":"T2","confidence":"medium-high","scope":"anniversary / global","finding":"first-anniversary wishes campaign Sep 10-21; video/screenshot submissions; rewards"},
+    {"source":"https://raijin.gg/app/4223760/Foundation_Galactic_Frontier","tier":"T3","confidence":"medium","scope":"Steam","finding":"Steam remains Coming Soon; estimated wishlists ~4.1K as of Sep 21 UTC"}
+  ],
+  "conflicts":[
+    "S2 official FAQ uses Servers 1-16 while operational/social material uses 1001-1016.",
+    "Lunar Ruins/Shared Moonlight end-date wording differs: Sep 26 in a detailed official-social mirror vs Sep 27 in the broader event announcement."
+  ],
+  "tier1_promotions": 0,
+  "s3_future": "No reliable new primary S3/future-season mechanics surfaced; gap retained.",
+  "persistence": {"supabase":"completed", "github":"completed", "notion":"not updated this run"}
+}
