@@ -34,7 +34,14 @@ The system is being extended from retrieval into a persistent evidence and learn
 - controlled promotion and supersession
 
 ## Evidence rule
-T1 = direct current in-game evidence; T2 = official game information; T3 = strong tested technical/community evidence; T4 = creator/video/written guides; T5 = meta/recommendation; T6 = rumour/unverified.
+T1 = direct current in-game evidence; T2 = official game information; T3 = strong tested/community evidence when no stronger source establishes the claim; T4+ = discovery/meta/rumour layers as defined by the evidence registry.
+
+For YouTube, creator, player and other crowd material:
+- If Tier 1 or Tier 2 evidence exists for the same claim, stronger evidence governs; the video is supporting/additional evidence.
+- If no Tier 1 or Tier 2 evidence exists, the observation is retained as **Tier 3 crowd/community evidence**, status **candidate**, canonical **false**.
+- A Tier 3 crowd claim must be presented as additional data suggested/reported by others and carefully evaluated before reliance.
+- Contradictions are preserved and flagged for review; they never silently overwrite canonical knowledge.
+- YouTube extraction never auto-promotes a claim to CURRENT or canonical truth.
 
 A source's default tier never overrides what the specific evidence actually establishes. Images and videos are first-class evidence objects.
 
