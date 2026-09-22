@@ -1,0 +1,23 @@
+{
+  "run": 11,
+  "acquired_at": "2026-09-22T19:37:37+05:30",
+  "scope": ["S1/new-server baseline","S2","S3/future-season"],
+  "discovery": [
+    {"title":"September 22 hot update","url":"https://murpo.com/news/klara-game-news-da5d638bc6a072319b59","publication_date":"2026-09-21","tier":"T2","confidence":"high","scope":"current build/S2","findings":["Weapon Prism added to Discount Shop","Combat Craft Modification prerequisite reduced 60% to 40%","Shadowfront Commerce Guild rewards increased","S2 first port occupation rewards improved","Fusion Seed/Stellar Fragment source and Quick Use UI improved","S2 and other bugs fixed"]},
+    {"title":"FoundationGF_EN Lunar Ruins","url":"https://w.twstalker.com/FoundationGF_EN","acquisition_date":"2026-09-22","tier":"T2","confidence":"high","scope":"Shared Moonlight","findings":["100 layers","every 5th layer is Special Lunar Soil Layer","Grand Prize can be changed without resetting progress","unused Moonsoil Diggers convert to 10 Credits","server phases 1001-1016 Sep 15-20 and 1017-1247 Sep 21-26"]},
+    {"title":"FunPlus Season 2 announcement","url":"https://funplus.com/foundation-galactic-frontier-soars-into-season-two/","publication_date":"2026-09-18","tier":"T1-candidate","confidence":"high","scope":"S2","findings":["Sivana","Ascendancy Court","Ascendancy Emperor final boss","Magnetic Storms and Resistance"]},
+    {"title":"Official portal","url":"https://www.foundation.game/en","acquisition_date":"2026-09-22","tier":"T1","confidence":"high","scope":"S1/Core35 baseline","findings":["Core35/Fusion Seed update remains current portal material","official Fleet Power and Port Occupation guides remain indexed"]},
+    {"title":"Community bug report","url":"https://www.reddit.com/r/FoundationGFrontier/comments/1qwela3/foundation_exploration_event/","publication_date":"2026-09-20","tier":"T3","confidence":"low","scope":"event","findings":["player reports successful exploration but locked Reward Exchange/no exchangeable rewards"]},
+    {"title":"Fandom","url":"https://foundation-galactic-frontier.fandom.com/","acquisition_date":"2026-09-22","tier":"unavailable","confidence":"none","scope":"all","findings":["robots restriction prevented direct acquisition; no claims promoted"]},
+    {"title":"Steam/SteamDB","url":"https://steamdb.info/app/4223760/info/","acquisition_date":"2026-09-22","tier":"T2","confidence":"high","scope":"platform","findings":["release state prerelease","store release date Coming soon","21 supported languages"]},
+    {"title":"Community strategy guide","url":"https://www.aayyy.com/foundation-galactic-frontier/foundation-champion-positioning-guide/","publication_date":"2026-09-17","tier":"T3","confidence":"low-medium","scope":"combat","findings":["champion positioning/target priority guidance; not used as canonical mechanic evidence"]}
+  ],
+  "conflicts":[
+    "S2 server labels: Servers 1-16 in FAQ versus 1001-1016 in operational/testing material",
+    "Shared Moonlight/Lunar Ruins end date: Sep 26 in latest official-social mirror versus Sep 27 in broader event announcement"
+  ],
+  "s3_future_gap": true,
+  "tier1_promotions": 0,
+  "supabase": {"attempted": true, "result":"write blocked by connector safety checks; no false persistence claim"},
+  "media": {"video_discovery":true,"image_post_discovery":true,"deep_media_extraction":false}
+}
