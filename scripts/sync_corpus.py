@@ -25,6 +25,7 @@ import os
 import re
 import urllib.parse
 import urllib.request
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
@@ -32,6 +33,12 @@ from typing import Any, Dict, List
 ROOT = Path(__file__).resolve().parents[1]
 KNOWLEDGE = ROOT / "data" / "knowledge.json"
 MANIFEST = ROOT / "data" / "knowledge_manifest.json"
+
+# Allow scripts executed directly (python scripts/sync_corpus.py) to import
+# repository-root modules such as claim_lifecycle.py and knowledge_analyzer.py.
+# This keeps the script runnable from CI, local shells, and other working dirs.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 
 def norm(value: Any) -> str:
