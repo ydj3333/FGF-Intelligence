@@ -17,7 +17,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-py -m pip install -r requirements-youtube.txt
+py -m pip install -r requirements-acquisition.txt
 if errorlevel 1 (
   echo ERROR: Dependency installation failed.
   pause
