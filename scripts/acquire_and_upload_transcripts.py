@@ -57,7 +57,8 @@ def main():
     p.add_argument("--count", type=int, default=None)
     p.add_argument("--output-dir", default="data/acquired_transcripts")
     p.add_argument("--proxy", default=os.getenv("FGF_YTDLP_PROXY"))
-    p.add_argument("--delay-seconds", type=float, default=3)
+    p.add_argument("--delay-seconds", type=float, default=8)
+    p.add_argument("--max-retries", type=int, default=4)
     args = p.parse_args()
 
     out = Path(args.output_dir)
@@ -94,13 +95,24 @@ def main():
             ]
             if args.proxy:
                 cmd[1:1] = ["--proxy", args.proxy]
-            try:
-                subprocess.run(cmd, check=True)
-            except Exception as e:
-                failures.append({"video_id": vid, "error": str(e)})
-                print(f"[{n}/{len(videos)}] FAIL {vid}: {e}")
+            success = False
+            last_error = None
+            for attempt in range(1, args.max_retries + 1):
+                try:
+                    subprocess.run(cmd, check=True)
+                    success = True
+                    break
+                except Exception as e:
+                    last_error = e
+                    wait = min(180, max(10, args.delay_seconds * (2 ** (attempt - 1))))
+                    print(f"[{n}/{len(videos)}] RETRY {vid} attempt {attempt}/{args.max_retries}; waiting {wait:.0f}s")
+                    if attempt < args.max_retries:
+                        import time
+                        time.sleep(wait)
+            if not success:
+                failures.append({"video_id": vid, "error": str(last_error)})
+                print(f"[{n}/{len(videos)}] FAIL {vid}: {last_error}")
                 continue
-
             candidates = list(work.glob(f"{vid}.*.vtt"))
             if not candidates:
                 candidates = list(work.glob("*.vtt"))
@@ -119,6 +131,9 @@ def main():
         except Exception as e:
             failures.append({"video_id": vid, "error": f"upload: {e}"})
             print(f"[{n}/{len(videos)}] FAIL-UPLOAD {vid}: {e}")
+
+        import time
+        time.sleep(max(0, args.delay_seconds))
 
     manifest = {"playlist_id": args.playlist_id, "selected": len(videos),
                 "ready": len(videos)-len(failures), "failed": len(failures),
