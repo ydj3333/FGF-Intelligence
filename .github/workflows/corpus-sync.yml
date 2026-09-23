@@ -4,6 +4,14 @@ on:
   schedule:
     - cron: '15 */6 * * *'
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/corpus-sync.yml'
+      - 'scripts/sync_corpus.py'
+      - 'claim_lifecycle.py'
+      - 'knowledge_analyzer.py'
+      - 'tests/test_sync_corpus.py'
+      - 'tests/test_claim_lifecycle.py'
 
 concurrency:
   group: fgf-corpus-sync
@@ -11,6 +19,10 @@ concurrency:
 
 permissions:
   contents: write
+
+env:
+  FGF_SUPABASE_URL: ${{ secrets.FGF_SUPABASE_URL || vars.FGF_SUPABASE_URL || 'https://qdoixzfkkmvzjfkhzups.supabase.co' }}
+  FGF_SUPABASE_SECRET_KEY: ${{ secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
 
 jobs:
   sync-and-validate:
@@ -25,20 +37,18 @@ jobs:
           python-version: "3.13"
 
       - name: Verify Supabase sync secret
-        env:
-          SUPABASE_SECRET: ${{ secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
-          if [ -z "$SUPABASE_SECRET" ]; then
+          if [ -z "$FGF_SUPABASE_SECRET_KEY" ]; then
             echo "::error::Configure FGF_SUPABASE_SECRET_KEY (preferred) or FGF_SUPABASE_SERVICE_ROLE_KEY in GitHub Actions secrets."
+            exit 1
+          fi
+          if [ -z "$FGF_SUPABASE_URL" ]; then
+            echo "::error::Configure FGF_SUPABASE_URL or repository variable FGF_SUPABASE_URL."
             exit 1
           fi
 
       - name: Synchronize canonical claim corpus
-        env:
-          FGF_SUPABASE_URL: https://qdoixzfkkmvzjfkhzups.supabase.co
-          FGF_SUPABASE_SECRET_KEY: ${{ secrets.FGF_SUPABASE_SECRET_KEY }}
-          FGF_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/sync_corpus.py
 
       - name: Run lifecycle and corpus tests
