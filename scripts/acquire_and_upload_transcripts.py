@@ -4,6 +4,7 @@ import argparse, json, os, re, subprocess, sys
 from pathlib import Path
 from urllib.parse import quote
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 BUCKET = os.getenv("FGF_TRANSCRIPT_BUCKET", "fgf-video-transcripts")
 BASE = os.getenv("FGF_SUPABASE_URL", "https://qdoixzfkkmvzjfkhzups.supabase.co").rstrip("/")
@@ -20,8 +21,13 @@ def request(method, path, payload=None, raw=False, content_type="application/jso
     req = Request(BASE + path, data=body, method=method, headers={
         "apikey": k, "Authorization": f"Bearer {k}", "Content-Type": content_type
     })
-    with urlopen(req, timeout=60) as r:
-        return r.read()
+    try:
+        with urlopen(req, timeout=60) as r:
+            return r.read()
+    except HTTPError as e:
+        detail = e.read().decode("utf-8", errors="replace")
+        print(f"Supabase HTTP {e.code}: {detail}")
+        raise RuntimeError(f"Supabase HTTP {e.code}: {detail}") from e
 
 def ensure_bucket():
     try:
@@ -36,8 +42,26 @@ def ensure_bucket():
 
 def upload(path, object_path, content_type):
     encoded = "/".join(quote(p, safe="") for p in object_path.split("/"))
-    request("POST", f"/storage/v1/object/{BUCKET}/{encoded}",
-            Path(path).read_bytes(), raw=True, content_type=content_type)
+    k = key()
+    body = Path(path).read_bytes()
+    req = Request(
+        BASE + "/storage/v1/object/" + BUCKET + "/" + encoded,
+        data=body,
+        method="POST",
+        headers={
+            "apikey": k,
+            "Authorization": f"Bearer {k}",
+            "Content-Type": content_type,
+            "x-upsert": "true",
+        },
+    )
+    try:
+        with urlopen(req, timeout=60) as r:
+            return r.read()
+    except HTTPError as e:
+        detail = e.read().decode("utf-8", errors="replace")
+        print(f"Supabase upload HTTP {e.code}: {detail}")
+        raise RuntimeError(f"Supabase upload HTTP {e.code}: {detail}") from e
 
 def vtt_to_text(path):
     lines = []
