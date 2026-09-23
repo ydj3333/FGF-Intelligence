@@ -36,7 +36,7 @@ echo Acquiring all 174 playlist videos and uploading transcripts...
 echo Optional: set FGF_YTDLP_PROXY before starting if a proxy is required.
 echo.
 
-py scripts/acquire_and_upload_transcripts.py --playlist-id PL2VyftArNQtQ2EbXMAmgwrPH0P4EvBVAR --start 0 --count 174
+py scripts/acquire_and_upload_transcripts.py --playlist-id PL2VyftArNQtQ2EbXMAmgwrPH0P4EvBVAR --start 0 --count 174 --delay-seconds 12 --max-retries 4 --rate-limit-base 45
 if errorlevel 1 (
   echo.
   echo Acquisition ended with errors. Review the manifest.
