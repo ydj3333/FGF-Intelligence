@@ -57,7 +57,9 @@ def main():
     p.add_argument("--count", type=int, default=None)
     p.add_argument("--output-dir", default="data/acquired_transcripts")
     p.add_argument("--proxy", default=os.getenv("FGF_YTDLP_PROXY"))
-    p.add_argument("--delay-seconds", type=float, default=8)
+    p.add_argument("--delay-seconds", type=float, default=12)
+    p.add_argument("--max-retries", type=int, default=4)
+    p.add_argument("--rate-limit-base", type=float, default=45)
     p.add_argument("--max-retries", type=int, default=4)
     args = p.parse_args()
 
@@ -104,11 +106,15 @@ def main():
                     break
                 except Exception as e:
                     last_error = e
-                    wait = min(180, max(10, args.delay_seconds * (2 ** (attempt - 1))))
+                    msg = str(e)
+                    if "429" in msg or "Too Many Requests" in msg:
+                        wait = min(300, args.rate_limit_base * attempt)
+                    else:
+                        wait = min(180, max(15, args.delay_seconds * attempt))
                     print(f"[{n}/{len(videos)}] RETRY {vid} attempt {attempt}/{args.max_retries}; waiting {wait:.0f}s")
                     if attempt < args.max_retries:
-                        import time
-                        time.sleep(wait)
+                        import random, time
+                        time.sleep(wait + random.uniform(0, min(15, args.delay_seconds)))
             if not success:
                 failures.append({"video_id": vid, "error": str(last_error)})
                 print(f"[{n}/{len(videos)}] FAIL {vid}: {last_error}")
@@ -133,7 +139,8 @@ def main():
             print(f"[{n}/{len(videos)}] FAIL-UPLOAD {vid}: {e}")
 
         import time
-        time.sleep(max(0, args.delay_seconds))
+        import random, time
+        time.sleep(max(0, args.delay_seconds) + random.uniform(0, min(10, args.delay_seconds)))
 
     manifest = {"playlist_id": args.playlist_id, "selected": len(videos),
                 "ready": len(videos)-len(failures), "failed": len(failures),
