@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-youtube.txt
+          pip install -r requirements-processing.txt
       - name: Validate credentials
         run: |
           test -n "$FGF_LLM_API_KEY" || (echo "Missing FGF_LLM_API_KEY" && exit 1)
