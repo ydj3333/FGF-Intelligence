@@ -14,6 +14,20 @@ def key():
         raise RuntimeError("Missing FGF_SUPABASE_SERVICE_ROLE_KEY")
     return k
 
+def supabase_get(path):
+    k = key()
+    req = Request(BASE + path, headers={"apikey": k, "Authorization": f"Bearer {k}"})
+    with urlopen(req, timeout=60) as r:
+        return json.loads(r.read().decode() or "[]")
+
+def processed_video_ids():
+    try:
+        rows = supabase_get("/rest/v1/video_database?select=video_id&processing_status=eq.persisted_candidates")
+        return {r["video_id"] for r in rows if r.get("video_id")}
+    except Exception as e:
+        print(f"Processed-state check unavailable: {e}")
+        return set()
+
 def download(object_path, target):
     enc = "/".join(quote(p, safe="") for p in object_path.split("/"))
     k = key()
@@ -34,8 +48,11 @@ def main():
     download("index/playlist_index.json", index_path)
     index = json.loads(index_path.read_text(encoding="utf-8"))
 
+    processed = processed_video_ids()
     ready = []
     for v in index["videos"]:
+        if v["video_id"] in processed:
+            continue
         target = root / f"{v['video_id']}.txt"
         try:
             download(f"transcripts/{v['video_id']}.txt", target)
@@ -45,7 +62,7 @@ def main():
         if len(ready) >= args.limit:
             break
 
-    print(f"Downloaded {len(ready)} transcript(s) from Supabase Storage.")
+    print(f"Downloaded {len(ready)} new transcript(s) from Supabase Storage; skipped {len(processed)} already processed.")
     for v in ready:
         vid = v["video_id"]
         subprocess.run([sys.executable, "scripts/extract_claims_from_transcript.py",
