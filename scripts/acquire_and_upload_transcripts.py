@@ -140,7 +140,18 @@ def main():
         if not txt.exists():
             candidates = list(work.glob(f'{vid}.*.vtt')) + list(work.glob('*.vtt'))
             if candidates:
-                txt.write_text(vtt_to_text(candidates[0]), encoding='utf-8')
+                text_value = vtt_to_text(candidates[0])
+                if text_value:
+                    txt.write_text(text_value, encoding='utf-8')
+                    print(f'[{n}/{len(videos)}] Subtitle transcript found: {vid}')
+                else:
+                    print(f'[{n}/{len(videos)}] Empty subtitle; falling back to local audio transcription: {vid}')
+                    try:
+                        txt = acquire_audio_transcript(vid, work)
+                    except Exception as e:
+                        failures.append({'video_id': vid, 'error': f'audio transcription: {e}'})
+                        print(f'[{n}/{len(videos)}] FAIL {vid}: {e}')
+                        continue
             else:
                 try:
                     print(f'[{n}/{len(videos)}] No usable subtitle; falling back to local audio transcription: {vid}')
