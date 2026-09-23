@@ -60,7 +60,6 @@ def main():
     p.add_argument("--delay-seconds", type=float, default=12)
     p.add_argument("--max-retries", type=int, default=4)
     p.add_argument("--rate-limit-base", type=float, default=45)
-    p.add_argument("--max-retries", type=int, default=4)
     args = p.parse_args()
 
     out = Path(args.output_dir)
