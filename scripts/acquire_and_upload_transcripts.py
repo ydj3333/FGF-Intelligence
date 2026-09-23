@@ -73,10 +73,20 @@ def transcribe_audio_local(audio_path):
         model_name = os.getenv('FGF_WHISPER_MODEL', 'small')
         device = os.getenv('FGF_WHISPER_DEVICE', 'cpu')
         compute_type = os.getenv('FGF_WHISPER_COMPUTE_TYPE', 'int8')
-        print(f'Loading faster-whisper model={model_name}, device={device}, compute_type={compute_type}')
+        print(f'Loading faster-whisper model={model_name}, device={device}, compute_type={compute_type}', flush=True)
         _WHISPER_MODEL = WhisperModel(model_name, device=device, compute_type=compute_type)
+        print('Whisper model loaded. Starting transcription...', flush=True)
+    else:
+        print('Whisper model already loaded. Starting transcription...', flush=True)
     segments, info = _WHISPER_MODEL.transcribe(str(audio_path), language='en', vad_filter=True)
-    return ' '.join(segment.text.strip() for segment in segments).strip()
+    parts = []
+    for segment in segments:
+        text_part = segment.text.strip()
+        if text_part:
+            parts.append(text_part)
+            print(f'Transcribed through {segment.end:.0f}s', flush=True)
+    print(f'Transcription complete: {len(parts)} segments', flush=True)
+    return ' '.join(parts).strip()
 
 def acquire_audio_transcript(vid, work):
     audio = work / f'{vid}.mp3'
