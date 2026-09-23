@@ -63,6 +63,32 @@ def upload(path, object_path, content_type):
         print(f"Supabase upload HTTP {e.code}: {detail}")
         raise RuntimeError(f"Supabase upload HTTP {e.code}: {detail}") from e
 
+
+_WHISPER_MODEL = None
+
+def transcribe_audio_local(audio_path):
+    global _WHISPER_MODEL
+    from faster_whisper import WhisperModel
+    if _WHISPER_MODEL is None:
+        model_name = os.getenv('FGF_WHISPER_MODEL', 'small')
+        device = os.getenv('FGF_WHISPER_DEVICE', 'cpu')
+        compute_type = os.getenv('FGF_WHISPER_COMPUTE_TYPE', 'int8')
+        print(f'Loading faster-whisper model={model_name}, device={device}, compute_type={compute_type}')
+        _WHISPER_MODEL = WhisperModel(model_name, device=device, compute_type=compute_type)
+    segments, info = _WHISPER_MODEL.transcribe(str(audio_path), language='en', vad_filter=True)
+    return ' '.join(segment.text.strip() for segment in segments).strip()
+
+def acquire_audio_transcript(vid, work):
+    audio = work / f'{vid}.mp3'
+    cmd = ['yt-dlp', '--extract-audio', '--audio-format', 'mp3', '--output', str(work / (vid + '.%(ext)s')), f'https://www.youtube.com/watch?v={vid}']
+    subprocess.run(cmd, check=True)
+    if not audio.exists():
+        raise RuntimeError('Audio download completed but MP3 was not found')
+    text = transcribe_audio_local(audio)
+    txt = work / f'{vid}.txt'
+    txt.write_text(text, encoding='utf-8')
+    return txt
+
 def vtt_to_text(path):
     lines = []
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
@@ -112,45 +138,17 @@ def main():
         txt = work / f"{vid}.txt"
 
         if not txt.exists():
-            cmd = [
-                "yt-dlp", "--skip-download", "--write-subs", "--write-auto-subs",
-                "--sub-langs", "en,en-US,en-GB", "--sub-format", "vtt",
-                "--output", str(work / f"{vid}.%(ext)s"),
-                f"https://www.youtube.com/watch?v={vid}"
-            ]
-            if args.proxy:
-                cmd[1:1] = ["--proxy", args.proxy]
-            success = False
-            last_error = None
-            for attempt in range(1, args.max_retries + 1):
+            candidates = list(work.glob(f'{vid}.*.vtt')) + list(work.glob('*.vtt'))
+            if candidates:
+                txt.write_text(vtt_to_text(candidates[0]), encoding='utf-8')
+            else:
                 try:
-                    subprocess.run(cmd, check=True)
-                    success = True
-                    break
+                    print(f'[{n}/{len(videos)}] No usable subtitle; falling back to local audio transcription: {vid}')
+                    txt = acquire_audio_transcript(vid, work)
                 except Exception as e:
-                    last_error = e
-                    msg = str(e)
-                    if "429" in msg or "Too Many Requests" in msg:
-                        wait = min(300, args.rate_limit_base * attempt)
-                    else:
-                        wait = min(180, max(15, args.delay_seconds * attempt))
-                    print(f"[{n}/{len(videos)}] RETRY {vid} attempt {attempt}/{args.max_retries}; waiting {wait:.0f}s")
-                    if attempt < args.max_retries:
-                        import random, time
-                        time.sleep(wait + random.uniform(0, min(15, args.delay_seconds)))
-            if not success:
-                failures.append({"video_id": vid, "error": str(last_error)})
-                print(f"[{n}/{len(videos)}] FAIL {vid}: {last_error}")
-                continue
-            candidates = list(work.glob(f"{vid}.*.vtt"))
-            if not candidates:
-                candidates = list(work.glob("*.vtt"))
-            if not candidates:
-                failures.append({"video_id": vid, "error": "No VTT subtitle file produced"})
-                print(f"[{n}/{len(videos)}] FAIL {vid}: no subtitles")
-                continue
-            txt.write_text(vtt_to_text(candidates[0]), encoding="utf-8")
-
+                    failures.append({'video_id': vid, 'error': f'audio transcription: {e}'})
+                    print(f'[{n}/{len(videos)}] FAIL {vid}: {e}')
+                    continue
         try:
             upload(txt, f"transcripts/{vid}.txt", "text/plain")
             meta = work / f"{vid}.json"
