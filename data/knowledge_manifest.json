@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "source_of_truth": "supabase.public.claims",
+  "supabase_project": "qdoixzfkkmvzjfkhzups",
+  "claim_count": 1083,
+  "tier1_count": 451,
+  "lifecycle_counts": {
+    "discovered": 0,
+    "candidate": 595,
+    "validated": 0,
+    "verified": 0,
+    "current": 485,
+    "superseded": 0,
+    "archived": 0,
+    "rejected": 0,
+    "conflicting": 3
+  },
+  "checksum": "0b52c9c1828b285535963105f70265b02d21eb3abb16003dcc6473b0bb788ce3",
+  "generated": "2026-09-23",
+  "synced_at_utc": "2026-09-23T16:52:10.662733+00:00"
+}
