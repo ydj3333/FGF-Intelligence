@@ -13,6 +13,11 @@ on:
       - 'knowledge_analyzer.py'
       - 'tests/test_sync_corpus.py'
       - 'tests/test_claim_lifecycle.py'
+      - 'tests/test_agent.py'
+      - 'agent.py'
+      - 'gap_detector.py'
+      - 'scripts/run_knowledge_quality.py'
+      - 'scripts/update_video_database.py'
 
 concurrency:
   group: fgf-corpus-sync
@@ -55,6 +60,20 @@ jobs:
       - name: Run lifecycle and corpus tests
         run: |
           python -m unittest             tests/test_claim_lifecycle.py             tests/test_sync_corpus.py             tests/test_knowledge_analyzer.py -v
+
+      - name: Start local agent for smoke tests
+        run: |
+          set -euo pipefail
+          nohup python agent.py > /tmp/fgf-agent.log 2>&1 &
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:8000/api/health > /tmp/fgf-health.json; then
+              cat /tmp/fgf-health.json
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/fgf-agent.log || true
+          exit 1
 
       - name: Run agent smoke tests
         run: python tests/test_agent.py
