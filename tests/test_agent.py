@@ -23,6 +23,13 @@ try:
     assert ask["answer"]
     assert ask["evidence"]
     assert ask["model"]
+    fleet_dup=urllib.request.urlopen("http://127.0.0.1:8000/api/tools/fleet-builder?style=Ion&champion=Ajita&champion=Ajita&champion=Killer%20Bee")
+    fleet_dup_json=json.load(fleet_dup)
+    assert fleet_dup_json["ok"] is False
+    assert "3 different Champions" in fleet_dup_json["error"]
+    fleet_invalid=json.load(urllib.request.urlopen("http://127.0.0.1:8000/api/tools/fleet-builder?style=Ion&champion=Ajita&champion=NotAChampion&champion=Killer%20Bee"))
+    assert fleet_invalid["ok"] is False
+    assert "Non-standard Champion" in fleet_invalid["error"]
     moon=json.load(urllib.request.urlopen("http://127.0.0.1:8000/api/ask?q=Shared%20Moonlight%20event%20what%20is%20on%20which%20day%20Monday%20speedups%20shortcut"))
     assert "September 15–21" in moon["answer"] or "September 15-21" in moon["answer"]
     assert "weekday" in moon["answer"].lower()
