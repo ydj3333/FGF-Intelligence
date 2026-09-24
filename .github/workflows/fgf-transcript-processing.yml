@@ -1,6 +1,13 @@
 name: FGF Transcript Processing
 
 on:
+  push:
+    paths:
+      - '.github/workflows/fgf-transcript-processing.yml'
+      - 'scripts/process_transcript_queue.py'
+      - 'scripts/extract_claims_from_transcript.py'
+      - 'scripts/cross_reference_claims.py'
+      - 'scripts/update_video_database.py'
   workflow_dispatch:
     inputs:
       limit:
@@ -21,8 +28,8 @@ jobs:
     permissions:
       contents: write
     env:
-      FGF_SUPABASE_URL: ${{ secrets.FGF_SUPABASE_URL }}
-      FGF_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
+      FGF_SUPABASE_URL: ${{ secrets.FGF_SUPABASE_URL || vars.FGF_SUPABASE_URL || 'https://qdoixzfkkmvzjfkhzups.supabase.co' }}
+      FGF_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.FGF_SUPABASE_SERVICE_ROLE_KEY || secrets.FGF_SUPABASE_SECRET_KEY }}
       FGF_LLM_API_KEY: ${{ secrets.FGF_LLM_API_KEY }}
       FGF_TRANSCRIPT_BUCKET: fgf-video-transcripts
     steps:
@@ -38,7 +45,8 @@ jobs:
       - name: Validate credentials
         run: |
           test -n "$FGF_LLM_API_KEY" || (echo "Missing FGF_LLM_API_KEY" && exit 1)
-          test -n "$FGF_SUPABASE_SERVICE_ROLE_KEY" || (echo "Missing FGF_SUPABASE_SERVICE_ROLE_KEY" && exit 1)
+          test -n "$FGF_SUPABASE_URL" || (echo "Missing FGF_SUPABASE_URL" && exit 1)
+          test -n "$FGF_SUPABASE_SERVICE_ROLE_KEY" || (echo "Missing FGF_SUPABASE_SERVICE_ROLE_KEY or FGF_SUPABASE_SECRET_KEY" && exit 1)
       - name: Process transcript queue
         run: |
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.apply }}" = "true" ]; then
