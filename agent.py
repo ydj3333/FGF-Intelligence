@@ -846,14 +846,29 @@ def champion_options():
     return {'ok':True,'champions':STANDARD_CHAMPIONS,'source':'FGF knowledge corpus',
             'note':'Select the standardized Champion name. Free-text Champion names are intentionally not accepted by the Builder.'}
 
-def _find_champion_style(name):
+def _find_champion_style(name, style=None):
     nl=str(name).strip().lower()
     if not nl: return None
+    aliases={'ion':'ionic','ionic':'ionic','beam':'beam','kinetic':'kinetic'}
+    wanted=aliases.get(str(style or '').strip().lower())
     candidates=[]
     for c in CLAIMS:
         cl=str(c.get('Claim','')).lower()
-        if nl in cl and any(x in cl for x in ('beam','kinetic','ion','ionic')):
-            candidates.append(c)
+        if nl not in cl:
+            continue
+        if wanted:
+            # Match energy types as words; never let 'ion' match words such as
+            # 'fusion'. This prevents false Champion/style assignments.
+            if not re.search(r'\b'+re.escape(wanted)+r'\b', cl):
+                continue
+        elif not any(re.search(r'\b'+x+r'\b', cl) for x in ('beam','kinetic','ionic')):
+            continue
+        candidates.append(c)
+    candidates.sort(key=lambda c: (
+        0 if normalize_state(c.get('Status')) == 'current' else 1,
+        0 if str(c.get('Evidence Tier','')).lower().startswith('tier 1') else
+           1 if str(c.get('Evidence Tier','')).lower().startswith('tier 2') else 2
+    ))
     return candidates[0] if candidates else None
 
 def repair_planner(damage='minor', repair_modules=0, in_combat=False):
@@ -882,10 +897,12 @@ def fleet_builder(style='', champions=None):
     invalid=[x for x in champs if x not in STANDARD_CHAMPIONS]
     if invalid:
         return {'ok':False,'error':'Non-standard Champion name(s) rejected: '+', '.join(invalid)+'. Select from the Champion dropdown.'}
+    if len(set(champs)) != 3:
+        return {'ok':False,'error':'Select 3 different Champions. Duplicate Champion selections are rejected.'}
     rows=[]
     for name in champs:
-        c=_find_champion_style(name)
-        rows.append({'champion':name,'evidence_style':canonical if c and canonical.lower() in str(c.get('Claim','')).lower() else None,'evidence':c.get('Claim','') if c else None})
+        c=_find_champion_style(name, canonical)
+        rows.append({'champion':name,'evidence_style':canonical if c else None,'evidence':c.get('Claim','') if c else None})
     matched=sum(1 for x in rows if x['evidence_style']==canonical)
     bonus='+20% ATK, DEF and INT' if matched==3 else ('+10% ATK, DEF and INT' if matched==2 else 'No matching-style synergy bonus established for this lineup')
     return {'ok':True,'style':canonical,'champions':rows,'matched_champions':matched,'synergy_bonus':bonus,'rule':'2 matching Champions grant +10%; 3 matching Champions grant +20%.','note':'Champion-to-style assignment is evidence-dependent; this builder does not invent an assignment when the corpus does not establish one.'}
