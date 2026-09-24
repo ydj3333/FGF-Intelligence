@@ -44334,6 +44334,4263 @@
         },
         "temporal": {}
       }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3138
+        },
+        {
+          "tier": 3,
+          "claim": "is. Looks like everybody couldn't wait until the star actually opened, actually open because we still have four minutes left on the star battle so yeah we're gonna g",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2517
+        },
+        {
+          "tier": 3,
+          "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2515
+        },
+        {
+          "tier": 3,
+          "claim": "ard. I'm getting down to the wire on this baby right here. All I've got left to unlock my kinetic T7 is finishing this one. Doing one level on this and one level on th",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2484
+        },
+        {
+          "tier": 3,
+          "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2436
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "Z3oV5Cf7RrM",
+      "source_type": "YouTube",
+      "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "see we got some hornets nest going on right here because the star is fixing to open up in six and a half minutes and we're going to try to jump in there and take th",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "see we got some hornets nest going on right here because the star is fixing to open up in six and a half minutes and we're going to try to jump in there and take th",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-3d7184b73f9b766ca1a4",
+      "supabase_id": "02eb4411-385d-491c-a54d-e804171c5d2e",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3138
+          },
+          {
+            "tier": 3,
+            "claim": "is. Looks like everybody couldn't wait until the star actually opened, actually open because we still have four minutes left on the star battle so yeah we're gonna g",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2517
+          },
+          {
+            "tier": 3,
+            "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2515
+          },
+          {
+            "tier": 3,
+            "claim": "ard. I'm getting down to the wire on this baby right here. All I've got left to unlock my kinetic T7 is finishing this one. Doing one level on this and one level on th",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2484
+          },
+          {
+            "tier": 3,
+            "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2436
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "Z3oV5Cf7RrM",
+        "source_type": "YouTube",
+        "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "see we got some hornets nest going on right here because the star is fixing to open up in six and a half minutes and we're going to try to jump in there and take th",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3809
+        },
+        {
+          "tier": 3,
+          "claim": "one ship so I'm gonna back off and regroup and then hit it again. So the start opens up in one minute and 45 seconds. We're looking to see if they're going to rally",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2873
+        },
+        {
+          "tier": 3,
+          "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2652
+        },
+        {
+          "tier": 3,
+          "claim": "ing to server number 1026 whenever the next migration the next migration period opens because we have a very active and tempting server to want to join so I can only",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2566
+        },
+        {
+          "tier": 3,
+          "claim": "is. Looks like everybody couldn't wait until the star actually opened, actually open because we still have four minutes left on the star battle so yeah we're gonna g",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2483
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "Z3oV5Cf7RrM",
+      "source_type": "YouTube",
+      "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "f this. But I'm gonna wait for just a few more minutes before the star actually opens up because we wanna try to get in there and get control of garrison if we can ri",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "f this. But I'm gonna wait for just a few more minutes before the star actually opens up because we wanna try to get in there and get control of garrison if we can ri",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-d70db1e00ae9665acc8f",
+      "supabase_id": "1eaee3a1-ae19-4f3c-899f-be9b57087520",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3809
+          },
+          {
+            "tier": 3,
+            "claim": "one ship so I'm gonna back off and regroup and then hit it again. So the start opens up in one minute and 45 seconds. We're looking to see if they're going to rally",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2873
+          },
+          {
+            "tier": 3,
+            "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2652
+          },
+          {
+            "tier": 3,
+            "claim": "ing to server number 1026 whenever the next migration the next migration period opens because we have a very active and tempting server to want to join so I can only",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2566
+          },
+          {
+            "tier": 3,
+            "claim": "is. Looks like everybody couldn't wait until the star actually opened, actually open because we still have four minutes left on the star battle so yeah we're gonna g",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2483
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "Z3oV5Cf7RrM",
+        "source_type": "YouTube",
+        "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "f this. But I'm gonna wait for just a few more minutes before the star actually opens up because we wanna try to get in there and get control of garrison if we can ri",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2472
+        },
+        {
+          "tier": 3,
+          "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2379
+        },
+        {
+          "tier": 3,
+          "claim": "I can get 37 shards with what I will have left over. I'm going to go ahead and unlock Killer B. I'm tired of sitting here and looking at her at 17-40. I know I could",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2356
+        },
+        {
+          "tier": 3,
+          "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2213
+        },
+        {
+          "tier": 3,
+          "claim": "ced fast as many as possible. We've seen this in other games to where there's a unlock of, you know, being able to level up your buildings more and then they introduce",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2202
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "Z3oV5Cf7RrM",
+      "source_type": "YouTube",
+      "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ee if I can find some targets. Here we go. Go ahead and get this attack ability open to where we can get in there and get to the fight. Oh yeah, here we go. Got a gu",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ee if I can find some targets. Here we go. Go ahead and get this attack ability open to where we can get in there and get to the fight. Oh yeah, here we go. Got a gu",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-7f423c1cefc68a38448e",
+      "supabase_id": "5fe3d3a7-6e93-4f1c-86e7-fb5bfee76841",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2472
+          },
+          {
+            "tier": 3,
+            "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2379
+          },
+          {
+            "tier": 3,
+            "claim": "I can get 37 shards with what I will have left over. I'm going to go ahead and unlock Killer B. I'm tired of sitting here and looking at her at 17-40. I know I could",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2356
+          },
+          {
+            "tier": 3,
+            "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2213
+          },
+          {
+            "tier": 3,
+            "claim": "ced fast as many as possible. We've seen this in other games to where there's a unlock of, you know, being able to level up your buildings more and then they introduce",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2202
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "Z3oV5Cf7RrM",
+        "source_type": "YouTube",
+        "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ee if I can find some targets. Here we go. Go ahead and get this attack ability open to where we can get in there and get to the fight. Oh yeah, here we go. Got a gu",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "til today. So let's get into it if that sounds interesting to you. I'm going to open up my little secret word document here called Star of the Guild event. As you've",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2959
+        },
+        {
+          "tier": 3,
+          "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2887
+        },
+        {
+          "tier": 3,
+          "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2831
+        },
+        {
+          "tier": 3,
+          "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2747
+        },
+        {
+          "tier": 3,
+          "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2686
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "Z3oV5Cf7RrM",
+      "source_type": "YouTube",
+      "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "Let's try to see if we can get a target. So in two minutes the star is going to open up. We're going to try to jump in there and see if we can't get control of that",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "Let's try to see if we can get a target. So in two minutes the star is going to open up. We're going to try to jump in there and see if we can't get control of that",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-8905575996717dcdc4f7",
+      "supabase_id": "cae7b87f-c8ee-4748-a329-23de1cbfc31d",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "til today. So let's get into it if that sounds interesting to you. I'm going to open up my little secret word document here called Star of the Guild event. As you've",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2959
+          },
+          {
+            "tier": 3,
+            "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2887
+          },
+          {
+            "tier": 3,
+            "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2831
+          },
+          {
+            "tier": 3,
+            "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2747
+          },
+          {
+            "tier": 3,
+            "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2686
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "Z3oV5Cf7RrM",
+        "source_type": "YouTube",
+        "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "Let's try to see if we can get a target. So in two minutes the star is going to open up. We're going to try to jump in there and see if we can't get control of that",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2267
+        },
+        {
+          "tier": 3,
+          "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2126
+        },
+        {
+          "tier": 3,
+          "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2038
+        },
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1921
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1915
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "Z3oV5Cf7RrM",
+      "source_type": "YouTube",
+      "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "alright dude I've had enough of you turn around burn you down before this star opens up storm fire wants some fov let's go alright He's gone four three two one. Let'",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "alright dude I've had enough of you turn around burn you down before this star opens up storm fire wants some fov let's go alright He's gone four three two one. Let'",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-2f5ca19e90b50e5cc3de",
+      "supabase_id": "206c7347-60e9-45a7-92b5-104df19a1516",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=Z3oV5Cf7RrM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2267
+          },
+          {
+            "tier": 3,
+            "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2126
+          },
+          {
+            "tier": 3,
+            "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2038
+          },
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1921
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1915
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "Z3oV5Cf7RrM",
+        "source_type": "YouTube",
+        "video_title": "PVP War With Server 1022! Will We Win? Foundation Galactic Frontier",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "alright dude I've had enough of you turn around burn you down before this star opens up storm fire wants some fov let's go alright He's gone four three two one. Let'",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=osYdUtgiFHY",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "urs. So basically, at reset, this event dropped on our server. And whenever you open it up, or whenever you first log into the game and haven't looked at this materi",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2464
+        },
+        {
+          "tier": 3,
+          "claim": "ce by the guild. These little point totals right here are what we're earning to unlock these bonus cargo holds. Okay. You can see we're at 43,966 right now. The next o",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2389
+        },
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2138
+        },
+        {
+          "tier": 3,
+          "claim": "don't really know what those metrics are and and we won't really know until it opens up for testing On the 28th, but that's just kind of interesting that What that d",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2053
+        },
+        {
+          "tier": 3,
+          "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2046
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "osYdUtgiFHY",
+      "source_type": "YouTube",
+      "video_title": "PVP With Server #1022 on Day 5 of Server Versus Server!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "all my chests. These are the chests you can earn on the first day whenever PVP opens at reset on day 5. You can see we won last time that we had server vs server. If",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "all my chests. These are the chests you can earn on the first day whenever PVP opens at reset on day 5. You can see we won last time that we had server vs server. If",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-d407b3b4f078b5cd8902",
+      "supabase_id": "e3b5753c-38d0-448b-9b96-63c419a35195",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=osYdUtgiFHY",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "urs. So basically, at reset, this event dropped on our server. And whenever you open it up, or whenever you first log into the game and haven't looked at this materi",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2464
+          },
+          {
+            "tier": 3,
+            "claim": "ce by the guild. These little point totals right here are what we're earning to unlock these bonus cargo holds. Okay. You can see we're at 43,966 right now. The next o",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2389
+          },
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2138
+          },
+          {
+            "tier": 3,
+            "claim": "don't really know what those metrics are and and we won't really know until it opens up for testing On the 28th, but that's just kind of interesting that What that d",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2053
+          },
+          {
+            "tier": 3,
+            "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2046
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "osYdUtgiFHY",
+        "source_type": "YouTube",
+        "video_title": "PVP With Server #1022 on Day 5 of Server Versus Server!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "all my chests. These are the chests you can earn on the first day whenever PVP opens at reset on day 5. You can see we won last time that we had server vs server. If",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=osYdUtgiFHY",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3104
+        },
+        {
+          "tier": 3,
+          "claim": "n another video as far as the costs and things like that and the things that it unlocks because that's a whole other topic for real. I mean, there's a lot going on with",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.299
+        },
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2602
+        },
+        {
+          "tier": 3,
+          "claim": "ard. I'm getting down to the wire on this baby right here. All I've got left to unlock my kinetic T7 is finishing this one. Doing one level on this and one level on th",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2597
+        },
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2548
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "osYdUtgiFHY",
+      "source_type": "YouTube",
+      "video_title": "PVP With Server #1022 on Day 5 of Server Versus Server!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "on working on research to get the build times down and the build costs down and unlock the other types but man, whenever I get that T7 Kinetic unlocked that's going to",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "on working on research to get the build times down and the build costs down and unlock the other types but man, whenever I get that T7 Kinetic unlocked that's going to",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-ca0dd581d0fb3c92ec09",
+      "supabase_id": "eeef061b-a9a1-45cf-b538-23d972d34260",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=osYdUtgiFHY",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3104
+          },
+          {
+            "tier": 3,
+            "claim": "n another video as far as the costs and things like that and the things that it unlocks because that's a whole other topic for real. I mean, there's a lot going on with",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.299
+          },
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2602
+          },
+          {
+            "tier": 3,
+            "claim": "ard. I'm getting down to the wire on this baby right here. All I've got left to unlock my kinetic T7 is finishing this one. Doing one level on this and one level on th",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2597
+          },
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2548
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "osYdUtgiFHY",
+        "source_type": "YouTube",
+        "video_title": "PVP With Server #1022 on Day 5 of Server Versus Server!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "on working on research to get the build times down and the build costs down and unlock the other types but man, whenever I get that T7 Kinetic unlocked that's going to",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "use her for good fuel for server vs server levels. I'm going to go ahead and unlock her first and then I'll see where I'm at. So the only thing that really gives me",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2908
+        },
+        {
+          "tier": 3,
+          "claim": "ecause my account on this server is only 18 million power and I just started to unlock my tier 5 subcombat support craft so I'm really not that strong and so this is s",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.27
+        },
+        {
+          "tier": 3,
+          "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2536
+        },
+        {
+          "tier": 3,
+          "claim": "hether I should just dump them all on killer b being what I'm going to, or just unlock her and put the rest on Evan. I'm not sure what I should do. Evan is 3 out of 40",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2535
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2522
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "wUubUJ4XwlU",
+      "source_type": "YouTube",
+      "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "cause I think that's where the biggest bang for my buck is for my account is to unlock Evan. So I'm going to, er, not unlock, but progress Evan because he is that good",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "cause I think that's where the biggest bang for my buck is for my account is to unlock Evan. So I'm going to, er, not unlock, but progress Evan because he is that good",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-e0144def51b68eac2147",
+      "supabase_id": "2b78d252-5eb4-4db6-8e51-a2b409dff234",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "use her for good fuel for server vs server levels. I'm going to go ahead and unlock her first and then I'll see where I'm at. So the only thing that really gives me",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2908
+          },
+          {
+            "tier": 3,
+            "claim": "ecause my account on this server is only 18 million power and I just started to unlock my tier 5 subcombat support craft so I'm really not that strong and so this is s",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.27
+          },
+          {
+            "tier": 3,
+            "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2536
+          },
+          {
+            "tier": 3,
+            "claim": "hether I should just dump them all on killer b being what I'm going to, or just unlock her and put the rest on Evan. I'm not sure what I should do. Evan is 3 out of 40",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2535
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2522
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "wUubUJ4XwlU",
+        "source_type": "YouTube",
+        "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "cause I think that's where the biggest bang for my buck is for my account is to unlock Evan. So I'm going to, er, not unlock, but progress Evan because he is that good",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2952
+        },
+        {
+          "tier": 3,
+          "claim": "hether I should just dump them all on killer b being what I'm going to, or just unlock her and put the rest on Evan. I'm not sure what I should do. Evan is 3 out of 40",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2925
+        },
+        {
+          "tier": 3,
+          "claim": "up one of the events and that would be awesome I may do that real quick. I may unlock killer B this time around Let's see where I'm at with her I'm 17 out of 40, it w",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2486
+        },
+        {
+          "tier": 3,
+          "claim": "Eight shards on a times 10 pull is really good. So I've probably got enough to unlock her right now. I am going to keep on pulling though because I want to get down t",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2465
+        },
+        {
+          "tier": 3,
+          "claim": "ouldn't take much for me to unlock her For one of the events I could slap 150 levels on her and boom I would get so",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.245
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "wUubUJ4XwlU",
+      "source_type": "YouTube",
+      "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "e evidence. So do I? pivot and spend the remaining shards on killer B to try to unlock her with 134 shards or 13 times 10 pulls. If I get an average of four-ish I shou",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "e evidence. So do I? pivot and spend the remaining shards on killer B to try to unlock her with 134 shards or 13 times 10 pulls. If I get an average of four-ish I shou",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-6e8b7f3b8072a776d7a2",
+      "supabase_id": "b6021bc6-ab13-4f59-8354-be3ebe9db544",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2952
+          },
+          {
+            "tier": 3,
+            "claim": "hether I should just dump them all on killer b being what I'm going to, or just unlock her and put the rest on Evan. I'm not sure what I should do. Evan is 3 out of 40",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2925
+          },
+          {
+            "tier": 3,
+            "claim": "up one of the events and that would be awesome I may do that real quick. I may unlock killer B this time around Let's see where I'm at with her I'm 17 out of 40, it w",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2486
+          },
+          {
+            "tier": 3,
+            "claim": "Eight shards on a times 10 pull is really good. So I've probably got enough to unlock her right now. I am going to keep on pulling though because I want to get down t",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2465
+          },
+          {
+            "tier": 3,
+            "claim": "ouldn't take much for me to unlock her For one of the events I could slap 150 levels on her and boom I would get so",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.245
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "wUubUJ4XwlU",
+        "source_type": "YouTube",
+        "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "e evidence. So do I? pivot and spend the remaining shards on killer B to try to unlock her with 134 shards or 13 times 10 pulls. If I get an average of four-ish I shou",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "re times 10 pulls and I'll get these guaranteed 10. I've probably got enough to unlock her already, but I think the smart play is to go ahead and take her to that 100",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3055
+        },
+        {
+          "tier": 3,
+          "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.252
+        },
+        {
+          "tier": 3,
+          "claim": "lready. I have spent all my platinum and I have 166 shards to use. I know I can unlock killer b with that, but I might even have a little bit to throw down on Evan. Wh",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2488
+        },
+        {
+          "tier": 3,
+          "claim": "Eight shards on a times 10 pull is really good. So I've probably got enough to unlock her right now. I am going to keep on pulling though because I want to get down t",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2475
+        },
+        {
+          "tier": 3,
+          "claim": "ouldn't take much for me to unlock her For one of the events I could slap 150 levels on her and boom I would get so",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2428
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "wUubUJ4XwlU",
+      "source_type": "YouTube",
+      "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ld be able to get enough shards to unlock her but nah we're gonna all go we're gonna go all in on them and that's what we'",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ld be able to get enough shards to unlock her but nah we're gonna all go we're gonna go all in on them and that's what we'",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-687de5992eeaf6eb7a33",
+      "supabase_id": "30ca2a64-882a-49dc-8efd-ef10390b043f",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "re times 10 pulls and I'll get these guaranteed 10. I've probably got enough to unlock her already, but I think the smart play is to go ahead and take her to that 100",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3055
+          },
+          {
+            "tier": 3,
+            "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.252
+          },
+          {
+            "tier": 3,
+            "claim": "lready. I have spent all my platinum and I have 166 shards to use. I know I can unlock killer b with that, but I might even have a little bit to throw down on Evan. Wh",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2488
+          },
+          {
+            "tier": 3,
+            "claim": "Eight shards on a times 10 pull is really good. So I've probably got enough to unlock her right now. I am going to keep on pulling though because I want to get down t",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2475
+          },
+          {
+            "tier": 3,
+            "claim": "ouldn't take much for me to unlock her For one of the events I could slap 150 levels on her and boom I would get so",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2428
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "wUubUJ4XwlU",
+        "source_type": "YouTube",
+        "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ld be able to get enough shards to unlock her but nah we're gonna all go we're gonna go all in on them and that's what we'",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.243
+        },
+        {
+          "tier": 3,
+          "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2381
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2353
+        },
+        {
+          "tier": 3,
+          "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2283
+        },
+        {
+          "tier": 3,
+          "claim": "roduce a cross server feature which will be available on service that have been open for at least four weeks. So if your server has been open for at least You will t",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2146
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "wUubUJ4XwlU",
+      "source_type": "YouTube",
+      "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "st you 10. If you are interested in coming to server number 1026 keep your eyes open for our recruitment post when we do it. This is a great place to be we're going",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "st you 10. If you are interested in coming to server number 1026 keep your eyes open for our recruitment post when we do it. This is a great place to be we're going",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-a401471b99387716b4fc",
+      "supabase_id": "cb8cbbfe-730c-448a-bbb9-6b856de78d60",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=wUubUJ4XwlU",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.243
+          },
+          {
+            "tier": 3,
+            "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2381
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2353
+          },
+          {
+            "tier": 3,
+            "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2283
+          },
+          {
+            "tier": 3,
+            "claim": "roduce a cross server feature which will be available on service that have been open for at least four weeks. So if your server has been open for at least You will t",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2146
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "wUubUJ4XwlU",
+        "source_type": "YouTube",
+        "video_title": "Insane Luck Pulling For Pay To Win Hero Evan!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "st you 10. If you are interested in coming to server number 1026 keep your eyes open for our recruitment post when we do it. This is a great place to be we're going",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=5MflTOIJc50",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "is may be where I get hung up. We'll see. Because I think I'll have to fight to unlock the planet. Yep. It says victory is assured 308 power against 357k power. So I h",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2327
+        },
+        {
+          "tier": 3,
+          "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2164
+        },
+        {
+          "tier": 3,
+          "claim": "n to me a couple times where I've been stuck on like 97% of the game just won't open Usually I can get it to finally work by closing the game and opening it multiple",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2084
+        },
+        {
+          "tier": 3,
+          "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2073
+        },
+        {
+          "tier": 3,
+          "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2034
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "5MflTOIJc50",
+      "source_type": "YouTube",
+      "video_title": "War With Server #1027 DARK and FZLG!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "t them easy points where everything get them but I don't I want to fight in the open field I don't want to hit FKs on the planet so come on guys alright let's look f",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "t them easy points where everything get them but I don't I want to fight in the open field I don't want to hit FKs on the planet so come on guys alright let's look f",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-01c2431ae25bfefe4243",
+      "supabase_id": "5e08bf1b-4ad8-40de-a130-596bf9c0900a",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=5MflTOIJc50",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "is may be where I get hung up. We'll see. Because I think I'll have to fight to unlock the planet. Yep. It says victory is assured 308 power against 357k power. So I h",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2327
+          },
+          {
+            "tier": 3,
+            "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2164
+          },
+          {
+            "tier": 3,
+            "claim": "n to me a couple times where I've been stuck on like 97% of the game just won't open Usually I can get it to finally work by closing the game and opening it multiple",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2084
+          },
+          {
+            "tier": 3,
+            "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2073
+          },
+          {
+            "tier": 3,
+            "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2034
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "5MflTOIJc50",
+        "source_type": "YouTube",
+        "video_title": "War With Server #1027 DARK and FZLG!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "t them easy points where everything get them but I don't I want to fight in the open field I don't want to hit FKs on the planet so come on guys alright let's look f",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=5MflTOIJc50",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "come available on servers that have been open for 27 weeks. The reason why they are opening it in stages is because a new flag",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2546
+        },
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2473
+        },
+        {
+          "tier": 3,
+          "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2433
+        },
+        {
+          "tier": 3,
+          "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2424
+        },
+        {
+          "tier": 3,
+          "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2406
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "5MflTOIJc50",
+      "source_type": "YouTube",
+      "video_title": "War With Server #1027 DARK and FZLG!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "tomorrow with the battle for the star in 13 hours Zarnas on their server comes open we will have the ability to try to take it and that will be a good time I hope t",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "tomorrow with the battle for the star in 13 hours Zarnas on their server comes open we will have the ability to try to take it and that will be a good time I hope t",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-79eec2e5f2beb4e133b8",
+      "supabase_id": "6e6a71a9-300b-433d-bbf8-98b6521ddbc6",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=5MflTOIJc50",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "come available on servers that have been open for 27 weeks. The reason why they are opening it in stages is because a new flag",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2546
+          },
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2473
+          },
+          {
+            "tier": 3,
+            "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2433
+          },
+          {
+            "tier": 3,
+            "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2424
+          },
+          {
+            "tier": 3,
+            "claim": "going on and oh look at that They're already going We don't even have the start open up for six minutes and they're already fighting. I see 81. I see fire. I see Uh,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2406
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "5MflTOIJc50",
+        "source_type": "YouTube",
+        "video_title": "War With Server #1027 DARK and FZLG!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "tomorrow with the battle for the star in 13 hours Zarnas on their server comes open we will have the ability to try to take it and that will be a good time I hope t",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=wh1FHtiRmGE",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3199
+        },
+        {
+          "tier": 3,
+          "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3027
+        },
+        {
+          "tier": 3,
+          "claim": "ing to server number 1026 whenever the next migration the next migration period opens because we have a very active and tempting server to want to join so I can only",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2759
+        },
+        {
+          "tier": 3,
+          "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2523
+        },
+        {
+          "tier": 3,
+          "claim": "days ago on the official discord. The new round of interstellar migration will open soon. This is for the block it's going to happen in. Servers 1,017 to 1,112. Tha",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2424
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "wh1FHtiRmGE",
+      "source_type": "YouTube",
+      "video_title": "PVP VALOR ARENA PUSH!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "u're interested in a really good server to migrate to when the migration period opens for this bracket of servers, be thinking about coming and joining us on this ser",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "u're interested in a really good server to migrate to when the migration period opens for this bracket of servers, be thinking about coming and joining us on this ser",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-aaa2344bebe557af6e1e",
+      "supabase_id": "36573fa3-9c63-4c0c-98ce-f323a26ba260",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=wh1FHtiRmGE",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3199
+          },
+          {
+            "tier": 3,
+            "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3027
+          },
+          {
+            "tier": 3,
+            "claim": "ing to server number 1026 whenever the next migration the next migration period opens because we have a very active and tempting server to want to join so I can only",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2759
+          },
+          {
+            "tier": 3,
+            "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2523
+          },
+          {
+            "tier": 3,
+            "claim": "days ago on the official discord. The new round of interstellar migration will open soon. This is for the block it's going to happen in. Servers 1,017 to 1,112. Tha",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2424
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "wh1FHtiRmGE",
+        "source_type": "YouTube",
+        "video_title": "PVP VALOR ARENA PUSH!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "u're interested in a really good server to migrate to when the migration period opens for this bracket of servers, be thinking about coming and joining us on this ser",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=GWSIyWN1zms",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2902
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2787
+        },
+        {
+          "tier": 3,
+          "claim": "ced fast as many as possible. We've seen this in other games to where there's a unlock of, you know, being able to level up your buildings more and then they introduce",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2491
+        },
+        {
+          "tier": 3,
+          "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2461
+        },
+        {
+          "tier": 3,
+          "claim": "at so I can kind of know how close I am. 37 is what I need of him to be able to unlock him. So fingers crossed or well not unlocking but take one more rank on him. Fin",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2413
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "GWSIyWN1zms",
+      "source_type": "YouTube",
+      "video_title": "SERVER #1026 WANTS YOU!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "t We know how to grow together. This is something that when the migration event opens and allows people to be able to choose our server as one of the servers in the b",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "t We know how to grow together. This is something that when the migration event opens and allows people to be able to choose our server as one of the servers in the b",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-41ab181faed8c673a7cd",
+      "supabase_id": "3d408b0d-e986-4787-b3e6-a8b30eab2bb1",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=GWSIyWN1zms",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2902
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2787
+          },
+          {
+            "tier": 3,
+            "claim": "ced fast as many as possible. We've seen this in other games to where there's a unlock of, you know, being able to level up your buildings more and then they introduce",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2491
+          },
+          {
+            "tier": 3,
+            "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2461
+          },
+          {
+            "tier": 3,
+            "claim": "at so I can kind of know how close I am. 37 is what I need of him to be able to unlock him. So fingers crossed or well not unlocking but take one more rank on him. Fin",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2413
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "GWSIyWN1zms",
+        "source_type": "YouTube",
+        "video_title": "SERVER #1026 WANTS YOU!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "t We know how to grow together. This is something that when the migration event opens and allows people to be able to choose our server as one of the servers in the b",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=KRiqdrRLGg8",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "days ago on the official discord. The new round of interstellar migration will open soon. This is for the block it's going to happen in. Servers 1,017 to 1,112. Tha",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2866
+        },
+        {
+          "tier": 3,
+          "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2838
+        },
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2805
+        },
+        {
+          "tier": 3,
+          "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2498
+        },
+        {
+          "tier": 3,
+          "claim": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2429
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "KRiqdrRLGg8",
+      "source_type": "YouTube",
+      "video_title": "HOT UPDATE NEWS! MAY 19th Foundation Galactic Frontier",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "to throw out there for everybody who's interested. Whenever the migration event opens up for your block of servers and if you are possibly in the block of servers tha",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "to throw out there for everybody who's interested. Whenever the migration event opens up for your block of servers and if you are possibly in the block of servers tha",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-10680b7647c547d4c597",
+      "supabase_id": "c9ec11a8-7414-4ce3-bd7d-09f569fb3f23",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=KRiqdrRLGg8",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "days ago on the official discord. The new round of interstellar migration will open soon. This is for the block it's going to happen in. Servers 1,017 to 1,112. Tha",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2866
+          },
+          {
+            "tier": 3,
+            "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2838
+          },
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2805
+          },
+          {
+            "tier": 3,
+            "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2498
+          },
+          {
+            "tier": 3,
+            "claim": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2429
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "KRiqdrRLGg8",
+        "source_type": "YouTube",
+        "video_title": "HOT UPDATE NEWS! MAY 19th Foundation Galactic Frontier",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "to throw out there for everybody who's interested. Whenever the migration event opens up for your block of servers and if you are possibly in the block of servers tha",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2729
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2515
+        },
+        {
+          "tier": 3,
+          "claim": ", 120. That means I'm gonna be able to get all three ranks of red and I'm gonna unlock the next light blue one or or whatever it is. And I'll be halfway into another r",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2405
+        },
+        {
+          "tier": 3,
+          "claim": "gnetic shield tower status. We did that. Boom. So now we're going to be able to unlock our first planet. Now this head to a neutral planet to regroup. This may be wher",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2373
+        },
+        {
+          "tier": 3,
+          "claim": "gularity Research. To do that, you must go here and start it. But to be able to unlock this tree itself, you must have your combat craft modification to at least 60% b",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.234
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "he new flagship that has been released. This is the event for you to be able to unlock it. It runs for 14 days or something like that. To unlock it as a free to play p",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "he new flagship that has been released. This is the event for you to be able to unlock it. It runs for 14 days or something like that. To unlock it as a free to play p",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-03784f0194429df39a34",
+      "supabase_id": "5570830b-48c1-426f-909b-2df3aded4da8",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2729
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2515
+          },
+          {
+            "tier": 3,
+            "claim": ", 120. That means I'm gonna be able to get all three ranks of red and I'm gonna unlock the next light blue one or or whatever it is. And I'll be halfway into another r",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2405
+          },
+          {
+            "tier": 3,
+            "claim": "gnetic shield tower status. We did that. Boom. So now we're going to be able to unlock our first planet. Now this head to a neutral planet to regroup. This may be wher",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2373
+          },
+          {
+            "tier": 3,
+            "claim": "gularity Research. To do that, you must go here and start it. But to be able to unlock this tree itself, you must have your combat craft modification to at least 60% b",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.234
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "he new flagship that has been released. This is the event for you to be able to unlock it. It runs for 14 days or something like that. To unlock it as a free to play p",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.303
+        },
+        {
+          "tier": 3,
+          "claim": "ause honestly at this point I'm focused on other things and not the research to unlock of this Ion T7 ship because I honestly don't feel like it's critical for me righ",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2716
+        },
+        {
+          "tier": 3,
+          "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2698
+        },
+        {
+          "tier": 3,
+          "claim": "more time's 10 pull to get this guaranteed amount and then I'll have enough to unlock her for sure. I probably already got enough to unlock her right now, but boom. T",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2688
+        },
+        {
+          "tier": 3,
+          "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2584
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ff you had saved up, you will not be prepared for this bingo board. and then to unlock the ship if you can't complete it during the allotted amount of time you'll have",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ff you had saved up, you will not be prepared for this bingo board. and then to unlock the ship if you can't complete it during the allotted amount of time you'll have",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-2d336edbe9908cc2aa05",
+      "supabase_id": "7c52ba26-f1e9-4978-88a3-327c9b6c0148",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.303
+          },
+          {
+            "tier": 3,
+            "claim": "ause honestly at this point I'm focused on other things and not the research to unlock of this Ion T7 ship because I honestly don't feel like it's critical for me righ",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2716
+          },
+          {
+            "tier": 3,
+            "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2698
+          },
+          {
+            "tier": 3,
+            "claim": "more time's 10 pull to get this guaranteed amount and then I'll have enough to unlock her for sure. I probably already got enough to unlock her right now, but boom. T",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2688
+          },
+          {
+            "tier": 3,
+            "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2584
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ff you had saved up, you will not be prepared for this bingo board. and then to unlock the ship if you can't complete it during the allotted amount of time you'll have",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2787
+        },
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2337
+        },
+        {
+          "tier": 3,
+          "claim": "t here. Now it says every Monday the Top 10 Commerce Guilds in Power qualify to unlock Star of the Guild event on Sunday. Qualification will not change even if the ran",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2293
+        },
+        {
+          "tier": 3,
+          "claim": "ause honestly at this point I'm focused on other things and not the research to unlock of this Ion T7 ship because I honestly don't feel like it's critical for me righ",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2284
+        },
+        {
+          "tier": 3,
+          "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.225
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "in the wild, it may change a little bit or it may not. Go to the Bingo Board to unlock the ship Complete every single bingo on this board This way and vertical and hor",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "in the wild, it may change a little bit or it may not. Go to the Bingo Board to unlock the ship Complete every single bingo on this board This way and vertical and hor",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-c830d5fe658f2785c7a8",
+      "supabase_id": "8c703dfd-a589-4d7d-bb55-95d8380499cc",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2787
+          },
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2337
+          },
+          {
+            "tier": 3,
+            "claim": "t here. Now it says every Monday the Top 10 Commerce Guilds in Power qualify to unlock Star of the Guild event on Sunday. Qualification will not change even if the ran",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2293
+          },
+          {
+            "tier": 3,
+            "claim": "ause honestly at this point I'm focused on other things and not the research to unlock of this Ion T7 ship because I honestly don't feel like it's critical for me righ",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2284
+          },
+          {
+            "tier": 3,
+            "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.225
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "in the wild, it may change a little bit or it may not. Go to the Bingo Board to unlock the ship Complete every single bingo on this board This way and vertical and hor",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "ouldn't take much for me to unlock her For one of the events I could slap 150 levels on her and boom I would get so",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2522
+        },
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2422
+        },
+        {
+          "tier": 3,
+          "claim": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2372
+        },
+        {
+          "tier": 1,
+          "claim": "Each ship specializes in one of three Energy Types: Beam, Kinetic, or Ionic.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.236
+        },
+        {
+          "tier": 3,
+          "claim": "The Energy Core is the main building that must be upgraded to unlock and upgrade other buildings.",
+          "status": "Under Review",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2319
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "izontal Unlock each one of the little energy cubes on the bottom You have to gather the energy",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "izontal Unlock each one of the little energy cubes on the bottom You have to gather the energy",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-b86c24d49a6e4f24b008",
+      "supabase_id": "21c256f0-09f3-46e0-abf8-51c1d47f6d4f",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "ouldn't take much for me to unlock her For one of the events I could slap 150 levels on her and boom I would get so",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2522
+          },
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2422
+          },
+          {
+            "tier": 3,
+            "claim": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2372
+          },
+          {
+            "tier": 1,
+            "claim": "Each ship specializes in one of three Energy Types: Beam, Kinetic, or Ionic.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.236
+          },
+          {
+            "tier": 3,
+            "claim": "The Energy Core is the main building that must be upgraded to unlock and upgrade other buildings.",
+            "status": "Under Review",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2319
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "izontal Unlock each one of the little energy cubes on the bottom You have to gather the energy",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "ce by the guild. These little point totals right here are what we're earning to unlock these bonus cargo holds. Okay. You can see we're at 43,966 right now. The next o",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.239
+        },
+        {
+          "tier": 3,
+          "claim": "an go right now because I don't have my core level up to 31 yet which will then unlock the later levels. I'm getting a 3,000 per hour and I have a cap of 36,000 before",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2356
+        },
+        {
+          "tier": 3,
+          "claim": "Eight shards on a times 10 pull is really good. So I've probably got enough to unlock her right now. I am going to keep on pulling though because I want to get down t",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2335
+        },
+        {
+          "tier": 1,
+          "claim": "The Core Component determines the Flagship Style and the Style of the entire fleet.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2318
+        },
+        {
+          "tier": 3,
+          "claim": "more time's 10 pull to get this guaranteed amount and then I'll have enough to unlock her for sure. I probably already got enough to unlock her right now, but boom. T",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2315
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "to unlock the flagship. You see I have zero out of eight right now because I haven't compl",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "to unlock the flagship. You see I have zero out of eight right now because I haven't compl",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-b6917617fbfbbb09b199",
+      "supabase_id": "6eb9c430-70b5-4e05-b388-4d9f2e93421f",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "ce by the guild. These little point totals right here are what we're earning to unlock these bonus cargo holds. Okay. You can see we're at 43,966 right now. The next o",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.239
+          },
+          {
+            "tier": 3,
+            "claim": "an go right now because I don't have my core level up to 31 yet which will then unlock the later levels. I'm getting a 3,000 per hour and I have a cap of 36,000 before",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2356
+          },
+          {
+            "tier": 3,
+            "claim": "Eight shards on a times 10 pull is really good. So I've probably got enough to unlock her right now. I am going to keep on pulling though because I want to get down t",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2335
+          },
+          {
+            "tier": 1,
+            "claim": "The Core Component determines the Flagship Style and the Style of the entire fleet.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2318
+          },
+          {
+            "tier": 3,
+            "claim": "more time's 10 pull to get this guaranteed amount and then I'll have enough to unlock her for sure. I probably already got enough to unlock her right now, but boom. T",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2315
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "to unlock the flagship. You see I have zero out of eight right now because I haven't compl",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2492
+        },
+        {
+          "tier": 3,
+          "claim": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.241
+        },
+        {
+          "tier": 3,
+          "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2388
+        },
+        {
+          "tier": 3,
+          "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2312
+        },
+        {
+          "tier": 3,
+          "claim": "ull, I'm guessing your full suite of components on a ship to plus six, then you unlock this ability. By consuming the new item, the catalyst device, you can consume mu",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2292
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "nts on your fleet to level your fleet or possibly do empowerment or possibly do unlocks or level ups on your components. Those are going to be the things you can do to",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "nts on your fleet to level your fleet or possibly do empowerment or possibly do unlocks or level ups on your components. Those are going to be the things you can do to",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-c1ce43b3a81706e1a19b",
+      "supabase_id": "556b0b9c-6b13-492c-9d53-f1e610f2b91a",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2492
+          },
+          {
+            "tier": 3,
+            "claim": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.241
+          },
+          {
+            "tier": 3,
+            "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2388
+          },
+          {
+            "tier": 3,
+            "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2312
+          },
+          {
+            "tier": 3,
+            "claim": "ull, I'm guessing your full suite of components on a ship to plus six, then you unlock this ability. By consuming the new item, the catalyst device, you can consume mu",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2292
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "nts on your fleet to level your fleet or possibly do empowerment or possibly do unlocks or level ups on your components. Those are going to be the things you can do to",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2985
+        },
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2697
+        },
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2681
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2669
+        },
+        {
+          "tier": 3,
+          "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2605
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "t drops. And this is where your paying players have the opportunity to actually unlock this vessel by paying. So you can go here, up here, you can buy these offers. Yo",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "t drops. And this is where your paying players have the opportunity to actually unlock this vessel by paying. So you can go here, up here, you can buy these offers. Yo",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-734c635a12ca9bcf4467",
+      "supabase_id": "93e00cb5-5c93-4fa8-8b34-bfa77e610d67",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2985
+          },
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2697
+          },
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2681
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2669
+          },
+          {
+            "tier": 3,
+            "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2605
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "t drops. And this is where your paying players have the opportunity to actually unlock this vessel by paying. So you can go here, up here, you can buy these offers. Yo",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.306
+        },
+        {
+          "tier": 3,
+          "claim": "se it's all contingent on getting this one done to here so that that I can then unlock the ability to do those energy core level caps up past 30. So it's all it's all",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2674
+        },
+        {
+          "tier": 3,
+          "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2377
+        },
+        {
+          "tier": 3,
+          "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2334
+        },
+        {
+          "tier": 3,
+          "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2299
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "it looks like. So if you get this offer right here, it looks like you can just unlock the ship. The Star Flag ship developed by the Foundation Board Union. So this on",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "it looks like. So if you get this offer right here, it looks like you can just unlock the ship. The Star Flag ship developed by the Foundation Board Union. So this on",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-a9bbdc19c1a1be5c6966",
+      "supabase_id": "d5bcaeb5-8a62-434b-a4aa-8439edfd316e",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.306
+          },
+          {
+            "tier": 3,
+            "claim": "se it's all contingent on getting this one done to here so that that I can then unlock the ability to do those energy core level caps up past 30. So it's all it's all",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2674
+          },
+          {
+            "tier": 3,
+            "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2377
+          },
+          {
+            "tier": 3,
+            "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2334
+          },
+          {
+            "tier": 3,
+            "claim": "here the cumulative cumulative rewards Whenever I spend a few shards on her to unlock her You know, I have 166 shards so I can get to this point guaranteed And then w",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2299
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "it looks like. So if you get this offer right here, it looks like you can just unlock the ship. The Star Flag ship developed by the Foundation Board Union. So this on",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2763
+        },
+        {
+          "tier": 3,
+          "claim": "earch path. So that would be great. So I'm looking to battle and I'm looking to unlock chests and I'm looking to win this. I would like to see us win this. That would",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2738
+        },
+        {
+          "tier": 3,
+          "claim": "I could recycle one and for most of us this is a good item to pick to actually unlock your renewal store your recycle store because a lot of us that are watching this",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.259
+        },
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2519
+        },
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2493
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "So that's what's up. And that's what I wanted to show you. You can be ready to unlock your new flagship gun air. One thing I learned about this whole process is that",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "So that's what's up. And that's what I wanted to show you. You can be ready to unlock your new flagship gun air. One thing I learned about this whole process is that",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-30afe8ab2c5afa37ae30",
+      "supabase_id": "88ff92b2-2d1a-49a5-b921-afdd9e1ce968",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2763
+          },
+          {
+            "tier": 3,
+            "claim": "earch path. So that would be great. So I'm looking to battle and I'm looking to unlock chests and I'm looking to win this. I would like to see us win this. That would",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2738
+          },
+          {
+            "tier": 3,
+            "claim": "I could recycle one and for most of us this is a good item to pick to actually unlock your renewal store your recycle store because a lot of us that are watching this",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.259
+          },
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2519
+          },
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2493
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "So that's what's up. And that's what I wanted to show you. You can be ready to unlock your new flagship gun air. One thing I learned about this whole process is that",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3158
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2867
+        },
+        {
+          "tier": 3,
+          "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2712
+        },
+        {
+          "tier": 3,
+          "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.261
+        },
+        {
+          "tier": 1,
+          "claim": "In a military rally, the rally leader's flagship skills apply to the entire aggregated battle group.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2496
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ne time. Even though this is a fourth flagship, it is not going to allow you to unlock it to fly You're only going to be able to fly three in the battle at one time. S",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ne time. Even though this is a fourth flagship, it is not going to allow you to unlock it to fly You're only going to be able to fly three in the battle at one time. S",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-0b993b9662e957905432",
+      "supabase_id": "95765c16-0f01-41c8-8581-00fef9da5c04",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3158
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2867
+          },
+          {
+            "tier": 3,
+            "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2712
+          },
+          {
+            "tier": 3,
+            "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.261
+          },
+          {
+            "tier": 1,
+            "claim": "In a military rally, the rally leader's flagship skills apply to the entire aggregated battle group.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2496
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ne time. Even though this is a fourth flagship, it is not going to allow you to unlock it to fly You're only going to be able to fly three in the battle at one time. S",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "r resource or punishment and you don't have enough resources, it will choose to open chests for you and you have to kind of select how many and that type of thing. T",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2608
+        },
+        {
+          "tier": 3,
+          "claim": "n another video as far as the costs and things like that and the things that it unlocks because that's a whole other topic for real. I mean, there's a lot going on with",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2461
+        },
+        {
+          "tier": 3,
+          "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2433
+        },
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2428
+        },
+        {
+          "tier": 3,
+          "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2376
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "a certain attack type style and certain It's a pretty little thing that we can unlock and have In my opinion it will serve a lot of use for a lot of players If you're",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "a certain attack type style and certain It's a pretty little thing that we can unlock and have In my opinion it will serve a lot of use for a lot of players If you're",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-7b35c6bc93a7a2d7c757",
+      "supabase_id": "61b6358d-93be-4523-be80-10302edefc9a",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "r resource or punishment and you don't have enough resources, it will choose to open chests for you and you have to kind of select how many and that type of thing. T",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2608
+          },
+          {
+            "tier": 3,
+            "claim": "n another video as far as the costs and things like that and the things that it unlocks because that's a whole other topic for real. I mean, there's a lot going on with",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2461
+          },
+          {
+            "tier": 3,
+            "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2433
+          },
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2428
+          },
+          {
+            "tier": 3,
+            "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2376
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "a certain attack type style and certain It's a pretty little thing that we can unlock and have In my opinion it will serve a lot of use for a lot of players If you're",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": ", 120. That means I'm gonna be able to get all three ranks of red and I'm gonna unlock the next light blue one or or whatever it is. And I'll be halfway into another r",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2746
+        },
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2714
+        },
+        {
+          "tier": 3,
+          "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2443
+        },
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2438
+        },
+        {
+          "tier": 3,
+          "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2408
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "his video helps you with the breakdown of the Bangalore board to be prepared to unlock your gun here whenever it drops on your server. And I'll see you guys in another",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "his video helps you with the breakdown of the Bangalore board to be prepared to unlock your gun here whenever it drops on your server. And I'll see you guys in another",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-e6c2fd24bab834a056ff",
+      "supabase_id": "842c15c9-d5dc-4685-b9d0-f4e44ead77d5",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": ", 120. That means I'm gonna be able to get all three ranks of red and I'm gonna unlock the next light blue one or or whatever it is. And I'll be halfway into another r",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2746
+          },
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2714
+          },
+          {
+            "tier": 3,
+            "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2443
+          },
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2438
+          },
+          {
+            "tier": 3,
+            "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2408
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "his video helps you with the breakdown of the Bangalore board to be prepared to unlock your gun here whenever it drops on your server. And I'll see you guys in another",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "ing to server number 1026 whenever the next migration the next migration period opens because we have a very active and tempting server to want to join so I can only",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3816
+        },
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2365
+        },
+        {
+          "tier": 3,
+          "claim": "allying him I guess. Okay I see a note in chat somebody said there's four slots open in our stronghold but my two show to still be in there, so I think I'm good. Got",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2188
+        },
+        {
+          "tier": 3,
+          "claim": "use her for good fuel for server vs server levels. I'm going to go ahead and unlock her first and then I'll see where I'm at. So the only thing that really gives me",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2183
+        },
+        {
+          "tier": 3,
+          "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2157
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "WOzsQ8PGxqA",
+      "source_type": "YouTube",
+      "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "alactic Frontier. Also remember server number 1026 whenever the migration event opens for our server we want to see you there because we have a really good crew we've",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "alactic Frontier. Also remember server number 1026 whenever the migration event opens for our server we want to see you there because we have a really good crew we've",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-27f52950f0832293b4c1",
+      "supabase_id": "dce88402-624c-4560-b01d-39c000bf425b",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=WOzsQ8PGxqA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "ing to server number 1026 whenever the next migration the next migration period opens because we have a very active and tempting server to want to join so I can only",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3816
+          },
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2365
+          },
+          {
+            "tier": 3,
+            "claim": "allying him I guess. Okay I see a note in chat somebody said there's four slots open in our stronghold but my two show to still be in there, so I think I'm good. Got",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2188
+          },
+          {
+            "tier": 3,
+            "claim": "use her for good fuel for server vs server levels. I'm going to go ahead and unlock her first and then I'll see where I'm at. So the only thing that really gives me",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2183
+          },
+          {
+            "tier": 3,
+            "claim": "go to a beta server for testing first, beta servers, I guess. And you know that opens up a whole other can of worms too. Because if you put this on a certain set of s",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2157
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "WOzsQ8PGxqA",
+        "source_type": "YouTube",
+        "video_title": "Let's Talk About The NEW FLAGSHIP GUNGNIR and The BINGO BOARD!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "alactic Frontier. Also remember server number 1026 whenever the migration event opens for our server we want to see you there because we have a really good crew we've",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=6YnmEtj7nSA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2351
+        },
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2331
+        },
+        {
+          "tier": 3,
+          "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.23
+        },
+        {
+          "tier": 3,
+          "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2145
+        },
+        {
+          "tier": 1,
+          "claim": "The game's story is described as beginning a century after the establishment of the First Foundation in the Korell star system.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2107
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "6YnmEtj7nSA",
+      "source_type": "YouTube",
+      "video_title": "GVG PVP 1026 VERSUS 1028 SPACE PIRATES!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "get your points and try to get your chest to get in there right as soon as PVP opens The most happening time of the PVP event is the 24 hour period of the event It w",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "get your points and try to get your chest to get in there right as soon as PVP opens The most happening time of the PVP event is the 24 hour period of the event It w",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-84c50591d5ed92d03e89",
+      "supabase_id": "dde05d59-ec06-4bb7-9beb-2324339f5daf",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=6YnmEtj7nSA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2351
+          },
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2331
+          },
+          {
+            "tier": 3,
+            "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.23
+          },
+          {
+            "tier": 3,
+            "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2145
+          },
+          {
+            "tier": 1,
+            "claim": "The game's story is described as beginning a century after the establishment of the First Foundation in the Korell star system.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2107
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "6YnmEtj7nSA",
+        "source_type": "YouTube",
+        "video_title": "GVG PVP 1026 VERSUS 1028 SPACE PIRATES!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "get your points and try to get your chest to get in there right as soon as PVP opens The most happening time of the PVP event is the 24 hour period of the event It w",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=6YnmEtj7nSA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2922
+        },
+        {
+          "tier": 3,
+          "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2814
+        },
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2684
+        },
+        {
+          "tier": 3,
+          "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2666
+        },
+        {
+          "tier": 3,
+          "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2565
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "6YnmEtj7nSA",
+      "source_type": "YouTube",
+      "video_title": "GVG PVP 1026 VERSUS 1028 SPACE PIRATES!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "t out today finally, so that's a little update for you on that. Whatever you do unlock the new ship, you're still only gonna be able to choose three. It does have some",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "t out today finally, so that's a little update for you on that. Whatever you do unlock the new ship, you're still only gonna be able to choose three. It does have some",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-9c07400956105f31e52e",
+      "supabase_id": "b50766fb-54ab-4776-b705-b9cb7c594a90",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=6YnmEtj7nSA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "fore you can go up to level 31. When you can go up to level 31, that's going to open up a whole new path for you. Like I said, you're going to be able to level up yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2922
+          },
+          {
+            "tier": 3,
+            "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2814
+          },
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2684
+          },
+          {
+            "tier": 3,
+            "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2666
+          },
+          {
+            "tier": 3,
+            "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2565
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "6YnmEtj7nSA",
+        "source_type": "YouTube",
+        "video_title": "GVG PVP 1026 VERSUS 1028 SPACE PIRATES!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "t out today finally, so that's a little update for you on that. Whatever you do unlock the new ship, you're still only gonna be able to choose three. It does have some",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=6YnmEtj7nSA",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "allying him I guess. Okay I see a note in chat somebody said there's four slots open in our stronghold but my two show to still be in there, so I think I'm good. Got",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2435
+        },
+        {
+          "tier": 3,
+          "claim": "n to me a couple times where I've been stuck on like 97% of the game just won't open Usually I can get it to finally work by closing the game and opening it multiple",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2289
+        },
+        {
+          "tier": 3,
+          "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2238
+        },
+        {
+          "tier": 3,
+          "claim": "or it's going on now. I guess it's going on now. Defeat Ascendancy Vanguard to open new routes. Search for target. See what happens. Alright I've got a level one an",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2154
+        },
+        {
+          "tier": 3,
+          "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2129
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "6YnmEtj7nSA",
+      "source_type": "YouTube",
+      "video_title": "GVG PVP 1026 VERSUS 1028 SPACE PIRATES!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ships and I'm just like dude. What? I've got a video that proves it right here Open your eyes, man He just wanted to cause me grief. I think cuz he's got an attitud",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ships and I'm just like dude. What? I've got a video that proves it right here Open your eyes, man He just wanted to cause me grief. I think cuz he's got an attitud",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-b6d402bef3c02f737918",
+      "supabase_id": "fe1ea746-c18c-4d16-b7a2-d09c13710a89",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=6YnmEtj7nSA",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "allying him I guess. Okay I see a note in chat somebody said there's four slots open in our stronghold but my two show to still be in there, so I think I'm good. Got",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2435
+          },
+          {
+            "tier": 3,
+            "claim": "n to me a couple times where I've been stuck on like 97% of the game just won't open Usually I can get it to finally work by closing the game and opening it multiple",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2289
+          },
+          {
+            "tier": 3,
+            "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2238
+          },
+          {
+            "tier": 3,
+            "claim": "or it's going on now. I guess it's going on now. Defeat Ascendancy Vanguard to open new routes. Search for target. See what happens. Alright I've got a level one an",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2154
+          },
+          {
+            "tier": 3,
+            "claim": "the next one and then I'll just have these two left And then whenever I finally unlock them t7 man, it's going to be a big party on that day So Thanks for watching my",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2129
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "6YnmEtj7nSA",
+        "source_type": "YouTube",
+        "video_title": "GVG PVP 1026 VERSUS 1028 SPACE PIRATES!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ships and I'm just like dude. What? I've got a video that proves it right here Open your eyes, man He just wanted to cause me grief. I think cuz he's got an attitud",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=_EnohZ-4arc",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2833
+        },
+        {
+          "tier": 3,
+          "claim": "p want to know when gun in an air will become available. Why can't this content open on all servers at the same time? To unlock the standard 4th flagship, it will be",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2788
+        },
+        {
+          "tier": 3,
+          "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2744
+        },
+        {
+          "tier": 3,
+          "claim": ", 120. That means I'm gonna be able to get all three ranks of red and I'm gonna unlock the next light blue one or or whatever it is. And I'll be halfway into another r",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2723
+        },
+        {
+          "tier": 3,
+          "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2672
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "_EnohZ-4arc",
+      "source_type": "YouTube",
+      "video_title": "UPDATE NEWS May 12th NEW FLAGSHIP IS HERE!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "the certain block of servers that will get this content, then you'll be able to unlock this new flagship and then take off and begin to build it, begin to include it i",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "the certain block of servers that will get this content, then you'll be able to unlock this new flagship and then take off and begin to build it, begin to include it i",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-a49366699079b2f8b62e",
+      "supabase_id": "d11e0847-1b46-418e-8470-e35c02364014",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=_EnohZ-4arc",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2833
+          },
+          {
+            "tier": 3,
+            "claim": "p want to know when gun in an air will become available. Why can't this content open on all servers at the same time? To unlock the standard 4th flagship, it will be",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2788
+          },
+          {
+            "tier": 3,
+            "claim": "n it makes you do all four. And then it makes you do this one. And then you can unlock this one. And then you get your T7 on the kinetic. So as you can see right now,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2744
+          },
+          {
+            "tier": 3,
+            "claim": ", 120. That means I'm gonna be able to get all three ranks of red and I'm gonna unlock the next light blue one or or whatever it is. And I'll be halfway into another r",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2723
+          },
+          {
+            "tier": 3,
+            "claim": "efore this tree, the epoch of fusion seed will unlock for you. Good luck and level up that refinery to start getting your fusion seeds",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2672
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "_EnohZ-4arc",
+        "source_type": "YouTube",
+        "video_title": "UPDATE NEWS May 12th NEW FLAGSHIP IS HERE!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "the certain block of servers that will get this content, then you'll be able to unlock this new flagship and then take off and begin to build it, begin to include it i",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
     }
   ],
   "conflicts": [
@@ -44400,6 +48657,6 @@
     "tier1_claims": 451,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1179
+    "total_claims": 1212
   }
 }
