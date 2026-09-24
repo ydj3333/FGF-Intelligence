@@ -1,4 +1,5 @@
 name: FGF Corpus Synchronization
+# Community learning layer: non-conflicting YouTube observations are included in knowledge snapshots; held-back conflicts remain separately surfaced.
 
 on:
   schedule:
