@@ -836,6 +836,16 @@ def answer(q,player_context=None):
 
 
 
+STANDARD_CHAMPIONS = [
+    'Ajita','Aliya','Cocoon','Doug Rockwell','Eva von Trier','Evan Rogers',
+    'Jodie Beart','Kama Moai','Killer Bee','Klara','Lani Verita','Lily',
+    'Lucius Pullo','Phade','Riian Dessos','Zora Domini'
+]
+
+def champion_options():
+    return {'ok':True,'champions':STANDARD_CHAMPIONS,'source':'FGF knowledge corpus',
+            'note':'Select the standardized Champion name. Free-text Champion names are intentionally not accepted by the Builder.'}
+
 def _find_champion_style(name):
     nl=str(name).strip().lower()
     if not nl: return None
@@ -868,7 +878,10 @@ def fleet_builder(style='', champions=None):
         return {'ok':False,'error':'style must be Beam, Kinetic, or Ion'}
     champs=[str(x).strip() for x in (champions or []) if str(x).strip()][:3]
     if len(champs)!=3:
-        return {'ok':False,'error':'Provide exactly 3 Champions.'}
+        return {'ok':False,'error':'Select exactly 3 Champions from the standardized Champion list.'}
+    invalid=[x for x in champs if x not in STANDARD_CHAMPIONS]
+    if invalid:
+        return {'ok':False,'error':'Non-standard Champion name(s) rejected: '+', '.join(invalid)+'. Select from the Champion dropdown.'}
     rows=[]
     for name in champs:
         c=_find_champion_style(name)
@@ -1011,6 +1024,8 @@ class H(BaseHTTPRequestHandler):
             profile,error=_player_profile_from_db(pid)
             if error:return self._json({'ok':False,'durable':False,'error':error},503)
             return self._json({'ok':True,'durable':True,'profile':profile})
+        if u.path=='/api/champions':
+            return self._json(champion_options())
         if u.path=='/api/tools/repair':
             qs=parse_qs(u.query)
             return self._json(repair_planner(qs.get('damage',['minor'])[0],qs.get('repair_modules',['0'])[0],qs.get('in_combat',['false'])[0].lower()=='true'))
