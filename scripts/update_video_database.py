@@ -5,7 +5,7 @@ Uses Supabase REST so the pipeline does not depend on local psycopg2.
 This script never inserts/updates public.claims and never promotes a video
 claim to canonical truth.
 """
-import argparse, json, os
+import argparse, json, os, hashlib, re
 from pathlib import Path
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -20,6 +20,7 @@ def config():
 
 
 def request(method, url, key, payload=None, prefer="return=representation"):
+
     headers = {
         "apikey": key,
         "Authorization": f"Bearer {key}",
@@ -79,8 +80,65 @@ def main():
         prefer="resolution=merge-duplicates,return=representation",
     )
     video_db_id = video_rows[0]["id"]
+    learn_enabled = os.getenv("FGF_YOUTUBE_LEARN_INTO_KNOWLEDGE", "true").strip().lower() in ("1", "true", "yes", "on")
+    learned = 0
+    held_back = 0
+
+    def claim_key(text):
+        normalized = re.sub(r"\\s+", " ", str(text or "").strip().lower())
+        return "yt3-" + hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:20]
+
+    def learn_claim(c):
+        nonlocal learned, held_back
+        classification = c.get("classification")
+        if classification == "conflict_candidate":
+            held_back += 1
+            return
+        # Only genuinely new/community observations enter the learned layer.
+        # Supporting/duplicate observations enrich the video evidence layer but
+        # do not create duplicate knowledge claims.
+        if classification not in ("new_candidate", "crowd_additional_data"):
+            return
+        payload = {
+            "claim_key": claim_key(c["claim"]),
+            "claim": c["claim"],
+            "category": c.get("category"),
+            "claim_type": c.get("claim_type"),
+            "tier": "Tier 3 — Creator/Community",
+            "confidence": c.get("confidence"),
+            "status": "Current",
+            "canonical": False,
+            "metadata": {
+                "Source": video["video_url"],
+                "source_type": "YouTube",
+                "source_layer": "community_learned",
+                "official": False,
+                "learning_status": "learned_non_conflicting",
+                "conflict_status": "not_conflicting_with_tier1_2",
+                "video_id": video["video_id"],
+                "video_title": video["title"],
+                "evidence_excerpt": c.get("evidence_excerpt", ""),
+                "nearest": c.get("nearest", []),
+                "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+                "pipeline": "fgf-youtube-v1",
+            },
+        }
+        request(
+            "POST",
+            f"{base}/rest/v1/claims?on_conflict=claim_key",
+            key,
+            [payload],
+            prefer="resolution=merge-duplicates,return=minimal",
+        )
+        learned += 1
+
+    if learn_enabled:
+        for c in cross["claims"]:
+            learn_claim(c)
+
 
     # Persist every extracted claim as evidence/candidate metadata. This keeps
+    # provenance even when a claim is not suitable for the learned knowledge layer.
     # supporting and conflicting observations instead of losing provenance.
     persisted = 0
     for c in cross["claims"]:
@@ -121,8 +179,9 @@ def main():
         prefer="return=minimal",
     )
     print(
-        f"Persisted video={args.video_id}; candidate/evidence rows={persisted}; "
-        "canonical KB unchanged."
+        f"Persisted video={args.video_id}; evidence rows={persisted}; "
+        f"learned_non_conflicting={learned}; conflicts_held_back={held_back}; "
+        "Tier 3 community layer updated; canonical official claims are not overwritten."
     )
 
 
