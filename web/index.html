@@ -8,7 +8,7 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;margin:0;back
 <section id="tools" class="hidden">
 <div class="card"><h2>🛠️ Evidence-aware tools</h2><p class="muted">These tools calculate or plan only from mechanics established in the current evidence layer. Unknown costs/timers are left unknown.</p></div>
 <div class="card"><h3>Fleet Repair Planner</h3><select id="damageType"><option value="minor">Minor Damage</option><option value="major">Major Damage</option></select><input id="repairModules" type="number" min="0" value="0" placeholder="Repair Modules available"/><label><input id="inCombat" type="checkbox" style="width:auto"> Currently in combat</label><br><button onclick="repairTool()">Calculate repair path</button><div id="repairResult"></div></div>
-<div class="card"><h3>Fleet Synergy Builder</h3><select id="fleetStyle"><option>Beam</option><option>Kinetic</option><option>Ion</option></select><input id="champ1" placeholder="Champion 1"/><input id="champ2" placeholder="Champion 2"/><input id="champ3" placeholder="Champion 3"/><button onclick="fleetTool()">Build lineup</button><div id="fleetResult"></div></div>
+<div class="card"><h3>Fleet Synergy Builder</h3><select id="fleetStyle"><option>Beam</option><option>Kinetic</option><option>Ion</option></select><select id="champ1"><option value="">Select Champion 1</option></select><select id="champ2"><option value="">Select Champion 2</option></select><select id="champ3"><option value="">Select Champion 3</option></select><button onclick="fleetTool()">Build lineup</button><div id="fleetResult"></div></div>
 <div class="card"><h3>Energy Core Progression Planner</h3><input id="coreNow" type="number" min="1" value="1" placeholder="Current Core"/><input id="coreTarget" type="number" min="1" value="30" placeholder="Target Core"/><select id="coreSeason"><option>S1</option><option>S2</option><option>S3</option></select><button onclick="progressionTool()">Build progression plan</button><div id="progressionResult"></div></div>
 </section><section id="conflicts" class="hidden"><div id="conflictResults"></div></section>
 <script>
@@ -72,6 +72,15 @@ async function loadConflicts(){
  }catch(e){document.getElementById('conflictResults').innerHTML=`<div class="card error">${esc(e.message)}</div>`}
 }
 function toolHTML(title,body){return '<div class="card"><b>'+esc(title)+'</b><p>'+esc(body)+'</p></div>'}
+async function loadChampionSelectors(){
+ try{
+  const a=await getJSON('/api/champions');
+  ['champ1','champ2','champ3'].forEach((id,i)=>{
+   const s=document.getElementById(id);
+   s.innerHTML='<option value="">Select Champion '+(i+1)+'</option>'+(a.champions||[]).map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+  });
+ }catch(e){document.getElementById('fleetResult').innerHTML='<div class="card error">Unable to load standardized Champion list: '+esc(e.message)+'</div>'}
+}
 async function repairTool(){
  const d=document.getElementById('damageType').value,m=document.getElementById('repairModules').value,combat=document.getElementById('inCombat').checked;
  try{const a=await getJSON('/api/tools/repair?damage='+encodeURIComponent(d)+'&repair_modules='+encodeURIComponent(m)+'&in_combat='+combat);document.getElementById('repairResult').innerHTML=toolHTML('Repair path',a.action||a.error)+(a.evidence_basis||[]).map(x=>'<div class="evidence small">'+esc(x)+'</div>').join('')}catch(e){document.getElementById('repairResult').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}
@@ -100,4 +109,4 @@ async function submitConflict(cid){
   status.style.color='#4ecb91';
  }catch(e){status.textContent='✕ '+e.message;status.style.color='#ff5f5f'}
 }
-init();document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});</script></main></body></html>
+init();loadChampionSelectors();document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});</script></main></body></html>
