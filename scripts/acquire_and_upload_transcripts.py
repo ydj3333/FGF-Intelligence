@@ -40,6 +40,22 @@ def ensure_bucket():
         if "already" not in str(e).lower() and "duplicate" not in str(e).lower():
             print(f"Bucket check notice: {e}")
 
+def list_remote_transcripts():
+    """Return video IDs whose transcripts already exist in Supabase Storage."""
+    raw = request("POST", f"/storage/v1/object/list/{BUCKET}", {
+        "prefix": "transcripts/",
+        "limit": 1000,
+        "offset": 0,
+        "sortBy": {"column": "name", "order": "asc"},
+    })
+    items = json.loads(raw.decode("utf-8"))
+    ids = set()
+    for item in items:
+        name = item.get("name", "")
+        if name.startswith("transcripts/") and name.endswith(".txt"):
+            ids.add(name[len("transcripts/"):-4])
+    return ids
+
 def upload(path, object_path, content_type):
     encoded = "/".join(quote(p, safe="") for p in object_path.split("/"))
     k = key()
@@ -141,8 +157,16 @@ def main():
     upload(out / "playlist_index.json", "index/playlist_index.json", "application/json")
 
     failures = []
+    remote_transcripts = list_remote_transcripts()
+    print(f"Supabase already has {len(remote_transcripts)} transcript(s); existing remote transcripts will be skipped.", flush=True)
+
     for n, video in enumerate(videos, 1):
         vid = video["video_id"]
+
+        if vid in remote_transcripts:
+            print(f"[{n}/{len(videos)}] ALREADY IN SUPABASE: {vid} — skipping acquisition", flush=True)
+            continue
+
         work = out / vid
         work.mkdir(parents=True, exist_ok=True)
         txt = work / f"{vid}.txt"
