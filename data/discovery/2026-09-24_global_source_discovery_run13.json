@@ -1,0 +1,70 @@
+{
+  "cycle": 13,
+  "date": "2026-09-24",
+  "scope": ["S1/new-server baseline", "S2", "S3/future"],
+  "discovery_window": "2026-09-23 to 2026-09-24",
+  "findings": [
+    {
+      "source": "https://funplus.com/foundation-galactic-frontier-soars-into-season-two/",
+      "published": "2026-09-18",
+      "type": "official portal/news",
+      "tier": "T1 candidate evidence",
+      "confidence": "very high",
+      "scope": "S2 / initial rollout",
+      "finding": "FunPlus officially documents S2 The Usurper Rebellion: Sivana, Ascendancy Court, Ascendancy Emperor final boss, Magnetic Storms & Resistance, resistance buildings, Aromabloom Trade War, and Steam wishlist integration. Official article states S2 began Sep 14 and was initially available to Servers 1-16."
+    },
+    {
+      "source": "https://murpo.com/",
+      "published": "2026-09-22",
+      "type": "developer-announcement mirror",
+      "tier": "T2",
+      "confidence": "high",
+      "scope": "current/live operations",
+      "finding": "Sep 23 scheduled maintenance: 06:00-08:00 UTC; access blocked during the window; end time may vary; compensation expected after completion. No reliable post-maintenance confirmation was found in this cycle."
+    },
+    {
+      "source": "https://murpo.com/news/klara-game-news-da5d638bc6a072319b59",
+      "published": "2026-09-21",
+      "type": "developer-announcement mirror",
+      "tier": "T2",
+      "confidence": "high",
+      "scope": "current version",
+      "finding": "Sep 22 hot update: Weapon Prism added to Discount Shop; Combat Craft Modification prerequisite reduced from 60% to 40%; Shadowfront Commerce Guild rewards increased; first-time S2 port occupation rewards improved; UI/Quick Use improvements; S2 and other bug fixes."
+    },
+    {
+      "source": "https://foxdata.com/en/app-marketing-analytics/6737595599/as/GB/foundation-galactic-frontier/",
+      "published": "2026-09-16",
+      "type": "third-party app-store metadata mirror",
+      "tier": "T3",
+      "confidence": "high",
+      "scope": "v1.1.153",
+      "finding": "Latest listed version 1.1.153; S2 testing on 1001-1016; Shared Moonlight; Combat Lab; Ruins Raiders cross-server; Repair button; Energy Core leaderboard tie-break by progress toward next level."
+    },
+    {
+      "source": "https://boostbot.org/blog/foundation-galactic-frontier-gift-codes/",
+      "published": "2026-09-23",
+      "type": "third-party code tracker",
+      "tier": "T3",
+      "confidence": "low-medium",
+      "scope": "current code claims",
+      "finding": "Reports FOUNDATION and FURTHERFUTURE as active codes, each claiming 3x 30m Universal Speedup, 3x 10,000 Water and 3x 10,000 Metal. This is not primary evidence and should not be treated as canonical until verified against an official channel or in-game redemption."
+    },
+    {
+      "source": "https://raijin.gg/app/4223760/Foundation_Galactic_Frontier",
+      "published": "2026-09-23",
+      "type": "third-party Steam telemetry",
+      "tier": "T3",
+      "confidence": "medium",
+      "scope": "Steam prerelease",
+      "finding": "Steam status remains Coming soon; third-party estimate ~4.23K wishlists and 0 current players on Sep 23 UTC. Wishlist estimate is not an official player metric."
+    }
+  ],
+  "conflicts": [
+    "S2 scope remains 1-16 in the official FunPlus season article versus 1001-1016 in current app-store metadata and other operational/test evidence.",
+    "Shared Moonlight 1017-1247 end date remains Sep 26 in a Lunar Ruins-specific official-social mirror versus Sep 27 in the broader Shared Moonlight announcement mirror.",
+    "Version evidence remains official App Store v1.1.153 versus third-party reports of v1.1.155.240733."
+  ],
+  "s3_result": "No reliable new primary S3/future-season mechanics surfaced; gap retained.",
+  "tier1_promotions": 0,
+  "deduplication": "New evidence was checked against prior Cycle 12 discovery; existing hot-update and rollout conflicts were retained rather than duplicated or normalized."
+}
