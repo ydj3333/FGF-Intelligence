@@ -37755,6 +37755,1425 @@
         },
         "temporal": {}
       }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=u9Kr_Y8JogQ",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3046
+        },
+        {
+          "tier": 3,
+          "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2712
+        },
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2696
+        },
+        {
+          "tier": 3,
+          "claim": "here that you can unlock and have access to. So that'll be cool. That'll be neat to do to figure out how",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2681
+        },
+        {
+          "tier": 3,
+          "claim": "n when we first got onto the game. There were objectives that we had to meet to unlock the new stages of content. So I guess what we are is we're at stage number one r",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2676
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "u9Kr_Y8JogQ",
+      "source_type": "YouTube",
+      "video_title": "THE NEW RECYCLE SHOP IS HERE! FOUNDATION GALACTIC FRONTIER!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-5aba8af7333cc9e1137d",
+      "supabase_id": "c1750d38-04e3-400c-97c4-beac01697998",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=u9Kr_Y8JogQ",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3046
+          },
+          {
+            "tier": 3,
+            "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2712
+          },
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2696
+          },
+          {
+            "tier": 3,
+            "claim": "here that you can unlock and have access to. So that'll be cool. That'll be neat to do to figure out how",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2681
+          },
+          {
+            "tier": 3,
+            "claim": "n when we first got onto the game. There were objectives that we had to meet to unlock the new stages of content. So I guess what we are is we're at stage number one r",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2676
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "u9Kr_Y8JogQ",
+        "source_type": "YouTube",
+        "video_title": "THE NEW RECYCLE SHOP IS HERE! FOUNDATION GALACTIC FRONTIER!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "want. good for the environment folks. It's good for the environment. How do you unlock it? So that's one of the first questions that people are going to ask. The first",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=u9Kr_Y8JogQ",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "roduce a cross server feature which will be available on service that have been open for at least four weeks. So if your server has been open for at least You will t",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.5689
+        },
+        {
+          "tier": 3,
+          "claim": "Ruin Raiders will introduce a cross-server feature for servers that have been open for at least four weeks.",
+          "status": "Under Review",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3994
+        },
+        {
+          "tier": 3,
+          "claim": "t deal on the whole thing, is that the energy core level expansion feature will unlock on servers that have been open for 27 plus weeks. That's going to include the fu",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3523
+        },
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3208
+        },
+        {
+          "tier": 1,
+          "claim": "Cross-server Ruin Raiders is a new feature for servers open four or more weeks.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2744
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "u9Kr_Y8JogQ",
+      "source_type": "YouTube",
+      "video_title": "THE NEW RECYCLE SHOP IS HERE! FOUNDATION GALACTIC FRONTIER!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ent is server age. The feature only becomes available on servers that have been open for at least five weeks. So if your server hasn't been open for at least five we",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ent is server age. The feature only becomes available on servers that have been open for at least five weeks. So if your server hasn't been open for at least five we",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-e84fe883e019de7b7acd",
+      "supabase_id": "f2b18696-5d07-4729-936b-e40f443a686b",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=u9Kr_Y8JogQ",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "roduce a cross server feature which will be available on service that have been open for at least four weeks. So if your server has been open for at least You will t",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.5689
+          },
+          {
+            "tier": 3,
+            "claim": "Ruin Raiders will introduce a cross-server feature for servers that have been open for at least four weeks.",
+            "status": "Under Review",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3994
+          },
+          {
+            "tier": 3,
+            "claim": "t deal on the whole thing, is that the energy core level expansion feature will unlock on servers that have been open for 27 plus weeks. That's going to include the fu",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3523
+          },
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3208
+          },
+          {
+            "tier": 1,
+            "claim": "Cross-server Ruin Raiders is a new feature for servers open four or more weeks.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2744
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "u9Kr_Y8JogQ",
+        "source_type": "YouTube",
+        "video_title": "THE NEW RECYCLE SHOP IS HERE! FOUNDATION GALACTIC FRONTIER!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ent is server age. The feature only becomes available on servers that have been open for at least five weeks. So if your server hasn't been open for at least five we",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=u9Kr_Y8JogQ",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "l shop will actually open for you. And you get it when you earn your first what's called loopback token. I",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2773
+        },
+        {
+          "tier": 3,
+          "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1873
+        },
+        {
+          "tier": 3,
+          "claim": "ny loopback tokens you get. All you got to do is just get one loopback token to unlock your recycling store. So one gram blue parent will do it. You just hit recycle,",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.184
+        },
+        {
+          "tier": 3,
+          "claim": "Kinetic mastery is the first mastery to prioritize when allocating resources within the mastery system.",
+          "status": "Under Review",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1787
+        },
+        {
+          "tier": 3,
+          "claim": "Hello everyone, today after the August 25th update we got the ability to unlock the Fusion Seed Refinery. You have to have a couple requirements met first to be",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1712
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "u9Kr_Y8JogQ",
+      "source_type": "YouTube",
+      "video_title": "THE NEW RECYCLE SHOP IS HERE! FOUNDATION GALACTIC FRONTIER!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "when the Recycle Shop unlocks. So the renewal shop, the Recycle Shop, whatever unlocks the moment you obtain your very first loopback token. So whenever you recycle so",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "when the Recycle Shop unlocks. So the renewal shop, the Recycle Shop, whatever unlocks the moment you obtain your very first loopback token. So whenever you recycle so",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-de2f9450c7687cd5f403",
+      "supabase_id": "e7c61e49-071d-4a64-86ea-b565eb1a792b",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=u9Kr_Y8JogQ",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "l shop will actually open for you. And you get it when you earn your first what's called loopback token. I",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2773
+          },
+          {
+            "tier": 3,
+            "claim": "trap in and let's go. So you get to your renewal shop when that option actually opens for you on your server. Your server has to be of a certain age before the renewa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1873
+          },
+          {
+            "tier": 3,
+            "claim": "ny loopback tokens you get. All you got to do is just get one loopback token to unlock your recycling store. So one gram blue parent will do it. You just hit recycle,",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.184
+          },
+          {
+            "tier": 3,
+            "claim": "Kinetic mastery is the first mastery to prioritize when allocating resources within the mastery system.",
+            "status": "Under Review",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1787
+          },
+          {
+            "tier": 3,
+            "claim": "Hello everyone, today after the August 25th update we got the ability to unlock the Fusion Seed Refinery. You have to have a couple requirements met first to be",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1712
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "u9Kr_Y8JogQ",
+        "source_type": "YouTube",
+        "video_title": "THE NEW RECYCLE SHOP IS HERE! FOUNDATION GALACTIC FRONTIER!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "when the Recycle Shop unlocks. So the renewal shop, the Recycle Shop, whatever unlocks the moment you obtain your very first loopback token. So whenever you recycle so",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=2WLXc2vFmtM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2365
+        },
+        {
+          "tier": 3,
+          "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.213
+        },
+        {
+          "tier": 3,
+          "claim": "n to me a couple times where I've been stuck on like 97% of the game just won't open Usually I can get it to finally work by closing the game and opening it multiple",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1983
+        },
+        {
+          "tier": 3,
+          "claim": "ance to higher level star systems. So as we move towards the center, that stuff unlocks as we progress through the story and stuff. Outer regions will all be able to be",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1928
+        },
+        {
+          "tier": 3,
+          "claim": "n when we first got onto the game. There were objectives that we had to meet to unlock the new stages of content. So I guess what we are is we're at stage number one r",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1891
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "2WLXc2vFmtM",
+      "source_type": "YouTube",
+      "video_title": "YOU ARE NOT GOING TO BELIEVE THIS PVP RANT! ALSO WE DESTROYED SERVER #1045 IN SVS!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-e171564e1dce71fbb7ab",
+      "supabase_id": "30042607-afa8-4b1a-93d4-4f0b35086361",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=2WLXc2vFmtM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2365
+          },
+          {
+            "tier": 3,
+            "claim": "y of time to be able to save up the resources they need and they was like, woo, unlock the ship. Thank you, Miranda. Well, here we go. I'm trying to do it again for yo",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.213
+          },
+          {
+            "tier": 3,
+            "claim": "n to me a couple times where I've been stuck on like 97% of the game just won't open Usually I can get it to finally work by closing the game and opening it multiple",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1983
+          },
+          {
+            "tier": 3,
+            "claim": "ance to higher level star systems. So as we move towards the center, that stuff unlocks as we progress through the story and stuff. Outer regions will all be able to be",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1928
+          },
+          {
+            "tier": 3,
+            "claim": "n when we first got onto the game. There were objectives that we had to meet to unlock the new stages of content. So I guess what we are is we're at stage number one r",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1891
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "2WLXc2vFmtM",
+        "source_type": "YouTube",
+        "video_title": "YOU ARE NOT GOING TO BELIEVE THIS PVP RANT! ALSO WE DESTROYED SERVER #1045 IN SVS!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "e now I wanna try to get some PVP. I've got 29 minutes before the Zarnist start opens up. We are the defenders today and we're gonna see if we can do anything because",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=2WLXc2vFmtM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "gnetic shield tower status. We did that. Boom. So now we're going to be able to unlock our first planet. Now this head to a neutral planet to regroup. This may be wher",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2489
+        },
+        {
+          "tier": 3,
+          "claim": "ecause my account on this server is only 18 million power and I just started to unlock my tier 5 subcombat support craft so I'm really not that strong and so this is s",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2403
+        },
+        {
+          "tier": 3,
+          "claim": "I could recycle one and for most of us this is a good item to pick to actually unlock your renewal store your recycle store because a lot of us that are watching this",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2263
+        },
+        {
+          "tier": 3,
+          "claim": "it gives you an extra refinery I bet that goes right there and then however you unlock the other two I don't know I'm assuming these are going be four refineries right",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2232
+        },
+        {
+          "tier": 3,
+          "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2218
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "2WLXc2vFmtM",
+      "source_type": "YouTube",
+      "video_title": "YOU ARE NOT GOING TO BELIEVE THIS PVP RANT! ALSO WE DESTROYED SERVER #1045 IN SVS!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "earch path. So that would be great. So I'm looking to battle and I'm looking to unlock chests and I'm looking to win this. I would like to see us win this. That would",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "earch path. So that would be great. So I'm looking to battle and I'm looking to unlock chests and I'm looking to win this. I would like to see us win this. That would",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-30d49a44697f1ff23d09",
+      "supabase_id": "5f127589-7cb4-47a2-8080-b377684eb839",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=2WLXc2vFmtM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "gnetic shield tower status. We did that. Boom. So now we're going to be able to unlock our first planet. Now this head to a neutral planet to regroup. This may be wher",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2489
+          },
+          {
+            "tier": 3,
+            "claim": "ecause my account on this server is only 18 million power and I just started to unlock my tier 5 subcombat support craft so I'm really not that strong and so this is s",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2403
+          },
+          {
+            "tier": 3,
+            "claim": "I could recycle one and for most of us this is a good item to pick to actually unlock your renewal store your recycle store because a lot of us that are watching this",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2263
+          },
+          {
+            "tier": 3,
+            "claim": "it gives you an extra refinery I bet that goes right there and then however you unlock the other two I don't know I'm assuming these are going be four refineries right",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2232
+          },
+          {
+            "tier": 3,
+            "claim": "g for this one is trying to get down and you can see at the start you've got to unlock this one so that you can begin the fusion seed reactor and then you work your wa",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2218
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "2WLXc2vFmtM",
+        "source_type": "YouTube",
+        "video_title": "YOU ARE NOT GOING TO BELIEVE THIS PVP RANT! ALSO WE DESTROYED SERVER #1045 IN SVS!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "earch path. So that would be great. So I'm looking to battle and I'm looking to unlock chests and I'm looking to win this. I would like to see us win this. That would",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=2WLXc2vFmtM",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "or it's going on now. I guess it's going on now. Defeat Ascendancy Vanguard to open new routes. Search for target. See what happens. Alright I've got a level one an",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2211
+        },
+        {
+          "tier": 3,
+          "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2059
+        },
+        {
+          "tier": 3,
+          "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2027
+        },
+        {
+          "tier": 3,
+          "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1849
+        },
+        {
+          "tier": 3,
+          "claim": "ials led by good old Cassie Myers, she's coming back for Part 2 have decided to open the Nexus Star. As a critical fulcrum in the Corel sector, whoever controls the",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1837
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "2WLXc2vFmtM",
+      "source_type": "YouTube",
+      "video_title": "YOU ARE NOT GOING TO BELIEVE THIS PVP RANT! ALSO WE DESTROYED SERVER #1045 IN SVS!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "allying him I guess. Okay I see a note in chat somebody said there's four slots open in our stronghold but my two show to still be in there, so I think I'm good. Got",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "allying him I guess. Okay I see a note in chat somebody said there's four slots open in our stronghold but my two show to still be in there, so I think I'm good. Got",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-59904b1ad6104a4b6024",
+      "supabase_id": "cd54728a-f912-4892-ac9f-1ecb61cd8efd",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=2WLXc2vFmtM",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "or it's going on now. I guess it's going on now. Defeat Ascendancy Vanguard to open new routes. Search for target. See what happens. Alright I've got a level one an",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2211
+          },
+          {
+            "tier": 3,
+            "claim": "ity to get up to three more copies of her. And it's a choice chest. So when you open it up, you get to choose who you want. If I can get the amount of these that the",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2059
+          },
+          {
+            "tier": 3,
+            "claim": "ameplay through the different gameplay mechanics and it's not all about just to open in your wallet and throwing money at them to get more. There is that option and",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2027
+          },
+          {
+            "tier": 3,
+            "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1849
+          },
+          {
+            "tier": 3,
+            "claim": "ials led by good old Cassie Myers, she's coming back for Part 2 have decided to open the Nexus Star. As a critical fulcrum in the Corel sector, whoever controls the",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1837
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "2WLXc2vFmtM",
+        "source_type": "YouTube",
+        "video_title": "YOU ARE NOT GOING TO BELIEVE THIS PVP RANT! ALSO WE DESTROYED SERVER #1045 IN SVS!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "allying him I guess. Okay I see a note in chat somebody said there's four slots open in our stronghold but my two show to still be in there, so I think I'm good. Got",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=rJnZzQJ9ukk",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "t deal on the whole thing, is that the energy core level expansion feature will unlock on servers that have been open for 27 plus weeks. That's going to include the fu",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3628
+        },
+        {
+          "tier": 3,
+          "claim": "roduce a cross server feature which will be available on service that have been open for at least four weeks. So if your server has been open for at least You will t",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3237
+        },
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.3162
+        },
+        {
+          "tier": 3,
+          "claim": "Ruin Raiders will introduce a cross-server feature for servers that have been open for at least four weeks.",
+          "status": "Under Review",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2818
+        },
+        {
+          "tier": 3,
+          "claim": "s two sides to this coin because that does mean that your runs will actually be open to be raided by more players too. So you could see an increase in yours getting",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.217
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "rJnZzQJ9ukk",
+      "source_type": "YouTube",
+      "video_title": "Foundation Galactic Frontier NEWS! Components to Level 70!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "eased to level 70. This new cap will become available on servers that have been open for over 27 weeks. So what does that mean? Well that means that right now the ca",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "eased to level 70. This new cap will become available on servers that have been open for over 27 weeks. So what does that mean? Well that means that right now the ca",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-414bb64b399386149bca",
+      "supabase_id": "ae9c58b1-2132-4363-8c4f-66102f286f09",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=rJnZzQJ9ukk",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "t deal on the whole thing, is that the energy core level expansion feature will unlock on servers that have been open for 27 plus weeks. That's going to include the fu",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3628
+          },
+          {
+            "tier": 3,
+            "claim": "roduce a cross server feature which will be available on service that have been open for at least four weeks. So if your server has been open for at least You will t",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3237
+          },
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.3162
+          },
+          {
+            "tier": 3,
+            "claim": "Ruin Raiders will introduce a cross-server feature for servers that have been open for at least four weeks.",
+            "status": "Under Review",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2818
+          },
+          {
+            "tier": 3,
+            "claim": "s two sides to this coin because that does mean that your runs will actually be open to be raided by more players too. So you could see an increase in yours getting",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.217
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "rJnZzQJ9ukk",
+        "source_type": "YouTube",
+        "video_title": "Foundation Galactic Frontier NEWS! Components to Level 70!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "eased to level 70. This new cap will become available on servers that have been open for over 27 weeks. So what does that mean? Well that means that right now the ca",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=rJnZzQJ9ukk",
+      "nearest": [
+        {
+          "tier": 1,
+          "claim": "The headquarters is described in-game as a trader flagship capable of hyperspace jumps.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2078
+        },
+        {
+          "tier": 1,
+          "claim": "Certain Ascendancy-related commissions can be completed even after the corresponding enemy was defeated in another Star System.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2008
+        },
+        {
+          "tier": 3,
+          "claim": "Guild vs Guild is described by the community as a six-day flagship PvP event involving territory battles.",
+          "status": "Under Review",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.198
+        },
+        {
+          "tier": 1,
+          "claim": "A Flagship Component Set bonus activates when the required amount of same-type, same-quality components is equipped.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1914
+        },
+        {
+          "tier": 3,
+          "claim": "r important yes the other one was super important because we had the ability to unlock a new ship, a new fleet of the shrimp ship. This one is super important though a",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1879
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "rJnZzQJ9ukk",
+      "source_type": "YouTube",
+      "video_title": "Foundation Galactic Frontier NEWS! Components to Level 70!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "see the stats on this device. Added a new potent empowerment system. The system unlocks after corresponding flagship components reach empowerment of plus six. So by the",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "see the stats on this device. Added a new potent empowerment system. The system unlocks after corresponding flagship components reach empowerment of plus six. So by the",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-a65f9142a31efe9afacc",
+      "supabase_id": "89e7e742-b11d-4088-a763-ee5bd1cd84e6",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=rJnZzQJ9ukk",
+        "nearest": [
+          {
+            "tier": 1,
+            "claim": "The headquarters is described in-game as a trader flagship capable of hyperspace jumps.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2078
+          },
+          {
+            "tier": 1,
+            "claim": "Certain Ascendancy-related commissions can be completed even after the corresponding enemy was defeated in another Star System.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2008
+          },
+          {
+            "tier": 3,
+            "claim": "Guild vs Guild is described by the community as a six-day flagship PvP event involving territory battles.",
+            "status": "Under Review",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.198
+          },
+          {
+            "tier": 1,
+            "claim": "A Flagship Component Set bonus activates when the required amount of same-type, same-quality components is equipped.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1914
+          },
+          {
+            "tier": 3,
+            "claim": "r important yes the other one was super important because we had the ability to unlock a new ship, a new fleet of the shrimp ship. This one is super important though a",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1879
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "rJnZzQJ9ukk",
+        "source_type": "YouTube",
+        "video_title": "Foundation Galactic Frontier NEWS! Components to Level 70!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "see the stats on this device. Added a new potent empowerment system. The system unlocks after corresponding flagship components reach empowerment of plus six. So by the",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=rJnZzQJ9ukk",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "se it's all contingent on getting this one done to here so that that I can then unlock the ability to do those energy core level caps up past 30. So it's all it's all",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2515
+        },
+        {
+          "tier": 3,
+          "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2448
+        },
+        {
+          "tier": 3,
+          "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2438
+        },
+        {
+          "tier": 3,
+          "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2374
+        },
+        {
+          "tier": 3,
+          "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2288
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "rJnZzQJ9ukk",
+      "source_type": "YouTube",
+      "video_title": "Foundation Galactic Frontier NEWS! Components to Level 70!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ull, I'm guessing your full suite of components on a ship to plus six, then you unlock this ability. By consuming the new item, the catalyst device, you can consume mu",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ull, I'm guessing your full suite of components on a ship to plus six, then you unlock this ability. By consuming the new item, the catalyst device, you can consume mu",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-7b69060594d6a69ceda8",
+      "supabase_id": "51e2432a-336d-4f90-91ab-15a3854ffb4e",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=rJnZzQJ9ukk",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "se it's all contingent on getting this one done to here so that that I can then unlock the ability to do those energy core level caps up past 30. So it's all it's all",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2515
+          },
+          {
+            "tier": 3,
+            "claim": "trying to basically work your way down to the end of this tree to where you can unlock this one. And that's going to unlock that power energy core cap level to go up.",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2448
+          },
+          {
+            "tier": 3,
+            "claim": "wn was when we had the Gungnir, the shrimp ship. Whenever we had the ability to unlock the shrimp ship, we had a bingo board and I went through and I showed you every",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2438
+          },
+          {
+            "tier": 3,
+            "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2374
+          },
+          {
+            "tier": 3,
+            "claim": "w building that if you've seen in one of my previous videos I showed you how to unlock this this is actually the place where you are going to be able to collect these",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2288
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "rJnZzQJ9ukk",
+        "source_type": "YouTube",
+        "video_title": "Foundation Galactic Frontier NEWS! Components to Level 70!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ull, I'm guessing your full suite of components on a ship to plus six, then you unlock this ability. By consuming the new item, the catalyst device, you can consume mu",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=AmSjUqGhQMc",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2329
+        },
+        {
+          "tier": 3,
+          "claim": "r important yes the other one was super important because we had the ability to unlock a new ship, a new fleet of the shrimp ship. This one is super important though a",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2233
+        },
+        {
+          "tier": 1,
+          "claim": "A Flagship Component Set bonus activates when the required amount of same-type, same-quality components is equipped.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2089
+        },
+        {
+          "tier": 3,
+          "claim": "gnetic shield tower status. We did that. Boom. So now we're going to be able to unlock our first planet. Now this head to a neutral planet to regroup. This may be wher",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1976
+        },
+        {
+          "tier": 3,
+          "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.1945
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "AmSjUqGhQMc",
+      "source_type": "YouTube",
+      "video_title": "NEW EMPOWERMENT MECHANIC!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "tier. It seems we're going to have a new potent empowerment system. This system unlocks when the corresponding flagship component levels reach empowerment of plus 6. By",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "tier. It seems we're going to have a new potent empowerment system. This system unlocks when the corresponding flagship component levels reach empowerment of plus 6. By",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-fea45cffdd55f29b2131",
+      "supabase_id": "6a940752-9a79-4cee-b826-aa0cebe6110b",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=AmSjUqGhQMc",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "g migration is going to hit us soon. We're going to have a new migration period open up soon and will contain our block of servers. Join in Server number 1026 where",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2329
+          },
+          {
+            "tier": 3,
+            "claim": "r important yes the other one was super important because we had the ability to unlock a new ship, a new fleet of the shrimp ship. This one is super important though a",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2233
+          },
+          {
+            "tier": 1,
+            "claim": "A Flagship Component Set bonus activates when the required amount of same-type, same-quality components is equipped.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2089
+          },
+          {
+            "tier": 3,
+            "claim": "gnetic shield tower status. We did that. Boom. So now we're going to be able to unlock our first planet. Now this head to a neutral planet to regroup. This may be wher",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1976
+          },
+          {
+            "tier": 3,
+            "claim": "s a big deal but right now I'm on this at 33 you're going to get the ability to unlock what's called a fusion seed The Fusion Seed Refinery is going to be the building",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.1945
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "AmSjUqGhQMc",
+        "source_type": "YouTube",
+        "video_title": "NEW EMPOWERMENT MECHANIC!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "tier. It seems we're going to have a new potent empowerment system. This system unlocks when the corresponding flagship component levels reach empowerment of plus 6. By",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
+    },
+    {
+      "Source": "https://www.youtube.com/watch?v=xDn5XlMYIIE",
+      "nearest": [
+        {
+          "tier": 3,
+          "claim": "t deal on the whole thing, is that the energy core level expansion feature will unlock on servers that have been open for 27 plus weeks. That's going to include the fu",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2961
+        },
+        {
+          "tier": 3,
+          "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2693
+        },
+        {
+          "tier": 1,
+          "claim": "Cross-server Ruin Raiders is a new feature for servers open four or more weeks.",
+          "status": "Confirmed",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.2447
+        },
+        {
+          "tier": 3,
+          "claim": "n another video as far as the costs and things like that and the things that it unlocks because that's a whole other topic for real. I mean, there's a lot going on with",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.24
+        },
+        {
+          "tier": 3,
+          "claim": "rocess? They give them a new ability to hold a weapon or something. But if that opens new ranks for them, then I will be very sad that I've recycled the extra copies",
+          "status": "Current",
+          "claim_id": null,
+          "canonical": null,
+          "similarity": 0.237
+        }
+      ],
+      "official": false,
+      "pipeline": "fgf-youtube-v1",
+      "video_id": "xDn5XlMYIIE",
+      "source_type": "YouTube",
+      "video_title": "FINALLY THE NEW WEAPONS FOR EVA AND ALIYA!",
+      "source_layer": "community_learned",
+      "conflict_status": "not_conflicting_with_tier1_2",
+      "learning_status": "learned_non_conflicting",
+      "evidence_excerpt": "ew Champion Weapons finally. The new Signature Weapons for Aliyah and Eva. They unlock on all servers that are 27 weeks or more old. They're also going to do a dual da",
+      "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+      "Claim": "ew Champion Weapons finally. The new Signature Weapons for Aliyah and Eva. They unlock on all servers that are 27 weeks or more old. They're also going to do a dual da",
+      "Category": "Progression",
+      "Season/Version": "",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "0.35",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "yt3-5b0e781a456f8eb27300",
+      "supabase_id": "c71abffb-9785-4d75-b546-8d02562ec20a",
+      "metadata": {
+        "Source": "https://www.youtube.com/watch?v=xDn5XlMYIIE",
+        "nearest": [
+          {
+            "tier": 3,
+            "claim": "t deal on the whole thing, is that the energy core level expansion feature will unlock on servers that have been open for 27 plus weeks. That's going to include the fu",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2961
+          },
+          {
+            "tier": 3,
+            "claim": "t out real quick because this is just happening in a couple days. It's going to unlock on servers that have been open for 27 plus weeks. So you need to understand that",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2693
+          },
+          {
+            "tier": 1,
+            "claim": "Cross-server Ruin Raiders is a new feature for servers open four or more weeks.",
+            "status": "Confirmed",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.2447
+          },
+          {
+            "tier": 3,
+            "claim": "n another video as far as the costs and things like that and the things that it unlocks because that's a whole other topic for real. I mean, there's a lot going on with",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.24
+          },
+          {
+            "tier": 3,
+            "claim": "rocess? They give them a new ability to hold a weapon or something. But if that opens new ranks for them, then I will be very sad that I've recycled the extra copies",
+            "status": "Current",
+            "claim_id": null,
+            "canonical": null,
+            "similarity": 0.237
+          }
+        ],
+        "official": false,
+        "pipeline": "fgf-youtube-v1",
+        "video_id": "xDn5XlMYIIE",
+        "source_type": "YouTube",
+        "video_title": "FINALLY THE NEW WEAPONS FOR EVA AND ALIYA!",
+        "source_layer": "community_learned",
+        "conflict_status": "not_conflicting_with_tier1_2",
+        "learning_status": "learned_non_conflicting",
+        "evidence_excerpt": "ew Champion Weapons finally. The new Signature Weapons for Aliyah and Eva. They unlock on all servers that are 27 weeks or more old. They're also going to do a dual da",
+        "governance_reason": "User-approved community learning layer; Tier 1/2 precedence; conflicts held back.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 3
+        },
+        "temporal": {}
+      }
     }
   ],
   "conflicts": [
@@ -37821,6 +39240,6 @@
     "tier1_claims": 451,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1128
+    "total_claims": 1139
   }
 }
