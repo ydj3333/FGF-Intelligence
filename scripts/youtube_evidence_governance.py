@@ -27,6 +27,28 @@ CROWD_WARNING = (
     "it. Carefully evaluate it before relying on it."
 )
 
+def _contradicts(extracted: str, existing: str) -> bool:
+    """Conservative contradiction detector for high-risk numeric/polarity changes."""
+    import re
+    a, b = str(extracted or '').lower(), str(existing or '').lower()
+    # Explicit polarity is a strong signal when the same topic is discussed.
+    neg = r"\\b(?:not|no|never|cannot|can't|doesn't|does not|isn't|is not|requires no|without)\\b"
+    a_neg, b_neg = bool(re.search(neg, a)), bool(re.search(neg, b))
+    if a_neg != b_neg:
+        return True
+    # Different explicit numeric values are contradictory only when both claims
+    # share a meaningful subject token. This avoids treating unrelated numbers
+    # (e.g. a level and a cost) as contradictions.
+    nums_a = set(re.findall(r"\\b\\d+(?:[.,]\\d+)?%?\\b", a))
+    nums_b = set(re.findall(r"\\b\\d+(?:[.,]\\d+)?%?\\b", b))
+    if nums_a and nums_b and nums_a != nums_b:
+        stop={'the','and','for','with','from','that','this','are','you','can','has','have','into','when','then'}
+        ta={x for x in re.findall(r"[a-z]{4,}",a) if x not in stop}
+        tb={x for x in re.findall(r"[a-z]{4,}",b) if x not in stop}
+        if len(ta & tb) >= 2:
+            return True
+    return False
+
 
 def _tier_number(value: Any) -> Optional[int]:
     if value is None:
@@ -59,6 +81,18 @@ def classify_against_existing(
     ]
 
     if strong:
+        # Do not assume that a semantically nearby Tier 1/2 claim is supportive.
+        # If the extracted statement changes polarity or a shared numeric fact,
+        # hold it back as a conflict instead of teaching the model the wrong value.
+        if any(_contradicts(extracted_claim.get("claim", ""), c.get("claim", c.get("Claim", ""))) for c in strong):
+            return EvidenceDecision(
+                tier=3,
+                status="conflict_candidate",
+                canonical=False,
+                classification="possible_contradiction_with_t1_t2",
+                user_warning="This community/creator claim conflicts with stronger evidence and requires evaluation.",
+                reason="A Tier 1/2 claim covers the same subject with incompatible polarity or numeric evidence.",
+            )
         same = any(
             str(c.get("status", c.get("Status", ""))).lower()
             in {"current", "verified", "confirmed", "validated"}
