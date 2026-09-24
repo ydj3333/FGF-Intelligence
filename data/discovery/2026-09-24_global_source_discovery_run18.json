@@ -1,0 +1,45 @@
+{
+  "cycle": 18,
+  "date": "2026-09-24",
+  "scope": ["S1/new-server baseline", "S2", "S3/future"],
+  "discovery_window": "2026-09-24",
+  "findings": [
+    {
+      "source": "https://murpo.com/",
+      "published": "2026-09-23",
+      "type": "community news / developer-announcement aggregator",
+      "tier": "T3",
+      "confidence": "medium",
+      "scope": "current/live",
+      "finding": "Two current known issues are surfaced: some Traders cannot access the Operation Blackout Shop; opening The Royal Conservatory mission on PIKE-I may freeze the game. Development investigation is reported; no confirmed fix found in this scan."
+    },
+    {
+      "source": "https://www.pocketgamer.com/foundation-galactic-frontier/codes/",
+      "published": "2026-09-19",
+      "type": "third-party guide",
+      "tier": "T3",
+      "confidence": "medium",
+      "scope": "current codes",
+      "finding": "Reports FOUNDATION and FURTHERFUTURE as active codes, each claiming 3x 30m Universal Speedup, 3x 10,000 Water and 3x 10,000 Metal. Retained as corroboration only."
+    },
+    {
+      "source": "https://raijin.gg/app/4223760/Foundation_Galactic_Frontier",
+      "published": "2026-09-24",
+      "type": "third-party Steam telemetry",
+      "tier": "T3",
+      "confidence": "medium",
+      "scope": "Steam prerelease",
+      "finding": "Steam remains Coming soon; third-party telemetry estimates about 4.23K wishlists. No official release date inferred."
+    }
+  ],
+  "existing_state_checked": [
+    "Official/primary S2 evidence remains the stronger authority for Sivana/Siwenna, Ascendancy Court/Emperor, Magnetic Storms & Resistance, Aromabloom Trade War and Steam integration.",
+    "Combat Craft Modification prerequisite remains 40% current T2 candidate from Sep 22 hot update; 60% retained as historical/superseded.",
+    "S2 server-scope conflict 1-16 vs 1001-1016 remains open.",
+    "Shared Moonlight/Lunar Ruins 1017-1247 end-date conflict Sep 26 vs Sep 27 remains open.",
+    "Official App Store v1.1.153 vs third-party v1.1.155.240733 remains an unresolved version discrepancy.",
+    "No reliable new primary S3/future-season mechanics surfaced."
+  ],
+  "tier1_promotions": 0,
+  "deduplication": "Current known-issue and Steam/code findings were checked against prior discovery; existing evidence/conflicts were not duplicated or normalized."
+}
