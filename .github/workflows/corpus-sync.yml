@@ -18,6 +18,9 @@ on:
       - 'gap_detector.py'
       - 'scripts/run_knowledge_quality.py'
       - 'scripts/update_video_database.py'
+      - 'scripts/youtube_evidence_governance.py'
+      - 'web/index.html'
+      - 'web/v5.html'
 
 concurrency:
   group: fgf-corpus-sync
