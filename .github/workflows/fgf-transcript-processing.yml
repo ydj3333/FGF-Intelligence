@@ -19,6 +19,10 @@ on:
         type: boolean
         required: true
         default: false
+      playlist_id:
+        description: "Optional YouTube playlist ID to process"
+        required: false
+        default: ""
   schedule:
     - cron: "*/15 * * * *"
 
@@ -54,7 +58,7 @@ jobs:
       - name: Process transcript queue
         run: |
           if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ "${{ inputs.apply }}" = "true" ]; then
-            python scripts/process_transcript_queue.py --limit "${{ inputs.limit || 20 }}" --apply
+            python scripts/process_transcript_queue.py --limit "${{ inputs.limit || 20 }}" ${{ inputs.playlist_id && format('--playlist-id "{0}"', inputs.playlist_id) || '' }} --apply
           else
             python scripts/process_transcript_queue.py --limit "${{ inputs.limit || 20 }}"
           fi
