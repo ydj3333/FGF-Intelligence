@@ -1,0 +1,598 @@
+{
+  "version": "1.0",
+  "title": "FGF Objective #1 — Responding Agent Benchmark",
+  "purpose": "End-to-end evaluation of whether the FGF agent answers the player's actual question using relevant evidence, preserves authority/conflicts, respects constraints, avoids unsupported numbers, and produces actionable responses.",
+  "questions": [
+    {
+      "id": "O1-01",
+      "question": "What does Kinetic weapon type counter?",
+      "expected_intent": "combat_mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-02",
+      "question": "What does Beam weapon type counter?",
+      "expected_intent": "combat_mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-03",
+      "question": "What does Ion weapon type counter?",
+      "expected_intent": "combat_mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-04",
+      "question": "What is the difference between minor and major damage?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-05",
+      "question": "How do I repair my fleet?",
+      "expected_intent": "how_to",
+      "constraints": [],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-06",
+      "question": "Can I repair ships during combat?",
+      "expected_intent": "how_to",
+      "constraints": [],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-07",
+      "question": "Do I need repair modules for minor damage?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-08",
+      "question": "I'm F2P and my ship took major damage, how do I repair it without spending?",
+      "expected_intent": "how_to",
+      "constraints": [
+        "F2P"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-09",
+      "question": "What does Energy Core 33 unlock?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-10",
+      "question": "What is the maximum Energy Core level?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-11",
+      "question": "How do I get Fusion Seeds?",
+      "expected_intent": "how_to",
+      "constraints": [],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-12",
+      "question": "How much does Core 35 cost in Fusion Seeds?",
+      "expected_intent": "calculation",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": true,
+      "requires_conflict": false,
+      "must_not_contain": [
+        "flagship blueprint",
+        "flagship cost"
+      ],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-13",
+      "question": "What is the best flagship for F2P players?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "F2P"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-14",
+      "question": "How do I get flagship blueprints?",
+      "expected_intent": "how_to",
+      "constraints": [],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-15",
+      "question": "What are Champions?",
+      "expected_intent": "definition",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-16",
+      "question": "What are the best heroes for a Kinetic ship?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-17",
+      "question": "What are the best heroes for a Beam ship?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-18",
+      "question": "What are the best heroes for an Ion ship?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-19",
+      "question": "How do I upgrade Champion star level?",
+      "expected_intent": "how_to",
+      "constraints": [],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-20",
+      "question": "What is the best way to farm Credits?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-21",
+      "question": "How do I get more Repair Modules?",
+      "expected_intent": "how_to",
+      "constraints": [],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-22",
+      "question": "What building should I upgrade first for F2P?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "F2P",
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-23",
+      "question": "How does Shared Moonlight work?",
+      "expected_intent": "definition",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-24",
+      "question": "What rewards are available in Lunar Ruins?",
+      "expected_intent": "definition",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-25",
+      "question": "Shared Moonlight event what is on which day Monday speedups shortcut",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [
+        "Computational Component"
+      ],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-26",
+      "question": "How should I approach Shared Moonlight as F2P?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "F2P"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-27",
+      "question": "I have 50K Speedups for Moonlight. How should I use them?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-28",
+      "question": "What is the exact Monday task in Shared Moonlight?",
+      "expected_intent": "calculation",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": true,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-29",
+      "question": "Official evidence and YouTube disagree about this FGF mechanic. What should I trust?",
+      "expected_intent": "comparison",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": true,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-30",
+      "question": "What happens when a community YouTube claim conflicts with official evidence?",
+      "expected_intent": "definition",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": true,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-31",
+      "question": "Why does Command Point matter?",
+      "expected_intent": "definition",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-32",
+      "question": "What does Kinetic counter?",
+      "expected_intent": "combat_mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-33",
+      "question": "How does formation affect fleet combat?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-34",
+      "question": "Can a single ship type counter all weapon types?",
+      "expected_intent": "comparison",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-35",
+      "question": "Should I upgrade Energy Core or flagship first?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-36",
+      "question": "I have Core 31. Should I upgrade to Core 35 or my flagship first?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-37",
+      "question": "How long does it take to farm Fusion Seeds for Core 35 if I'm F2P?",
+      "expected_intent": "calculation",
+      "constraints": [
+        "F2P"
+      ],
+      "actionable": true,
+      "requires_uncertainty": true,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-38",
+      "question": "What unlocks at Energy Core level 40?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": true,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-39",
+      "question": "What is the difference between flagship and regular ships?",
+      "expected_intent": "comparison",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-40",
+      "question": "Do flagship bonuses apply to all ships or just the flagship?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-41",
+      "question": "What does Champion star level do?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-42",
+      "question": "Do I need duplicates to upgrade Champions?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-43",
+      "question": "What is the best use of daily Crystals for F2P?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "F2P",
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-44",
+      "question": "How do I save resources efficiently?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-45",
+      "question": "What is the current Energy Core cap in S2?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-46",
+      "question": "What changed in the Epoch of Fusion Seed prerequisite?",
+      "expected_intent": "mechanic",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-47",
+      "question": "What changed in the Sep 22 hot update?",
+      "expected_intent": "definition",
+      "constraints": [],
+      "actionable": false,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-48",
+      "question": "What should I do when the evidence does not establish an exact cost?",
+      "expected_intent": "strategy",
+      "constraints": [],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-49",
+      "question": "Give me a safe F2P progression plan when exact resource costs are unknown.",
+      "expected_intent": "strategy",
+      "constraints": [
+        "F2P"
+      ],
+      "actionable": true,
+      "requires_uncertainty": true,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    },
+    {
+      "id": "O1-50",
+      "question": "I want a Kinetic fleet. What should I consider for weapons, flagship and Champions?",
+      "expected_intent": "strategy",
+      "constraints": [
+        "Best"
+      ],
+      "actionable": true,
+      "requires_uncertainty": false,
+      "requires_conflict": false,
+      "must_not_contain": [],
+      "numeric_safety": true
+    }
+  ]
+}
