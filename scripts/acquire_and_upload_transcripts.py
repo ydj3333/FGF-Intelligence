@@ -126,9 +126,20 @@ def vtt_to_text(path):
             lines.append(s)
     return "\n".join(lines).strip()
 
+def playlist_id_from_input(value):
+    """Accept a raw playlist ID or a YouTube playlist URL and return the playlist ID."""
+    value = (value or "").strip()
+    m = re.search(r"(?:[?&]list=|/playlist/)([A-Za-z0-9_-]+)", value)
+    if m:
+        return m.group(1)
+    if re.fullmatch(r"[A-Za-z0-9_-]{10,}", value):
+        return value
+    raise ValueError("Invalid YouTube playlist URL/ID.")
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--playlist-id", required=True)
+    p.add_argument("--playlist-id", help="YouTube playlist ID")
+    p.add_argument("--playlist-url", help="YouTube playlist URL")
     p.add_argument("--start", type=int, default=0)
     p.add_argument("--count", type=int, default=None)
     p.add_argument("--output-dir", default="data/acquired_transcripts")
@@ -137,13 +148,16 @@ def main():
     p.add_argument("--max-retries", type=int, default=4)
     p.add_argument("--rate-limit-base", type=float, default=45)
     args = p.parse_args()
+    if not args.playlist_id and not args.playlist_url:
+        p.error("Provide --playlist-url or --playlist-id")
+    playlist_id = playlist_id_from_input(args.playlist_url or args.playlist_id)
 
-    out = Path(args.output_dir)
+    out = Path(args.output_dir) / playlist_id
     out.mkdir(parents=True, exist_ok=True)
 
     subprocess.run([
         sys.executable, "scripts/fetch_playlist_index.py",
-        "--playlist-id", args.playlist_id
+        "--playlist-id", playlist_id
     ], check=True)
 
     index = json.loads(Path("data/video_playlist_index.json").read_text(encoding="utf-8"))
@@ -154,7 +168,7 @@ def main():
     batch_index = {**index, "videos": videos, "total_videos": len(videos)}
     (out / "playlist_index.json").write_text(json.dumps(batch_index, indent=2), encoding="utf-8")
     ensure_bucket()
-    upload(out / "playlist_index.json", "index/playlist_index.json", "application/json")
+    upload(out / "playlist_index.json", f"playlists/{playlist_id}/index.json", "application/json")
 
     failures = []
     remote_transcripts = list_remote_transcripts()
@@ -208,11 +222,11 @@ def main():
         import random, time
         time.sleep(max(0, args.delay_seconds) + random.uniform(0, min(10, args.delay_seconds)))
 
-    manifest = {"playlist_id": args.playlist_id, "selected": len(videos),
+    manifest = {"playlist_id": playlist_id, "selected": len(videos),
                 "ready": len(videos)-len(failures), "failed": len(failures),
-                "failures": failures, "bucket": BUCKET}
+                "failures": failures, "bucket": BUCKET, "index_path": f"playlists/{playlist_id}/index.json"}
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    upload(out / "manifest.json", "manifests/latest.json", "application/json")
+    upload(out / "manifest.json", f"manifests/{playlist_id}.json", "application/json")
     print(json.dumps(manifest, indent=2))
 
 if __name__ == "__main__":
