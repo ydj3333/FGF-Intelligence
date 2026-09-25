@@ -14,6 +14,9 @@ try:
     assert health["tier1"] == EXPECTED_TIER1
     assert health["conflicts"] == EXPECTED_CONFLICTS
     assert health["claim_lifecycle_aware"] is True
+    assert health["version"] == "v5.3.0-response-engine"
+    assert "synthesis" in health
+    assert "structured_output" in health["synthesis"]
     assert health["lifecycle_states"]["current"] > 0
     assert health["lifecycle_states"]["candidate"] > 0
     lifecycle=json.load(urllib.request.urlopen("http://127.0.0.1:8000/api/admin/lifecycle"))
@@ -23,6 +26,8 @@ try:
     assert ask["answer"]
     assert ask["evidence"]
     assert ask["model"]
+    assert ask["answer_type"] in ("evidence_fallback","synthesized_evidence")
+    assert "quality_gate" in ask
     fleet_dup=urllib.request.urlopen("http://127.0.0.1:8000/api/tools/fleet-builder?style=Ion&champion=Ajita&champion=Ajita&champion=Killer%20Bee")
     fleet_dup_json=json.load(fleet_dup)
     assert fleet_dup_json["ok"] is False
