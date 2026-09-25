@@ -65,19 +65,37 @@ def main():
             break
 
     print(f"Downloaded {len(ready)} new transcript(s) from Supabase Storage; skipped {len(processed)} already processed.")
+    failures = []
+    succeeded = 0
     for v in ready:
         vid = v["video_id"]
-        subprocess.run([sys.executable, "scripts/extract_claims_from_transcript.py",
-                        "--video-id", vid], check=True)
-        subprocess.run([sys.executable, "scripts/cross_reference_claims.py",
-                        "--video-id", vid], check=True)
-        cmd = [sys.executable, "scripts/update_video_database.py", "--video-id", vid]
-        if args.apply:
-            cmd.append("--apply")
-        subprocess.run(cmd, check=True)
+        try:
+            subprocess.run([sys.executable, "scripts/extract_claims_from_transcript.py",
+                            "--video-id", vid], check=True)
+            subprocess.run([sys.executable, "scripts/cross_reference_claims.py",
+                            "--video-id", vid], check=True)
+            cmd = [sys.executable, "scripts/update_video_database.py", "--video-id", vid]
+            if args.apply:
+                cmd.append("--apply")
+            subprocess.run(cmd, check=True)
+            succeeded += 1
+            print(f"SUCCESS {vid}")
+        except subprocess.CalledProcessError as e:
+            failures.append({"video_id": vid, "stage": "extract/cross-reference/update", "returncode": e.returncode})
+            print(f"FAILED {vid}: subprocess exit code {e.returncode}; continuing with remaining videos.", flush=True)
+        except Exception as e:
+            failures.append({"video_id": vid, "stage": "queue", "error": str(e)})
+            print(f"FAILED {vid}: {e}; continuing with remaining videos.", flush=True)
 
     subprocess.run([sys.executable, "scripts/generate_knowledge_snapshot.py"], check=True)
-    print(f"Queue processing complete: processed={len(ready)}, apply={args.apply}, playlist_id={args.playlist_id or index.get("playlist_id")}")
+    print(json.dumps({
+        "queue_complete": True,
+        "playlist_id": args.playlist_id or index.get("playlist_id"),
+        "downloaded": len(ready),
+        "succeeded": succeeded,
+        "failed": failures,
+        "apply": args.apply,
+    }, indent=2))
 
 if __name__ == "__main__":
     main()
