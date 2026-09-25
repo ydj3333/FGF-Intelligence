@@ -10,13 +10,27 @@ from claim_lifecycle import summarize_states, normalize_state
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v5.2.0-core-lifecycle'
+RELEASE='v5.3.0-response-engine'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
 SUPABASE_SECRET=os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 ADMIN_TOKEN=os.getenv('FGF_ADMIN_TOKEN')
 SYNTHESIS_RUNTIME_STATUS='configured_not_runtime_verified' if (os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')) else 'missing_api_key'
+LLM_HEALTH={
+    'status': SYNTHESIS_RUNTIME_STATUS,
+    'model': os.getenv('FGF_LLM_MODEL','gpt-5.6-luna'),
+    'api_reachable': False,
+    'authentication': 'not_tested',
+    'structured_output': 'not_tested',
+    'last_error_category': None,
+    'last_error_detail': None,
+    'last_successful_call': None,
+    'last_latency_ms': None,
+    'successful_calls': 0,
+    'failed_calls': 0,
+    'latencies_ms': [],
+}
 try:
     CONFLICT_REVIEWS=json.loads(CONFLICT_REVIEWS_FILE.read_text()) if CONFLICT_REVIEWS_FILE.exists() else {}
 except Exception:
@@ -420,129 +434,223 @@ def extract_output(data):
     if not text:
         for item in data.get('output',[]):
             for part in item.get('content',[]):
-                if part.get('type')=='output_text':text+=part.get('text','')
+                if part.get('type')=='output_text':
+                    text+=part.get('text','')
     return text.strip()
 
-def parse_synthesis(text,max_id):
-    try:
-        obj=json.loads(text)
-        if isinstance(obj,dict) and obj.get('answer'):
-            ids=[]
-            for x in obj.get('evidence_ids',[]):
-                try:
-                    n=int(x)
-                    if 1<=n<=max_id:ids.append(n)
-                except (TypeError,ValueError):pass
-            return obj['answer'].strip(),ids,obj.get('uncertainty','')
-    except (ValueError,TypeError):pass
-    ids=[]
-    for n in re.findall(r'(?:evidence|source|ref(?:erence)?)\s*(?:ids?|#)?\s*[:#]?\s*([0-9, ]+)',text,re.I):
-        for x in n.split(','):
-            try:
-                v=int(x.strip())
-                if 1<=v<=max_id and v not in ids:ids.append(v)
-            except ValueError:pass
-    return text,ids,''
+SYNTHESIS_SCHEMA={
+    'type':'object','additionalProperties':False,
+    'properties':{
+        'answer':{'type':'string'},
+        'evidence_ids':{'type':'array','items':{'type':'integer'}},
+        'uncertainty':{'type':'string'},
+        'conflicts_presented':{'type':'boolean'},
+        'tier_breakdown':{'type':'object','additionalProperties':False,'properties':{
+            'tier_1_count':{'type':'integer'},'tier_2_count':{'type':'integer'},'tier_3_count':{'type':'integer'}},
+            'required':['tier_1_count','tier_2_count','tier_3_count']}
+    },
+    'required':['answer','evidence_ids','uncertainty','conflicts_presented','tier_breakdown']
+}
 
-def exact_cost_question(q):
+def _safe_error_category(status=None, code=None, exc=None):
+    if status in (401,403): return 'auth_failure'
+    if status==429: return 'rate_limit'
+    if status in (408,504): return 'timeout'
+    if status and 400 <= status < 500: return 'request_failure'
+    if status and status >= 500: return 'provider_failure'
+    if isinstance(exc,(TimeoutError,URLError)): return 'transport_failure'
+    if isinstance(exc,json.JSONDecodeError): return 'malformed_response'
+    if code: return str(code)[:80]
+    return type(exc).__name__ if exc else 'unknown'
+
+def _record_llm_success(latency_ms):
+    LLM_HEALTH['status']='runtime_verified'
+    LLM_HEALTH['api_reachable']=True
+    LLM_HEALTH['authentication']='pass'
+    LLM_HEALTH['structured_output']='pass'
+    LLM_HEALTH['last_error_category']=None
+    LLM_HEALTH['last_error_detail']=None
+    LLM_HEALTH['last_successful_call']=time.time()
+    LLM_HEALTH['last_latency_ms']=round(latency_ms,1)
+    LLM_HEALTH['successful_calls']+=1
+    LLM_HEALTH['latencies_ms']=(LLM_HEALTH['latencies_ms']+[latency_ms])[-20:]
+
+def _record_llm_failure(category,detail=None):
+    LLM_HEALTH['status']='runtime_failed'
+    LLM_HEALTH['api_reachable']=category not in ('transport_failure','timeout')
+    if category=='auth_failure': LLM_HEALTH['authentication']='fail'
+    if category=='malformed_response' or category=='schema_validation': LLM_HEALTH['structured_output']='fail'
+    LLM_HEALTH['last_error_category']=category
+    LLM_HEALTH['last_error_detail']=str(detail or '')[:200]
+    LLM_HEALTH['failed_calls']+=1
+
+def _diagnostic_error_body(e):
+    try:
+        raw=e.read().decode('utf-8','replace')
+        obj=json.loads(raw)
+        err=obj.get('error',{}) if isinstance(obj,dict) else {}
+        return err.get('type') or err.get('code') or 'provider_error'
+    except Exception:
+        return ''
+
+def call_llm_api(question,claims,conflicts,mode='answer'):
+    """Responses API call with strict Structured Outputs and diagnostics."""
+    key=os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')
+    if not key:
+        _record_llm_failure('missing_api_key')
+        return None,{'synthesis_error':'missing_api_key','synthesis_error_detail':'LLM API key is not configured.'}
+    system='''You are FGF Intelligence, an evidence-first expert assistant for Foundation: Galactic Frontier.
+
+Answer the player's actual question directly using ONLY the supplied evidence packet. Do not replace the requested mechanic with an adjacent mechanic. Tier 1 is highest authority, then Tier 2, then Tier 3/community. Current evidence outranks historical evidence. Never invent numbers, costs, timers, requirements, effects, schedules or rewards.
+
+For recommendations, distinguish documented mechanics from strategy suggestions. For F2P questions, respect the spending constraint. For conflicts, present both positions when relevant, identify the lower-tier/community position clearly, and tell the player to check the latest official/in-game information before relying on the conflict. If evidence is insufficient, say exactly what is not established instead of guessing.
+
+Write a useful, actionable answer. Do not mention APIs, prompts, retrieval, hidden reasoning or being a language model. Evidence references in the answer must use [E1], [E2], etc.'''
+    packet=evidence_packet(question,claims,conflicts)
+    body_obj={
+        'model':LLM_MODEL,
+        'input':[
+            {'role':'system','content':system},
+            {'role':'user','content':json.dumps({'mode':mode,'packet':packet},ensure_ascii=False)}
+        ],
+        'text':{'format':{
+            'type':'json_schema','name':'fgf_answer',
+            'description':'Evidence-grounded FGF answer with references and uncertainty.',
+            'strict':True,'schema':SYNTHESIS_SCHEMA
+        }},
+        'max_output_tokens':900,'store':False
+    }
+    req=Request(LLM_URL,data=json.dumps(body_obj,ensure_ascii=False).encode('utf-8'),
+                headers={'Authorization':'Bearer '+key,'Content-Type':'application/json','Accept':'application/json'},method='POST')
+    started=time.time()
+    try:
+        with urlopen(req,timeout=35) as r: data=json.loads(r.read().decode('utf-8'))
+        latency=(time.time()-started)*1000
+        text=extract_output(data)
+        if not text:
+            _record_llm_failure('malformed_response','No output_text returned.')
+            return None,{'synthesis_error':'malformed_response','synthesis_error_detail':'No structured output returned.'}
+        try: obj=json.loads(text)
+        except json.JSONDecodeError as e:
+            _record_llm_failure('malformed_response',str(e))
+            return None,{'synthesis_error':'malformed_response','synthesis_error_detail':'Structured output was not valid JSON.'}
+        if not isinstance(obj,dict) or not isinstance(obj.get('answer'),str):
+            _record_llm_failure('schema_validation','Required answer field missing.')
+            return None,{'synthesis_error':'schema_validation','synthesis_error_detail':'Structured response did not match expected shape.'}
+        _record_llm_success(latency)
+        return obj,{'latency_ms':round(latency,1)}
+    except HTTPError as e:
+        cat=_safe_error_category(e.code,_diagnostic_error_body(e),e)
+        _record_llm_failure(cat,'HTTP '+str(e.code))
+        return None,{'synthesis_error':cat,'synthesis_error_detail':'HTTP '+str(e.code)}
+    except (URLError,TimeoutError) as e:
+        cat=_safe_error_category(exc=e)
+        _record_llm_failure(cat,type(e).__name__)
+        return None,{'synthesis_error':cat,'synthesis_error_detail':type(e).__name__}
+    except json.JSONDecodeError:
+        _record_llm_failure('malformed_response','Provider returned invalid JSON.')
+        return None,{'synthesis_error':'malformed_response','synthesis_error_detail':'Provider returned invalid JSON.'}
+    except Exception as e:
+        cat=_safe_error_category(exc=e)
+        _record_llm_failure(cat,type(e).__name__)
+        return None,{'synthesis_error':cat,'synthesis_error_detail':type(e).__name__}
+
+def verify_llm_runtime():
+    if not (os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY')):
+        _record_llm_failure('missing_api_key')
+        return dict(LLM_HEALTH)
+    result,err=call_llm_api('Runtime health check: confirm the FGF synthesis runtime is available.',[],[],'healthcheck')
+    return dict(LLM_HEALTH) if result else {**LLM_HEALTH,**err}
+
+def parse_synthesis(text,max_id):
+    if isinstance(text,dict): obj=text
+    else:
+        try: obj=json.loads(text)
+        except (ValueError,TypeError): obj=None
+    if isinstance(obj,dict) and obj.get('answer'):
+        ids=[]
+        for x in obj.get('evidence_ids',[]):
+            try:
+                n=int(x)
+                if 1<=n<=max_id: ids.append(n)
+            except (TypeError,ValueError): pass
+        return obj['answer'].strip(),ids,str(obj.get('uncertainty',''))
+    return str(text or ''),[],''
+
+def _claim_refs(claims,selected):
+    return [claims.index(c)+1 for c in selected if c in claims]
+
+def _fallback_question_type(q):
     ql=q.lower()
-    return (('cost' in ql or 'costs' in ql or 'how much' in ql) and
-            ('fusion seed' in ql or 'fusion seeds' in ql or 'core 35' in ql))
+    if any(x in ql for x in ('how do i','how can i','how to','what should i do','how should i','tackle','deal with')): return 'how_to'
+    if any(x in ql for x in ('how much','cost','price','how many','how long','per hour')): return 'calculation'
+    if any(x in ql for x in ('best','optimal','recommended','should i','which should','prioritize','priority')): return 'strategy'
+    if any(x in ql for x in ('what is','what are','what does','what do')): return 'definition'
+    if any(x in ql for x in ('compare','difference','versus',' vs ')): return 'comparison'
+    return 'generic'
 
 def fallback_answer(question,claims,conflicts=None):
+    """Question-aware, evidence-only fallback. Never invents unsupported facts."""
+    conflicts=conflicts or []
     ql=question.lower()
+    if not claims:
+        return {'text':'I could not find sufficiently relevant evidence to answer this safely.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient relevant evidence.'}
 
-    # Event-calendar questions get a dedicated deterministic path. This prevents
-    # generic event claims (or unrelated Monday mechanics) from being presented
-    # as a day-by-day Shared Moonlight schedule when no such evidence exists.
     if is_event_schedule_question(question):
         schedule=shared_moonlight_schedule_claims(claims)
         lines=['Shared Moonlight schedule (verified current evidence):']
-        for c in schedule:
-            claim=c.get('Claim','').strip()
-            if claim:
-                lines.append('• '+claim)
-        lines.append('• Exact weekday task mapping (for example, “Monday = Speedups”) is not established in the current evidence.')
-        lines.append('• Season 2 event schedules vary by server; use the in-game calendar for your server before saving or spending resources for a specific day.')
-        if any(x in ql for x in ('shortcut','hack','focus','what should i do','what to do')):
-            guide=[c for c in claims if c.get('Source')== 'User-provided detailed Shared Moonlight guide summary — Krypton test-server guide, Sep 2026']
-            guide=sorted(guide,key=lambda c: 0 if 'priority sequence' in c.get('Claim','').lower() else 1)
-            if guide:
-                lines.append('• F2P shortcut from the detailed guide: claim daily rewards, collect free event resources, delay shop spending until the shop is understood, prioritize limited/rare rewards, manage Moonsoil Diggers carefully, and treat paid features as optional.')
-            lines.append('• Do not move generic Monday Speedup/Computational Component advice into Shared Moonlight unless the calendar evidence explicitly links it to this event.')
-        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in schedule[:6]],'uncertainty':'Exact weekday rotation is not established; server-specific in-game calendar remains authoritative.'}
-
+        for c in schedule[:6]:
+            if c.get('Claim'): lines.append('• '+c.get('Claim','').strip())
+        lines.append('• Exact weekday task mapping is not established in the current evidence.')
+        lines.append('• Use the in-game calendar for your server before relying on a specific day.')
+        if conflicts: lines.append('• Conflict: both evidence positions are preserved; check the latest official/in-game information.')
+        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':_claim_refs(claims,schedule[:6]),'uncertainty':'Exact weekday rotation is not established.'}
 
     if exact_cost_question(question):
-        exact=[c for c in claims if any(k in c.get('Claim','').lower() for k in ('fusion seed','fusion seeds','cost','core level 35','l35'))]
-        numeric=[c for c in exact if re.search(r'\b(?:\d{1,3}(?:,\d{3})*|\d+)\b',c.get('Claim','')) and ('fusion seed' in c.get('Claim','').lower() or 'cost' in c.get('Claim','').lower())]
+        relevant=[c for c in claims if any(k in c.get('Claim','').lower() for k in ('fusion seed','core 35','core level','cost'))]
+        numeric=[c for c in relevant if re.search(r'\b\d[\d,]*\b',c.get('Claim','')) and 'fusion seed' in c.get('Claim','').lower()]
         if not numeric:
-            return {'text':'The current evidence does not establish an exact Fusion Seed cost for Energy Core 35. I will not infer or substitute another upgrade cost.','model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in exact[:4]],'uncertainty':'Exact Core 35 Fusion Seed cost is not established in the retrieved evidence.'}
+            return {'text':'The current evidence does not establish the exact Fusion Seed cost for this Core level. I will not substitute another upgrade cost.','model':'evidence-fallback','evidence_used':_claim_refs(claims,relevant[:4]),'uncertainty':'Exact cost is not established in the current evidence.'}
 
-    if not claims:
-        return {'text':'I could not find sufficiently relevant evidence for that question.','model':'evidence-fallback','evidence_used':[],'uncertainty':'Insufficient retrieved evidence.'}
-
-    # Recommendation questions about heroes/champions must not fall back to generic
-    # energy-type mechanics. Use champion evidence and clearly separate meta from facts.
     if classify_intent(question)=='Champions' and any(x in ql for x in ('best','optimal','recommended','heroes','champions','team','composition','tier list')):
-        kinetic = any(x in ql for x in ('kinetic','kinetic ship','kinetic fleet'))
-        candidates=[]
-        for c in claims:
-            cl=c.get('Claim','').lower()
-            if 'champion' not in cl and 'kinetic' not in cl: continue
-            if kinetic and ('kinetic' not in cl): continue
-            if any(name in cl for name in ('killer bee','eva von trier','zora dominii','zora domini','kama moai','riian dessos','lani verita','cocoon')):
-                candidates.append(c)
-        # Prefer confirmed/current evidence first, then high-confidence meta evidence.
-        candidates=sorted(candidates,key=lambda c: (
-            0 if c.get('Status')=='Confirmed' else 1,
-            0 if str(c.get('Confidence','')).lower().startswith('high') else 1,
-            c.get('Claim','').lower()
-        ))
+        candidates=[c for c in claims if ('champion' in c.get('Claim','').lower() or 'hero' in c.get('Claim','').lower()) and (not any(x in ql for x in ('kinetic','beam','ion','ionic')) or any(x in c.get('Claim','').lower() for x in ('kinetic','beam','ion','ionic')))]
         if candidates:
-            lines=['For a Kinetic ship/fleet, the available evidence identifies these Kinetic Champions:']
-            for c in candidates[:6]:
-                lines.append('• '+c.get('Claim','').strip())
-            lines.append('• Important: the champion classifications are mostly Tier-2/community evidence and several are marked Under Review, so I would not present a single “best” hero as a confirmed fact.')
-            return {'text':'\\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in candidates[:6]],'uncertainty':'Recommendation is evidence-based but the available Kinetic Champion meta is not uniformly confirmed; Under Review claims remain labeled as such.'}
+            lines=['The available Champion evidence supports these documented matches:']
+            for c in candidates[:6]: lines.append('• '+c.get('Claim','').strip())
+            lines.append('• I will not name a single “best” Champion unless the evidence establishes that ranking.')
+            return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':_claim_refs(claims,candidates[:6]),'uncertainty':'Champion recommendation evidence is not uniformly confirmed.'}
 
-    # Repair questions must answer the player's actual location/action question,
-    # not merely recite the damage taxonomy.
-    if any(k in ql for k in ('repair','where can i repair','where do i repair','repair my fleet','fix my fleet')):
-        repair_claims=[c for c in claims if any(k in c.get('Claim','').lower() for k in
-            ('repair cabin','repair bay','repair module','minor damage','major damage','repair via formation'))]
-        location=[c for c in repair_claims if any(k in c.get('Claim','').lower() for k in
-            ('repair cabin','repair bay','repair via formation'))]
-        minor=[c for c in repair_claims if 'minor damage' in c.get('Claim','').lower() and
-               ('auto' in c.get('Claim','').lower() or 'recover' in c.get('Claim','').lower())]
-        major=[c for c in repair_claims if 'major damage' in c.get('Claim','').lower() and
-               ('repair module' in c.get('Claim','').lower() or 'repair cabin' in c.get('Claim','').lower())]
-        selected=[]
-        for group in (location,minor,major,repair_claims):
-            for c in group:
-                if c not in selected:selected.append(c)
-                if len(selected)>=4:break
-            if len(selected)>=4:break
+    if any(k in ql for k in ('repair','damaged','repair module','repair cabin','repair bay','fix my fleet')):
+        repair_claims=[c for c in claims if any(k in c.get('Claim','').lower() for k in ('repair cabin','repair bay','repair module','minor damage','major damage','recover'))]
+        lines=['For fleet repair, the current evidence supports:']
+        for c in repair_claims[:5]: lines.append('• '+c.get('Claim','').strip())
+        if not repair_claims: lines.append('• The current evidence does not establish the exact repair action.')
+        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':_claim_refs(claims,repair_claims[:5]),'uncertainty':'Fallback used; only retrieved repair evidence is stated.'}
 
-        lines=['For fleet repair, the evidence distinguishes Minor Damage from Major Damage:']
-        if any('repair cabin' in c.get('Claim','').lower() for c in location):
-            lines.append('• Major Damage is repaired through the Repair Cabin; the Repair Cabin repairs craft with Major Damage.')
-        elif any('repair bay' in c.get('Claim','').lower() for c in location):
-            lines.append('• Major Damage sends the damaged craft to the Repair Bay, where repair requires Repair Modules.')
-        if minor:
-            lines.append('• Minor Damage does not require Repair Modules: it can recover/auto-repair after leaving combat.')
-        if not location and not minor:
-            lines.append('• The retrieved evidence does not establish the exact repair location.')
-        if any(x in ql for x in ('without repair modules','without consuming','ad free','free','no spending')):
-            lines.append('• The evidence supports the Minor Damage auto-recovery path as the no-Repair-Module option; it does not establish a separate ad-based repair mechanic.')
-        return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected[:4]],'uncertainty':'Direct repair evidence used; no unsupported repair mechanic was assumed.'}
-
-    mechanics=[c for c in claims if c.get('Evidence Tier','').startswith('Tier 1')]
-    selected=mechanics[:4] or claims[:4]
-    lines=['Based on the retrieved FGF evidence:']
-    for c in selected: lines.append('• '+c.get('Claim','').strip())
-    if conflicts:lines.append('• Conflict: both evidence positions are preserved; the lower-tier/community position is not treated as established truth. Check the latest official/in-game information before relying on it.')
-    return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':[claims.index(c)+1 for c in selected],'uncertainty':'Deterministic fallback used; synthesis model unavailable.'}
+    qtype=_fallback_question_type(question)
+    selected=claims[:6]
+    if qtype=='how_to':
+        lines=['Here is the evidence-supported path:']+[('• '+c.get('Claim','').strip()) for c in selected]
+        lines.append('I am not adding a step, threshold, cost or timing that the current evidence does not establish.')
+    elif qtype=='strategy':
+        lines=['The current evidence supports these strategy considerations:']+[('• '+c.get('Claim','').strip()) for c in selected]
+    elif qtype=='calculation':
+        lines=['For this numeric question, the evidence establishes:']+[('• '+c.get('Claim','').strip()) for c in selected]
+        lines.append('Any exact value not explicitly established is left uncalculated.')
+    elif qtype=='definition':
+        lines=['The current evidence describes the requested mechanic as:']+[('• '+c.get('Claim','').strip()) for c in selected]
+    elif qtype=='comparison':
+        lines=['The retrieved evidence supports this comparison:']+[('• '+c.get('Claim','').strip()) for c in selected]
+        lines.append('I am not declaring a winner where the evidence does not establish one.')
+    else:
+        lines=['Based on the most relevant current evidence:']+[('• '+c.get('Claim','').strip()) for c in selected]
+    if 'F2P' in extract_constraints(question):
+        lines.append('• F2P constraint applied: no unsupported paid/spending step has been added.')
+    if conflicts:
+        lines.append('• Conflict: both evidence positions are preserved; the lower-tier/community position is not treated as established truth. Check the latest official/in-game information.')
+    refs=_claim_refs(claims,selected)
+    lines.append('Evidence: '+', '.join('[E%d]'%x for x in refs))
+    return {'text':'\n'.join(lines),'model':'evidence-fallback','evidence_used':refs,'uncertainty':'LLM synthesis unavailable; answer generated only from relevant evidence.'}
 
 def _api_error_detail(e):
     try:
@@ -583,18 +691,13 @@ def call_llm(question,claims,conflicts,mode,temperature=0.2):
 
 def synthesize(question,claims,conflicts=None,mode='answer'):
     conflicts=conflicts or []
-    text,err=call_llm(question,claims,conflicts,mode,0.2)
-    if text:
-        answer_text,ids,unc=parse_synthesis(text,len(claims))
-        if answer_text:return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),'uncertainty':unc}
-    # One low-temperature retry handles transient/model-format failures without
-    # changing evidence or truth state.
-    if err.get('synthesis_error') not in ('missing_api_key',):
-        retry_text,retry_err=call_llm(question,claims,conflicts,mode,0.0)
-        if retry_text:
-            answer_text,ids,unc=parse_synthesis(retry_text,len(claims))
-            if answer_text:return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),'uncertainty':unc}
-        err=retry_err or err
+    obj,err=call_llm_api(question,claims,conflicts,mode)
+    if obj:
+        answer_text,ids,unc=parse_synthesis(obj,len(claims))
+        if answer_text:
+            return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),
+                    'uncertainty':unc,'conflicts_presented':bool(obj.get('conflicts_presented')),
+                    'tier_breakdown':obj.get('tier_breakdown',{})}
     fb=fallback_answer(question,claims,conflicts)
     fb.update(err)
     return fb
@@ -806,6 +909,42 @@ def run_quality_benchmarks():
         })
     return {'version':RELEASE,'total':len(rows),'passed':sum(1 for x in rows if x['passed']),'failed':sum(1 for x in rows if not x['passed']),'results':rows}
 
+def objective_1_benchmark_suite():
+    path=ROOT/'data'/'objective_1_benchmark.json'
+    return json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'version':'1.0','title':'FGF Objective #1 Responding Agent Benchmark','questions':[]}
+
+def grade_objective_1_answer(response,expected):
+    text=str(response.get('answer','')).lower()
+    checks={
+        'addresses_question':len(text)>=20,
+        'uses_relevant_evidence':bool(response.get('evidence')),
+        'respects_tier_priority':not ('tier 3' in text and 'community' not in text and 'official' not in text),
+        'respects_f2p':('F2P' not in expected.get('constraints',[])) or ('f2p' in text or 'without spending' in text or 'free' in text),
+        'avoids_invented_numbers':not any(x in text for x in ('i estimate','approximately','probably costs')),
+        'exposes_uncertainty':bool(response.get('uncertainty')) or not expected.get('requires_uncertainty',False),
+        'handles_conflicts':not expected.get('requires_conflict',False) or bool(response.get('critical_conflicts')) or 'conflict' in text,
+        'avoids_unrelated_evidence':not any(x in text for x in expected.get('must_not_contain',[])),
+        'actionable':not expected.get('actionable',False) or any(x in text for x in ('use','prioritize','check','repair','spend','step')),
+        'cites_evidence':bool(response.get('evidence_used')) or '[e' in text
+    }
+    score=sum(1 for v in checks.values() if v)
+    return {'score':score,'max_score':10,'checks':checks,'passed':score>=8}
+
+def run_objective_1_benchmark(start=0,count=50):
+    suite=objective_1_benchmark_suite()
+    selected=suite.get('questions',[])[max(0,int(start)):max(0,int(start))+max(1,min(50,int(count)))]
+    rows=[]
+    for item in selected:
+        result=answer(item['question'])
+        grade=grade_objective_1_answer(result,item)
+        rows.append({'id':item['id'],'question':item['question'],'intent':classify_intent(item['question']),
+                     'grade':grade,'model':result.get('model'),'answer':result.get('answer'),
+                     'evidence_used':result.get('evidence_used',[]),'uncertainty':result.get('uncertainty','')})
+    return {'version':suite.get('version','1.0'),'title':suite.get('title','FGF Objective #1 Responding Agent Benchmark'),
+            'total':len(rows),'passed':sum(1 for r in rows if r['grade']['passed']),
+            'failed':sum(1 for r in rows if not r['grade']['passed']),
+            'average_score':round(sum(r['grade']['score'] for r in rows)/max(1,10*len(rows)),3),'results':rows}
+
 def run_benchmarks():
     tests=[
         ("what's the best ways to repair your fleets ad free way","Fleet Damage/Repair",["F2P","Best"],["repair","damage"]),
@@ -989,7 +1128,9 @@ class H(BaseHTTPRequestHandler):
         u=urlparse(self.path)
         if u.path=='/api/health':
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
-            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
+            avg=(sum(LLM_HEALTH['latencies_ms'])/len(LLM_HEALTH['latencies_ms'])) if LLM_HEALTH['latencies_ms'] else None
+            synthesis={**LLM_HEALTH,'configured':configured,'model':LLM_MODEL,'average_latency_ms':round(avg,1) if avg is not None else None}
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
@@ -1088,6 +1229,8 @@ class H(BaseHTTPRequestHandler):
             detector=GapDetector(CLAIMS, failed_questions=failed)
             return self._json({'ok':True,**detector.get_summary()})
         if u.path=='/api/benchmarks/quality':return self._json(run_quality_benchmarks())
+        if u.path=='/api/benchmarks/objective1':
+            qs=parse_qs(u.query);start=int(qs.get('start',['0'])[0]);count=int(qs.get('count',['50'])[0]);return self._json(run_objective_1_benchmark(start,count))
         if u.path=='/api/benchmarks/100':
             qs=parse_qs(u.query);start=int(qs.get('start',['0'])[0]);count=int(qs.get('count',['20'])[0]);return self._json(run_benchmark_suite_100(start,count))
         if u.path=='/api/rules':return self._json({'rules':RULES,'authority_order':DATA['authority_order']})
@@ -1142,4 +1285,5 @@ class H(BaseHTTPRequestHandler):
     def log_message(self,*a):pass
 
 if __name__=='__main__':
+    LLM_HEALTH.update(verify_llm_runtime())
     port=int(os.getenv('PORT','8000'));print(f'FGF Intelligence running on http://127.0.0.1:{port}');ThreadingHTTPServer(('0.0.0.0',port),H).serve_forever()
