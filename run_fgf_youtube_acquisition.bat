@@ -32,13 +32,21 @@ if "%FGF_SUPABASE_SERVICE_ROLE_KEY%"=="" (
 )
 
 echo.
-echo Acquiring all 174 playlist videos and uploading transcripts...
+set /p FGF_PLAYLIST_INPUT=YouTube playlist URL (or playlist ID):
+if "%FGF_PLAYLIST_INPUT%"=="" (
+  echo ERROR: Playlist URL/ID is required.
+  pause
+  exit /b 1
+)
+
+echo.
+echo Acquiring the selected playlist and uploading transcripts...
 echo Local faster-whisper STT is enabled for videos without usable subtitles.
 echo Default model: small / CPU / int8.
 echo Optional: set FGF_YTDLP_PROXY before starting if a proxy is required.
 echo.
 
-py scripts/acquire_and_upload_transcripts.py --playlist-id PL2VyftArNQtQ2EbXMAmgwrPH0P4EvBVAR --start 0 --count 174 --delay-seconds 12 --max-retries 2 --rate-limit-base 45
+py scripts/acquire_and_upload_transcripts.py --playlist-url "%FGF_PLAYLIST_INPUT%" --start 0 --delay-seconds 12 --max-retries 2 --rate-limit-base 45
 if errorlevel 1 (
   echo.
   echo Acquisition ended with errors. Review the manifest.
