@@ -153,5 +153,6 @@ def new_post(self):
 agent.H.do_GET=new_get; agent.H.do_POST=new_post
 
 if __name__=="__main__":
+    agent.LLM_HEALTH.update(agent.verify_llm_runtime())
     port=int(os.getenv("PORT","8000")); print("FGF V5 intelligence extension running",port)
     ThreadingHTTPServer(("0.0.0.0",port),agent.H).serve_forever()
