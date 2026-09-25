@@ -40,12 +40,14 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--limit", type=int, default=10)
     p.add_argument("--apply", action="store_true")
+    p.add_argument("--playlist-id", default=os.getenv("FGF_PLAYLIST_ID"), help="Playlist ID to process; omitted uses the legacy first-playlist index.")
     args = p.parse_args()
 
     root = Path("data/video_transcripts")
     root.mkdir(parents=True, exist_ok=True)
     index_path = Path("data/video_playlist_index.json")
-    download("index/playlist_index.json", index_path)
+    object_path = f"playlists/{args.playlist_id}/index.json" if args.playlist_id else "index/playlist_index.json"
+    download(object_path, index_path)
     index = json.loads(index_path.read_text(encoding="utf-8"))
 
     processed = processed_video_ids()
@@ -75,7 +77,7 @@ def main():
         subprocess.run(cmd, check=True)
 
     subprocess.run([sys.executable, "scripts/generate_knowledge_snapshot.py"], check=True)
-    print(f"Queue processing complete: processed={len(ready)}, apply={args.apply}")
+    print(f"Queue processing complete: processed={len(ready)}, apply={args.apply}, playlist_id={args.playlist_id or index.get("playlist_id")}")
 
 if __name__ == "__main__":
     main()
