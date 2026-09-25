@@ -56,9 +56,17 @@ jobs:
           test -n "$FGF_SUPABASE_URL" || (echo "Missing FGF_SUPABASE_URL" && exit 1)
           test -n "$FGF_SUPABASE_SERVICE_ROLE_KEY" || (echo "Missing FGF_SUPABASE_SERVICE_ROLE_KEY or FGF_SUPABASE_SECRET_KEY" && exit 1)
       - name: Process transcript queue
+        env:
+          PLAYLIST_ID: ${{ inputs.playlist_id || '' }}
+          LIMIT: ${{ inputs.limit || '20' }}
         run: |
+          set -e
+          EXTRA_ARGS=""
+          if [ -n "$PLAYLIST_ID" ]; then
+            EXTRA_ARGS="--playlist-id $PLAYLIST_ID"
+          fi
           if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ "${{ inputs.apply }}" = "true" ]; then
-            python scripts/process_transcript_queue.py --limit "${{ inputs.limit || 20 }}" ${{ inputs.playlist_id && format('--playlist-id "{0}"', inputs.playlist_id) || '' }} --apply
+            python scripts/process_transcript_queue.py --limit "$LIMIT" $EXTRA_ARGS --apply
           else
-            python scripts/process_transcript_queue.py --limit "${{ inputs.limit || 20 }}"
+            python scripts/process_transcript_queue.py --limit "$LIMIT" $EXTRA_ARGS
           fi
