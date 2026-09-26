@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: "3.13"
       - name: Compile response engine
-        run: python -m py_compile agent.py v5_extension.py
+        run: python -m py_compile agent.py v5_extension.py knowledge_query_engine.py evidence_graph.py
       - name: Run Knowledge Analyzer tests
         run: python -m unittest tests/test_knowledge_analyzer.py tests/test_claim_lifecycle.py tests/test_sync_corpus.py -v
       - name: Analyze full repository corpus
