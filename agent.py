@@ -11,7 +11,7 @@ from deterministic_synthesis import synthesize_deterministic
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v5.4.1-deterministic-agent'
+RELEASE='v5.4.2-deterministic-agent'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -401,7 +401,18 @@ def relevant_conflicts(q):
     explicitly labeled as community/YouTube information requiring a latest-info check.
     """
     qt = tokens(q)
-    out = list(CONFLICTS)
+    out = []
+    # Do not attach the entire conflict table to every answer. A conflict is
+    # relevant only when its topic/evidence actually intersects the question.
+    for c in CONFLICTS:
+        blob = ' '.join(str(c.get(k,'')) for k in (
+            'Topic','Claim','Existing / Tier-2 claim','Tier-1 evidence','Notes'
+        ))
+        overlap = qt & tokens(blob)
+        if len(overlap) >= 2 or any(term in blob.lower() and term in q.lower() for term in (
+            'command point','energy core','repair module','champion','commerce guild','cocoon'
+        )):
+            out.append(c)
     seen = {str(x.get('Conflict ID', '')) + '|' + str(x.get('Claim', '')) for x in out}
     for x in CLAIMS:
         state = normalize_state(x.get('Status'))
