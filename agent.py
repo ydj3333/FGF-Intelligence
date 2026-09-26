@@ -11,7 +11,7 @@ from deterministic_synthesis import synthesize_deterministic
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v5.4.5-deterministic-agent'
+RELEASE='v5.4.6-relevance-guard'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -377,20 +377,57 @@ def retrieve(q,limit=10,include_candidates=False):
     Normal answer retrieval uses CURRENT lifecycle claims only. Candidate/
     Under Review evidence is available only to explicit evidence/recommendation
     surfaces that can label it as unverified.
+
+    IMPORTANT: authority is a tie-breaker, not relevance. A Tier-1/Confirmed
+    claim with zero connection to the user's words must never enter the answer
+    merely because its authority score is high. Unknown/unclassified queries
+    therefore require a lexical or explicit phrase anchor before evidence can
+    be returned.
     """
+    q_tokens=tokens(q)-STOP
+    q_phrases=phrases(q)
+    intent=classify_intent(q)
     ranked=sorted(((score(q,c),c) for c in CLAIMS),key=lambda x:x[0],reverse=True)
-    hits=[c for s,c in ranked
-          if s>0.85
-          and (include_candidates or normalize_state(c.get('Status')) == 'current')
-          and current_scope_relevance(c) and claim_relevance(q,c)]
+
+    filtered=[]
+    for s,c in ranked:
+        if s <= 0.85:
+            continue
+        if not (include_candidates or normalize_state(c.get('Status')) == 'current'):
+            continue
+        if not current_scope_relevance(c) or not claim_relevance(q,c):
+            continue
+
+        claim_tokens=tokens(c.get('Claim','')+' '+c.get('Category','')+' '+c.get('Notes',''))
+        lexical_overlap=q_tokens & claim_tokens
+        phrase_anchor=any(p in (c.get('Claim','')+' '+c.get('Notes','')).lower() for p in q_phrases)
+
+        # For genuinely unknown queries, do not let Tier/Status bonuses create
+        # a false positive. A question such as "appearance tokens or raych"
+        # must return "insufficient evidence", not an unrelated Energy Core
+        # answer.
+        if intent == 'Unknown' and not lexical_overlap and not phrase_anchor:
+            continue
+
+        # Even for known intents, a claim must either match the query lexically
+        # or pass an explicit semantic/domain gate. This keeps authority from
+        # overwhelming topic relevance while preserving mappings such as
+        # "heal my fleet" -> documented repair evidence.
+        if not lexical_overlap and not phrase_anchor and not query_domains(q):
+            continue
+
+        filtered.append((s,c))
+
     out=[];seen=set();categories=set()
-    for c in hits:
+    for _,c in filtered:
         key=(c.get('Category',''),c.get('Claim','').lower()[:120])
-        if key in seen:continue
+        if key in seen:
+            continue
         seen.add(key)
         cat=c.get('Category','')
         out.append(c);categories.add(cat)
-        if len(out)>=limit:break
+        if len(out)>=limit:
+            break
     return out
 
 def relevant_conflicts(q):
