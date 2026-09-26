@@ -1,0 +1,67 @@
+{
+  "cycle": "FGF V4 Global Source Discovery",
+  "run_date": "2026-09-27",
+  "scope": [
+    "S1/new-server/Core35",
+    "S2",
+    "S3/future"
+  ],
+  "acquisition": "free/native first",
+  "deduplicated_before_extraction": true,
+  "sources_checked": [
+    "official portal/news/guides",
+    "official social-derived discovery",
+    "Steam/store",
+    "Reddit/player discovery",
+    "third-party guides/forums",
+    "YouTube/video search",
+    "FGF Wiki/Fandom discovery"
+  ],
+  "new_findings": [
+    {
+      "topic": "MOONFESTIVAL26 gift code",
+      "url": "https://www.sotwe.com/FoundationGF_EN?lang=en",
+      "observed_date": "2026-09-27",
+      "evidence_tier": "T2",
+      "confidence": "high",
+      "scope": "current live game",
+      "details": "Official social mirror reports MOONFESTIVAL26 valid until 2026-10-07 23:59 UTC.",
+      "status": "candidate",
+      "canonical": false
+    },
+    {
+      "topic": "Lunar Ruins schedule",
+      "url": "https://www.sotwe.com/FoundationGF_EN?lang=en",
+      "observed_date": "2026-09-27",
+      "evidence_tier": "T2",
+      "confidence": "high",
+      "scope": "S2/shared moonlight",
+      "details": "1001-1016 Sep 15-20; 1017-1247 Sep 21-26; unused Moonsoil Diggers convert to 10 Credits.",
+      "status": "candidate",
+      "canonical": false
+    },
+    {
+      "topic": "Combat Lab Stage 7 and ranking",
+      "url": "https://www.sotwe.com/FoundationGF_EN?lang=en",
+      "observed_date": "2026-09-27",
+      "evidence_tier": "T2",
+      "confidence": "high",
+      "scope": "selected S2 test servers",
+      "details": "Stage 7 freely challengeable after clearing all stages with guaranteed 100% damage bonus; ranking by highest stage, clear time, then earlier achievement.",
+      "status": "candidate",
+      "canonical": false
+    }
+  ],
+  "cross_checks": {
+    "s2_scope": "1-16 vs 1001-1016 conflict preserved.",
+    "lunar_ruins": "1017-1247 Sep 26 vs broader Shared Moonlight Sep 27 conflict preserved.",
+    "version": "official v1.1.154 remains latest verified authoritative baseline.",
+    "future": "No reliable new primary S3 mechanics surfaced."
+  },
+  "tier1_promotions": 0,
+  "persistence": {
+    "supabase": "source snapshot + 3 evidence items persisted; candidate/run writes blocked by safety checks",
+    "github": true,
+    "notion": "not updated this run"
+  }
+}
