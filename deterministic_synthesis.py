@@ -249,6 +249,25 @@ def synthesize_deterministic(question: str, claims: List[Dict[str,Any]], conflic
     reqs=_requirements(q)
     constraints=_constraint_terms(q)
 
+    # Explicit F2P + major-damage handling: the corpus establishes the
+    # Repair Module requirement, but that is not evidence of a free acquisition
+    # route. State that limitation instead of inventing a workaround.
+    if "F2P" in constraints and "repair" in reqs and "major" in q.lower():
+        repair_refs=[x[0] for x in selected[:3]]
+        lines=[
+            "For Major Damage, the current evidence says Repair Modules are required for repair.",
+            "• The current evidence does not establish a no-spend/free method to complete that repair. I will not invent one."
+        ]
+        if repair_refs:
+            lines.append("Evidence: "+", ".join(f"[E{x}]" for x in repair_refs))
+        return {
+            "text":"\\n".join(lines),
+            "model":"deterministic-evidence-synthesis",
+            "evidence_used":repair_refs,
+            "uncertainty":"A free/no-spend repair route is not established in the current evidence.",
+            "synthesis_method":"symbolic_evidence_synthesis"
+        }
+
     if not selected:
         return {
             "text":"I don't have sufficiently relevant current evidence to answer that safely. I won't substitute a related FGF mechanic or invent the missing value.",
