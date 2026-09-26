@@ -70,3 +70,8 @@ def test_v6_generic_graph_requirement_question():
     assert "Energy Core Level 9" in r["answer"]
     assert "2,000 Credits" in r["answer"]
     assert r["reasoning"]["mode"] in ("graph_requirement","requirement")
+
+def test_v6_generic_entity_parser_does_not_match_substrings():
+    engine=agent.get_engine()
+    p=engine.parse("What does Commerce Guild creation require?")
+    assert p.entity=="commerce guild creation"
