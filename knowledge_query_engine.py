@@ -116,8 +116,13 @@ class QuestionParser:
   if re.search(r"\b(?:which|what)\s+(?:type\s+of\s+)?components?\b", ql):
    entity="component"
   else:
-   for e in sorted(ENTITY_ALIASES,key=len,reverse=True):
-    if e in ql: entity=e; break
+   entity_candidates=[]
+   for e,aliases in ENTITY_ALIASES.items():
+    phrases=[e]+aliases
+    if any(phrase in ql for phrase in phrases):
+     entity_candidates.append((max(len(phrase) for phrase in phrases if phrase in ql),e))
+   if entity_candidates:
+    entity=max(entity_candidates)[1]
   qualifier=""
   if entity!="unknown":
    m=re.search(r"\b([a-z][a-z-]{2,})\s+"+re.escape(entity)+r"\b",ql)
