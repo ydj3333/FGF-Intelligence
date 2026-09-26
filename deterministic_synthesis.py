@@ -101,6 +101,21 @@ def _matches_requirement(q: str, claim: Dict[str, Any], req: str) -> bool:
     }
     return any(x in b for x in checks.get(req, ()))
 
+def _specific_target(q: str) -> Dict[str, Any]:
+    ql=q.lower()
+    out={}
+    m=re.search(r'\b(?:energy\s+)?core\s*(?:level\s*)?(3[1-9]|[4-9]0?)\b',ql)
+    if m:
+        out["core_level"]=int(m.group(1))
+    if "maximum" in ql and "energy core" in ql:
+        out["max_core"]=True
+    m=re.search(r'\b(beam|kinetic|ionic|ion)\s+(?:weapon\s+)?type?\s*counter(?:s|ed)?\s*(?:what|which)?',ql)
+    if not m:
+        m=re.search(r'what\s+does\s+(beam|kinetic|ionic|ion)\s+(?:weapon\s+type\s+)?counter',ql)
+    if m:
+        out["counter_attacker"]="ionic" if m.group(1)=="ion" else m.group(1)
+    return out
+
 def _constraint_terms(q: str) -> List[str]:
     ql = q.lower()
     out=[]
@@ -133,13 +148,33 @@ def _claim_score(q: str, claim: Dict[str, Any], all_claims: List[Dict[str, Any]]
 
 def _select(q: str, claims: List[Dict[str, Any]], limit: int = 8) -> List[Tuple[int, Dict[str, Any], float]]:
     scored=[]
+    target=_specific_target(q)
     for idx,c in enumerate(claims,1):
         if _status(c) in ("superseded","rejected"):
             continue
+        blob=_blob(c)
+        if target.get("core_level") is not None:
+            n=str(target["core_level"])
+            if not (re.search(r'\\bcore\\s*(?:level\\s*)?'+n+r'\\b',blob) or
+                    re.search(r'\\benergy\\s+core\\s*(?:level\\s*)?'+n+r'\\b',blob)):
+                # For an exact-level question, generic Energy Core claims are
+                # supporting context only and must not masquerade as the answer.
+                continue
+        if target.get("max_core"):
+            if not re.search(r'\\b(?:cap|maximum|max)\\b[^.]{0,60}\\b35\\b|\\b35\\b[^.]{0,60}\\b(?:cap|maximum|max)\\b',blob):
+                continue
+        if target.get("counter_attacker"):
+            attacker=target["counter_attacker"]
+            if not (re.search(r'\\b'+re.escape(attacker)+r'\\b[^.]{0,40}\\bcounter(?:s|ed)?\\b',blob)
+                    or re.search(r'\\bcounter(?:s|ed)?\\b[^.]{0,40}\\b'+re.escape(attacker)+r'\\b',blob)):
+                continue
         if _requirements(q) and not all(_matches_requirement(q,c,r) for r in _requirements(q)):
             continue
         s=_claim_score(q,c,claims)
         if s > 1.5:
+            if target.get("core_level") is not None: s += 8.0
+            if target.get("max_core"): s += 8.0
+            if target.get("counter_attacker"): s += 8.0
             scored.append((idx,c,s))
     scored.sort(key=lambda x:(x[2],_authority_score(x[1])), reverse=True)
     # Keep at most two near-duplicates from the same normalized claim text.
@@ -187,7 +222,12 @@ def _conflict_text(conflicts: List[Dict[str,Any]], q: str) -> List[str]:
     for c in conflicts or []:
         txt=" ".join(str(c.get(k,"")) for k in ("Claim","Evidence A","Evidence B","Notes")).strip()
         if not txt: continue
-        if qt & _tokens(txt):
+        overlap=qt & _tokens(txt)
+        # One generic word such as "major" or "level" is not enough to make a
+        # conflict relevant. Require a real topic intersection.
+        if len(overlap)>=2 or any(x in txt.lower() and x in q.lower() for x in (
+            "command point","energy core","repair module","champion","commerce guild","cocoon"
+        )):
             out.append(txt)
     return out[:2]
 
@@ -220,7 +260,30 @@ def synthesize_deterministic(question: str, claims: List[Dict[str,Any]], conflic
 
     top=selected[0]
     top_text=_text(top[1])
+    target=_specific_target(q)
     lines=[]
+
+    # Exact counter questions should return the direct relationship, not an
+    # adjacent synergy/meta claim.
+    if target.get("counter_attacker"):
+        rel=[]
+        attacker=target["counter_attacker"]
+        for idx,c,_ in selected:
+            txt=_text(c)
+            if re.search(r'\\b'+re.escape(attacker)+r'\\b[^.]{0,40}\\bcounter(?:s|ed)?\\b',txt.lower()):
+                rel.append((idx,txt))
+        if rel:
+            lines.append(rel[0][1] + f" [E{rel[0][0]}]")
+            refs=[x[0] for x in rel[:3]]
+            lines.append("Evidence: "+", ".join(f"[E{x}]" for x in refs))
+            return {
+                "text":"\\n".join(lines),
+                "model":"deterministic-evidence-synthesis",
+                "evidence_used":refs,
+                "uncertainty":"",
+                "synthesis_method":"symbolic_evidence_synthesis"
+            }
+
 
     # Direct answer first: prefer the highest-authority claim, then add
     # complementary facts rather than dumping the whole retrieval set.
