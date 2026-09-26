@@ -120,8 +120,9 @@ class QuestionParser:
    entity_candidates=[]
    for e,aliases in ENTITY_ALIASES.items():
     phrases=[e]+aliases
-    if any(phrase in ql for phrase in phrases):
-     entity_candidates.append((max(len(phrase) for phrase in phrases if phrase in ql),e))
+    matched=[phrase for phrase in phrases if re.search(r"\b"+re.escape(phrase.lower())+r"\b", ql)]
+    if matched:
+     entity_candidates.append((max(len(phrase) for phrase in matched),e))
    if entity_candidates:
     entity=max(entity_candidates)[1]
   qualifier=""
