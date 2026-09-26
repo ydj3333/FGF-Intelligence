@@ -47,6 +47,7 @@ QUESTION_TYPES={
  "counter":["what counters","which counters","counter","against"],
  "numeric":["how many","how much","how long","percentage","percent","cost"],
  "definition":["what is","what are"],
+ "event_schedule":["which day","what day","weekday","schedule","calendar","monday","tuesday","wednesday","thursday","friday","saturday","sunday"],
 }
 RELATION_TERMS={
  "unlock":["unlock","unlocks","available","opens","introduced","access"],
@@ -192,6 +193,17 @@ class KnowledgeQueryEngine:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
     c,s,sent=cand[0]; return self._answer(p,sent,[c],"direct_level")
    return self._empty(p,"The corpus contains related component evidence, but it does not establish the requested unlock/appearance level.")
+  if p.question_type=="event_schedule":
+   cand=[]
+   for c,s in rel:
+    if "moonlight" in _blob(c) or "lunar" in _blob(c): cand.append((c,s))
+   if cand:
+    cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    top=cand[:3]
+    text=" ".join(_text(x[0]) for x in top)
+    text+=" The current evidence does not establish a weekday-specific speedup/shortcut mapping." if any(x in p.raw.lower() for x in ("weekday","which day","what day","monday","tuesday","wednesday","thursday","friday","saturday","sunday")) else ""
+    return self._answer(p,text,[x[0] for x in top],"event_schedule")
+   return self._empty(p,"The current knowledge base does not establish the requested event-day schedule.")
   if p.question_type=="source":
    cand=[]
    for c,s in rel:
