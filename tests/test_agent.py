@@ -43,7 +43,7 @@ try:
     assert health["claim_lifecycle_aware"] is True
     assert health["version"] == "v6.0.0-knowledge-query-engine"
     assert health["response_engine"]["status"] == "ready"
-    assert health["response_engine"]["primary_model"] == "deterministic-evidence-synthesis"
+    assert health["response_engine"]["primary_model"] == "fgf-v6-knowledge-query-engine"
     assert health["response_engine"]["external_api_required"] is False
     assert "synthesis" in health
     assert "structured_output" in health["synthesis"]
