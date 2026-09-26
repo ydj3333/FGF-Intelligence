@@ -53,7 +53,7 @@ try:
     assert lifecycle["production_current"] > 0
     assert lifecycle["candidate_count"] > 0
     try:
-        ask=get_json("http://127.0.0.1:8000/api/ask?q=guild%20creation")
+        ask=get_json("http://127.0.0.1:8000/api/ask?q=which%20component%20changes%20my%20fleet%20style")
     except Exception as e:
         raise AssertionError(f"/api/ask failed: {e}\nSERVER LOG:\n{diagnostic()}") from e
     assert ask["answer"]
