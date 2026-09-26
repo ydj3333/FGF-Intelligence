@@ -9,6 +9,7 @@ from __future__ import annotations
 import re, math
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Tuple
+from evidence_graph import EvidenceGraph
 
 STOP={"what","which","when","where","why","how","does","do","is","are","the","a","an","to","of","for","and","or","i","my","you","your","can","could","would","should","with","on","in","at","from","it","they","them","their","me","we","this","that","these","those","be","before","after","into","about","get","give","use","appear","appears"}
 
@@ -127,6 +128,9 @@ class QuestionParser:
   if entity!="unknown":
    m=re.search(r"\b([a-z][a-z-]{2,})\s+"+re.escape(entity)+r"\b",ql)
    if m and m.group(1) not in STOP: qualifier=m.group(1)
+  else:
+   m=re.search(r"(?:what|which)\s+(?:does|do|is|are)\s+(.+?)\s+(?:require|requires|unlock|unlocks|give|gives|change|changes|affect|affects)\b", ql)
+   if m: entity=re.sub(r"\s+"," ",m.group(1).strip())
   qtype="generic"
   if any(p in ql for p in QUESTION_TYPES["event_schedule"]):
    qtype="event_schedule"
@@ -156,7 +160,7 @@ class QuestionParser:
 
 class KnowledgeQueryEngine:
  def __init__(self,claims):
-  self.claims=claims; self.parser=QuestionParser()
+  self.claims=claims; self.parser=QuestionParser(); self.graph=EvidenceGraph(claims)
   self._index=[(c,_blob(c),_norm_tokens(_blob(c)),_char_grams(_blob(c))) for c in claims]
  def parse(self,q): return self.parser.parse(q)
  def _entity_score(self,p,c):
@@ -283,6 +287,18 @@ class KnowledgeQueryEngine:
    if p.entity=="shared moonlight" and p.property=="reward":
     r=self._strategy_shared_moonlight_rewards(p,rel)
     if r:return r
+  if p.question_type=="requirement" and p.entity!="unknown":
+   aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
+   paths=self.graph.derive(aliases, ("requires",), max_hops=1)
+   if paths:
+    path=paths[0]
+    return self._answer(p,f"{path[0].source} requires {path[0].target}.",self.graph.provenance(path),"graph_requirement")
+  if p.question_type=="source" and p.entity!="unknown":
+   aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
+   paths=self.graph.derive(aliases, ("obtained_from",), max_hops=1)
+   if paths:
+    path=paths[0]
+    return self._answer(p,f"{path[0].source} can be obtained through {path[0].target}.",self.graph.provenance(path),"graph_source")
   if p.question_type=="source":
    cand=[]
    for c,s in rel:
