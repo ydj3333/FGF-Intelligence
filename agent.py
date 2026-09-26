@@ -11,7 +11,7 @@ from deterministic_synthesis import synthesize_deterministic
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v5.4.2-deterministic-agent'
+RELEASE='v5.4.3-deterministic-agent'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -1160,7 +1160,7 @@ class H(BaseHTTPRequestHandler):
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
             avg=(sum(LLM_HEALTH['latencies_ms'])/len(LLM_HEALTH['latencies_ms'])) if LLM_HEALTH['latencies_ms'] else None
             synthesis={**LLM_HEALTH,'configured':configured,'model':LLM_MODEL,'average_latency_ms':round(avg,1) if avg is not None else None}
-            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'deterministic-evidence-synthesis','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.2'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'deterministic-evidence-synthesis','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.3'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
