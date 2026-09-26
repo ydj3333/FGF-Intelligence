@@ -9,6 +9,7 @@ def test_graph_extracts_explicit_relationships():
     ]
     g = EvidenceGraph(claims)
     assert any(e.relation == "requires" and "Energy Core" in e.target for e in g.edges)
+    assert any(e.relation == "requires" and "2,000 Credits" in e.target for e in g.edges)
     assert any(e.relation == "obtained_from" and "Glory Shop" in e.target for e in g.edges)
     assert any(e.relation == "unlocks" for e in g.edges)
 
