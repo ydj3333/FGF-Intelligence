@@ -151,6 +151,8 @@ class QuestionParser:
    "dps":["dps","damage","attacker"]}
   for p,words in order.items():
    if any(w in ql for w in words): prop=p; break
+  if prop in ("requirement","source") and qtype in ("effect","generic"):
+   qtype=prop
   if "dps" in ql: prop="dps"
   elif any(w in ql for w in ("reward","rewards","prize","prizes")): prop="reward"
   expansions=[q]
