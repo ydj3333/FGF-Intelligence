@@ -133,7 +133,10 @@ class QuestionParser:
    m=re.search(r"(?:what|which)\s+(?:does|do|is|are)\s+(.+?)\s+(?:require|requires|unlock|unlocks|give|gives|change|changes|affect|affects)\b", ql)
    if m: entity=re.sub(r"\s+"," ",m.group(1).strip())
   qtype="generic"
-  if any(p in ql for p in QUESTION_TYPES["event_schedule"]):
+  if (re.search(r"\b(?:require|requires|need|needs|prerequisite)\b", ql)
+      and re.search(r"\b(?:get|obtain|obtained|source|farm|where)\b", ql)):
+   qtype="multi_hop"
+  elif any(p in ql for p in QUESTION_TYPES["event_schedule"]):
    qtype="event_schedule"
   else:
    for kind,patterns in QUESTION_TYPES.items():
@@ -290,6 +293,30 @@ class KnowledgeQueryEngine:
    if p.entity=="shared moonlight" and p.property=="reward":
     r=self._strategy_shared_moonlight_rewards(p,rel)
     if r:return r
+  if p.question_type=="multi_hop" and p.entity!="unknown":
+   aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
+   requirement_paths=self.graph.derive(aliases, ("requires",), max_hops=1)
+   if requirement_paths:
+    complete=[]; incomplete=[]
+    for req_path in requirement_paths:
+     target=req_path[0].target
+     source_paths=self.graph.derive([target], ("obtained_from",), max_hops=1)
+     if source_paths:
+      complete.append((req_path,source_paths))
+     else:
+      incomplete.append((req_path,target))
+    if complete and not incomplete:
+     parts=[]; provenance=[]
+     for req_path,source_paths in complete:
+      source_list=", ".join(x[0].target for x in source_paths)
+      parts.append(f"{req_path[0].target} can be obtained through {source_list}")
+      provenance.extend(self.graph.provenance(req_path))
+      for path in source_paths: provenance.extend(self.graph.provenance(path))
+     text=f"{requirement_paths[0][0].source} requires "+", ".join(x[0].target for x in requirement_paths)+". "+".join(parts)+"."
+     return self._answer(p,text,provenance,"multi_hop")
+    # A multi-hop answer is only valid when every requested link is evidenced.
+    established=requirement_paths[0][0].source+" requires "+", ".join(x[0].target for x in requirement_paths)+"."
+    return self._empty(p,established+" The knowledge base does not establish the acquisition path for every requirement, so I will not infer it.")
   if p.question_type=="requirement" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    paths=self.graph.derive(aliases, ("requires",), max_hops=1)
@@ -305,8 +332,13 @@ class KnowledgeQueryEngine:
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    paths=self.graph.derive(aliases, ("obtained_from",), max_hops=1)
    if paths:
-    path=paths[0]
-    return self._answer(p,f"{path[0].source} can be obtained through {path[0].target}.",self.graph.provenance(path),"graph_source")
+    source=paths[0][0].source
+    targets=[]; provenance=[]
+    for path in paths:
+     if path[0].target not in targets: targets.append(path[0].target)
+     provenance.extend(self.graph.provenance(path))
+    text=f"{source} can be obtained through "+", ".join(targets[:-1])+(( " and " if len(targets)>1 else "")+targets[-1] if targets else "")+"."
+    return self._answer(p,text,provenance,"graph_source")
   if p.question_type=="source":
    cand=[]
    for c,s in rel:
