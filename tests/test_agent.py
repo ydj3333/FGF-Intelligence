@@ -41,7 +41,7 @@ try:
     assert health["tier1"] == EXPECTED_TIER1
     assert health["conflicts"] == EXPECTED_CONFLICTS
     assert health["claim_lifecycle_aware"] is True
-    assert health["version"] == "v5.4.1-deterministic-agent"
+    assert health["version"] == "v5.4.2-deterministic-agent"
     assert health["response_engine"]["status"] == "ready"
     assert health["response_engine"]["primary_model"] == "deterministic-evidence-synthesis"
     assert health["response_engine"]["external_api_required"] is False
