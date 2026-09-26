@@ -232,10 +232,10 @@ def synthesize_deterministic(question: str, claims: List[Dict[str,Any]], conflic
         else:
             lines.append("The current evidence does not establish the exact numeric value requested. [E%d]" % top[0])
     elif qtype=="procedure":
-        actions=_dedupe_lines(_action_sentences(selected),5)
+        actions=_dedupe_lines(_action_sentences(selected),4)
         if actions:
-            lines.append("The evidence-supported path is:")
-            for idx,s in actions[:4]:
+            lines.append("The documented path is:")
+            for idx,s in actions[:3]:
                 lines.append(f"• {s} [E{idx}]")
         else:
             lines.append(top_text + f" [E{top[0]}]")
@@ -268,11 +268,7 @@ def synthesize_deterministic(question: str, claims: List[Dict[str,Any]], conflic
     if _tier(top[1]).startswith("tier 3") or _status(top[1]) in ("candidate","under review"):
         lines.append("• Evidence status: the leading evidence is lower-tier or not fully confirmed; treat it as provisional.")
 
-    # Actionability: a small next step based only on documented verbs.
-    if qtype in ("procedure","strategy"):
-        actions=_dedupe_lines(_action_sentences(selected),3)
-        if actions:
-            lines.append("Next step: " + actions[0][1] + f" [E{actions[0][0]}]")
+    # Procedure bullets already contain the actionable next step; do not repeat them.
 
     evidence_line="Evidence: "+", ".join(f"[E{x}]" for x in refs[:6])
     lines.append(evidence_line)
