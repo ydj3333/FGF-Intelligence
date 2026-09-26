@@ -1,3 +1,3 @@
 Objective 1 response-engine deployment marker.
 Deploy current main branch.
-Expected /api/health version: v5.3.0-response-engine. Verify synthesis diagnostics and /api/benchmarks/objective1 after deployment.
+Expected /api/health version: v5.4.0-deterministic-agent. Verify deterministic response_engine status and /api/ask after deployment; LLM enhancement is optional.
