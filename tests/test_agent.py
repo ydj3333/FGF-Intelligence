@@ -60,7 +60,7 @@ try:
     assert ask["evidence"]
     assert ask["model"]
     assert ask["answer_type"] in ("evidence_fallback","synthesized_evidence","knowledge_query","knowledge_abstention")
-    assert ask["model"] == "deterministic-evidence-synthesis"
+    assert ask["model"] == "fgf-v6-knowledge-query-engine"
     assert ask["quality_gate"]["passes"] is True
     assert "quality_gate" in ask
 
