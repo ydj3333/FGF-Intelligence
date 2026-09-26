@@ -63,3 +63,10 @@ def test_v6_best_dps_champion():
     assert any(x in r["answer"].lower() for x in ("lily","killer bee","zora domini","evan rogers"))
     assert "community" in r["answer"].lower()
     assert len(r["evidence"])<=4
+
+def test_v6_generic_graph_requirement_question():
+    r=agent.answer("What does Commerce Guild creation require?")
+    assert r["answer_type"]=="knowledge_query"
+    assert "Energy Core Level 9" in r["answer"]
+    assert "2,000 Credits" in r["answer"]
+    assert r["reasoning"]["mode"] in ("graph_requirement","requirement")
