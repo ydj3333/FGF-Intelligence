@@ -23,6 +23,9 @@ ENTITY_ALIASES={
  "repair modules":["repair module","repair modules","repair"],
  "fleet style":["style","damage style","fleet style"],
  "fusion seeds":["fusion seed","fusion seeds"],
+ "shared moonlight":["shared moonlight","shadow moonlight","moonlight event","moonsoil","lunar soil"],
+ "lunar ruins":["lunar ruins","lunar soil","moonsoil","moonlit market"],
+ "energy type":["beam","kinetic","ionic","ion"],
 }
 PROPERTY_ALIASES={
  "unlock_level":["level","unlock","unlocks","unlocking","appear","appears","available","availability","access","opens","introduced"],
