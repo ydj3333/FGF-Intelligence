@@ -808,7 +808,17 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
     if used_claims:
         result['uses_relevant_evidence']=all(claim_relevance(q,c) for c in used_claims)
     else:
-        result['uses_relevant_evidence']=bool(claims) and any(claim_relevance(q,c) for c in claims)
+        # Empty evidence is valid only for an explicit abstention. Never scan
+        # the entire corpus here and declare an unrelated claim "relevant":
+        # claim_relevance() is intentionally permissive for unknown queries
+        # once retrieval has already enforced its relevance boundary.
+        result['uses_relevant_evidence']=any(x in low for x in (
+            'sufficiently relevant evidence',
+            'insufficient relevant evidence',
+            'does not establish',
+            'not established',
+            'could not find'
+        ))
 
     requirements=topic_requirements(q)
 
