@@ -76,3 +76,26 @@ def test_v6_generic_entity_parser_does_not_match_substrings():
     p=engine.parse("What does Commerce Guild creation require?")
     assert p.entity=="commerce guild creation"
     assert p.question_type=="requirement"
+
+def test_v6_multihop_reasoning_requires_complete_chain():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Research Academy requires Energy Core Level 10.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Energy Core Level 10 can be obtained through Core progression.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    e=KnowledgeQueryEngine(claims)
+    r=e.compose("What does Research Academy require and how do I get the requirement?")
+    assert r["reasoning"]["mode"]=="multi_hop"
+    assert "Energy Core Level 10" in r["answer"]
+    assert "Core progression" in r["answer"]
+    assert len(r["evidence"])==2
+
+def test_v6_multihop_abstains_on_incomplete_chain():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Research Academy requires Energy Core Level 10.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    e=KnowledgeQueryEngine(claims)
+    r=e.compose("What does Research Academy require and how do I get the requirement?")
+    assert r["answer_type"]=="knowledge_abstention"
+    assert "does not establish the acquisition path" in r["answer"]
