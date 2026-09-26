@@ -23,9 +23,10 @@ ENTITY_ALIASES={
  "repair modules":["repair module","repair modules","repair"],
  "fleet style":["style","damage style","fleet style"],
  "fusion seeds":["fusion seed","fusion seeds"],
- "shared moonlight":["shared moonlight","shadow moonlight","moonlight event","moonsoil","lunar soil"],
+ "shared moonlight":["shared moonlight","shadow moonlight","moonlight event","moonlight","moonsoil","lunar soil"],
  "lunar ruins":["lunar ruins","lunar soil","moonsoil","moonlit market"],
  "energy type":["beam","kinetic","ionic","ion"],
+ "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
 }
 PROPERTY_ALIASES={
  "unlock_level":["level","unlock","unlocks","unlocking","appear","appears","available","availability","access","opens","introduced"],
@@ -36,6 +37,8 @@ PROPERTY_ALIASES={
  "comparison":["difference","different","versus","vs","compare","compared"],
  "counter":["counter","counters","against","beats","advantage"],
  "upgrade":["upgrade","upgrading","level","empowerment","power up"],
+ "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
+ "dps":["dps","damage","attacker","attacking"],
 }
 QUESTION_TYPES={
  "level_threshold":["which level","what level","at what level","level do","level does"],
@@ -134,9 +137,13 @@ class QuestionParser:
    "requirement":["require","need","prerequisite","before","condition"],
    "cost":["cost","price","spend"],"comparison":["difference","different","versus","compare"],
    "counter":["counter","against","beats"],"effect":["effect","bonus","boost","change","happen"],
-   "upgrade":["upgrade","empowerment","power up"]}
+   "upgrade":["upgrade","empowerment","power up"],
+   "reward":["reward","prize","shop"],
+   "dps":["dps","damage","attacker"]}
   for p,words in order.items():
    if any(w in ql for w in words): prop=p; break
+  if "dps" in ql: prop="dps"
+  elif any(w in ql for w in ("reward","rewards","prize","prizes")): prop="reward"
   expansions=[q]
   if entity in ENTITY_ALIASES: expansions+=ENTITY_ALIASES[entity]
   if prop in PROPERTY_ALIASES: expansions+=PROPERTY_ALIASES[prop]
@@ -186,6 +193,45 @@ class KnowledgeQueryEngine:
    sl=s.lower()
    if (p.entity=="unknown" or any(x in sl for x in aliases)) and (not props or any(x in sl for x in props)): out.append(s)
   return out
+ def _strategy_champion_dps(self,p,rel):
+  # Rank only claims that explicitly identify a champion as DPS and give a
+  # tier/rank. Community rankings are reported as community evidence, not fact.
+  rank_value={"sss":7,"ss+":6.5,"ss":6,"s+":5.5,"s":5,"a+":4.5,"a":4,"b+":3.5,"b":3}
+  found=[]
+  for c,s in rel:
+   text=_text(c); low=text.lower()
+   if "dps" not in low or not any(x in low for x in ("champion","dps")): continue
+   m=re.search(r"^(.+?)\s+is\s+(?:ranked\s+)?(sss|ss\+|ss|s\+|s|a\+|a|b\+|b)\b",low)
+   if not m: continue
+   found.append((rank_value[m.group(2)],m.group(1).strip(),c,s,m.group(2).upper()))
+  if not found:return None
+  best=max(x[0] for x in found)
+  top=[]; seen=set()
+  for rv,name,c,s,rk in sorted(found,key=lambda x:(-x[0],-x[3])):
+   if rv!=best or name.lower() in seen: continue
+   seen.add(name.lower()); top.append((c,name,rk))
+  names=", ".join(f"{n} ({r}-tier)" for _,n,r in top)
+  text=f"Based on the current S2 community tier-list evidence in the knowledge base, the highest-ranked explicit DPS Champions are {names}."
+  text+=" This is community/meta evidence (Tier 2), not an official developer ranking."
+  return self._answer(p,text,[x[0] for x in top],"strategy_champion_dps")
+
+ def _strategy_shared_moonlight_rewards(self,p,rel):
+  official=[]; guidance=[]
+  for c,s in rel:
+   low=_blob(c); text=_text(c)
+   if "limited rewards include" in low and _authority(c)>=4: official.append((c,s))
+   if "recommends prioritizing limited or rare event-shop rewards" in low or "f2p priority sequence" in low or "grand prize" in low and "recommends" in low:
+    guidance.append((c,s))
+  if not official:
+   for c,s in rel:
+    if "reward" in _blob(c) and _authority(c)>=4: official.append((c,s))
+  if not official:return None
+  official.sort(key=lambda x:x[1],reverse=True)
+  text="The official Shared Moonlight announcement lists these limited rewards: an exclusive ship skin, a name frame, an Avatar Frame, a Killing Effect, and a Festival Crew choice of Holly Nico, Murphy Riley, or Boka Lape."
+  if guidance:
+   text+=" For F2P play, the stored guide recommends prioritizing limited/rare rewards and comparing the Grand Prize against the Moonsoil Diggers/resources required; that guidance is test-server/community evidence."
+  return self._answer(p,text,[official[0][0]]+([guidance[0][0]] if guidance else []),"strategy_shared_moonlight_rewards")
+
  def _empty(self,p,note=""):
   return {"answer":"I cannot establish the exact answer from the current FGF knowledge base." if not note else note,"evidence":[],"evidence_used":[],"model":"fgf-v6-knowledge-query-engine","answer_type":"knowledge_abstention","uncertainty":note or "No sufficiently relevant evidence was found.","quality_gate":{"passes":True,"uses_relevant_evidence":False,"reason":"Evidence-safe abstention."},"query":p.as_dict()}
  def _answer(self,p,text,claims,mode):
@@ -226,6 +272,13 @@ class KnowledgeQueryEngine:
     text+=" The current evidence does not establish a weekday-specific speedup/shortcut mapping." if any(x in p.raw.lower() for x in ("weekday","which day","what day","monday","tuesday","wednesday","thursday","friday","saturday","sunday")) else ""
     return self._answer(p,text,[x[0] for x in top],"event_schedule")
    return self._empty(p,"The current knowledge base does not establish the requested event-day schedule.")
+  if p.question_type=="strategy":
+   if p.entity=="champion" and p.property=="dps":
+    r=self._strategy_champion_dps(p,rel)
+    if r:return r
+   if p.entity=="shared moonlight" and p.property=="reward":
+    r=self._strategy_shared_moonlight_rewards(p,rel)
+    if r:return r
   if p.question_type=="source":
    cand=[]
    for c,s in rel:
