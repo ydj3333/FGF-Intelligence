@@ -41,7 +41,7 @@ try:
     assert health["tier1"] == EXPECTED_TIER1
     assert health["conflicts"] == EXPECTED_CONFLICTS
     assert health["claim_lifecycle_aware"] is True
-    assert health["version"] == "v5.4.6-relevance-guard"
+    assert health["version"] == "v6.0.0-knowledge-query-engine"
     assert health["response_engine"]["status"] == "ready"
     assert health["response_engine"]["primary_model"] == "deterministic-evidence-synthesis"
     assert health["response_engine"]["external_api_required"] is False
@@ -68,7 +68,7 @@ try:
     # high-authority but unrelated claim merely because Tier-1/Confirmed
     # evidence has a large authority score.
     nonsense=get_json("http://127.0.0.1:8000/api/ask?q=appearance%20tokens%20or%20raych")
-    assert "sufficiently relevant current evidence" in nonsense["answer"].lower()
+    assert "knowledge base" in nonsense["answer"].lower() or "relevant" in nonsense["answer"].lower()
     assert nonsense["evidence"] == []
     fleet_dup=get_json("http://127.0.0.1:8000/api/tools/fleet-builder?style=Ion&champion=Ajita&champion=Ajita&champion=Killer%20Bee")
     assert fleet_dup["ok"] is False
