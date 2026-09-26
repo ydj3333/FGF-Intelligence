@@ -7,6 +7,7 @@ from urllib.error import URLError, HTTPError
 from gap_detector import GapDetector
 from knowledge_analyzer import KnowledgeAnalyzer
 from claim_lifecycle import summarize_states, normalize_state
+from deterministic_synthesis import synthesize_deterministic
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
@@ -702,17 +703,23 @@ def call_llm(question,claims,conflicts,mode,temperature=0.2):
         return None,{'synthesis_error':type(e).__name__}
 
 def synthesize(question,claims,conflicts=None,mode='answer'):
+    """Primary response path: deterministic local synthesis first; LLM is optional enhancement."""
     conflicts=conflicts or []
-    obj,err=call_llm_api(question,claims,conflicts,mode)
-    if obj:
-        answer_text,ids,unc=parse_synthesis(obj,len(claims))
-        if answer_text:
-            return {'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or list(range(1,min(4,len(claims))+1)),
-                    'uncertainty':unc,'conflicts_presented':bool(obj.get('conflicts_presented')),
-                    'tier_breakdown':obj.get('tier_breakdown',{})}
-    fb=fallback_answer(question,claims,conflicts)
-    fb.update(err)
-    return fb
+    local=synthesize_deterministic(question,claims,conflicts)
+    # Optional enhancement only. The agent remains fully usable without API credits.
+    if os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'):
+        obj,err=call_llm_api(question,claims,conflicts,mode)
+        if obj:
+            answer_text,ids,unc=parse_synthesis(obj,len(claims))
+            if answer_text:
+                enhanced={'text':answer_text,'model':LLM_MODEL,'evidence_used':ids or local.get('evidence_used',[]),
+                          'uncertainty':unc,'conflicts_presented':bool(obj.get('conflicts_presented')),
+                          'tier_breakdown':obj.get('tier_breakdown',{}),'synthesis_method':'llm_enhanced'}
+                gate=answer_quality_gate(question,enhanced['text'],claims,enhanced.get('evidence_used',[]))
+                if gate.get('passes'):
+                    enhanced['quality_gate']=gate
+                    return enhanced
+    return local
 
 def recommend(q,objective='general'):
     objective_terms={'pvp':'pvp arena gvg port war combat','pve':'pve boss event hunting ground shrine','f2p':'f2p free progression economy spending','progression':'energy core building research shipyard construction','economy':'trade home port resources credits guild vouchers','event':'event rewards currency points guild'}
