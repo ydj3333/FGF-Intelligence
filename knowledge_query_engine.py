@@ -294,8 +294,13 @@ class KnowledgeQueryEngine:
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    paths=self.graph.derive(aliases, ("requires",), max_hops=1)
    if paths:
-    path=paths[0]
-    return self._answer(p,f"{path[0].source} requires {path[0].target}.",self.graph.provenance(path),"graph_requirement")
+    source=paths[0][0].source
+    targets=[]; provenance=[]
+    for path in paths:
+     if path[0].target not in targets: targets.append(path[0].target)
+     provenance.extend(self.graph.provenance(path))
+    text=f"{source} requires "+", ".join(targets[:-1])+((" and " if len(targets)>1 else "")+targets[-1] if targets else "")+"."
+    return self._answer(p,text,provenance,"graph_requirement")
   if p.question_type=="source" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    paths=self.graph.derive(aliases, ("obtained_from",), max_hops=1)
