@@ -98,8 +98,12 @@ class QuestionParser:
  def parse(self,question):
   q=question.strip(); ql=q.lower()
   entity="unknown"
-  for e in sorted(ENTITY_ALIASES,key=len,reverse=True):
-   if e in ql: entity=e; break
+  # Interrogative subject takes precedence over later target phrases.
+  if re.search(r"\b(?:which|what)\s+(?:type\s+of\s+)?components?\b", ql):
+   entity="component"
+  else:
+   for e in sorted(ENTITY_ALIASES,key=len,reverse=True):
+    if e in ql: entity=e; break
   qualifier=""
   if entity!="unknown":
    m=re.search(r"\b([a-z][a-z-]{2,})\s+"+re.escape(entity)+r"\b",ql)
