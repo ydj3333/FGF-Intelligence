@@ -153,6 +153,11 @@ def new_post(self):
 agent.H.do_GET=new_get; agent.H.do_POST=new_post
 
 if __name__=="__main__":
-    agent.LLM_HEALTH.update(agent.verify_llm_runtime())
+    # The deterministic response engine is the production baseline. Only probe
+    # the paid external LLM when explicitly enabled as an enhancement.
+    if os.getenv("FGF_ENABLE_LLM_ENHANCEMENT","false").lower() in ("1","true","yes","on"):
+        agent.LLM_HEALTH.update(agent.verify_llm_runtime())
+    else:
+        agent.LLM_HEALTH.update({"status":"disabled_optional_enhancement","authentication":"not_required","structured_output":"not_required"})
     port=int(os.getenv("PORT","8000")); print("FGF V5 intelligence extension running",port)
     ThreadingHTTPServer(("0.0.0.0",port),agent.H).serve_forever()
