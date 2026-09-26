@@ -155,18 +155,18 @@ def _select(q: str, claims: List[Dict[str, Any]], limit: int = 8) -> List[Tuple[
         blob=_blob(c)
         if target.get("core_level") is not None:
             n=str(target["core_level"])
-            if not (re.search(r'\\bcore\\s*(?:level\\s*)?'+n+r'\\b',blob) or
-                    re.search(r'\\benergy\\s+core\\s*(?:level\\s*)?'+n+r'\\b',blob)):
+            if not (re.search(r'\bcore\s*(?:level\s*)?'+n+r'\b',blob) or
+                    re.search(r'\benergy\s+core\s*(?:level\s*)?'+n+r'\b',blob)):
                 # For an exact-level question, generic Energy Core claims are
                 # supporting context only and must not masquerade as the answer.
                 continue
         if target.get("max_core"):
-            if not re.search(r'\\b(?:cap|maximum|max)\\b[^.]{0,60}\\b35\\b|\\b35\\b[^.]{0,60}\\b(?:cap|maximum|max)\\b',blob):
+            if not re.search(r'\b(?:cap|maximum|max)\b[^.]{0,60}\b35\b|\b35\b[^.]{0,60}\b(?:cap|maximum|max)\b',blob):
                 continue
         if target.get("counter_attacker"):
             attacker=target["counter_attacker"]
-            if not (re.search(r'\\b'+re.escape(attacker)+r'\\b[^.]{0,40}\\bcounter(?:s|ed)?\\b',blob)
-                    or re.search(r'\\bcounter(?:s|ed)?\\b[^.]{0,40}\\b'+re.escape(attacker)+r'\\b',blob)):
+            if not (re.search(r'\b'+re.escape(attacker)+r'\b[^.]{0,40}\bcounter(?:s|ed)?\b',blob)
+                    or re.search(r'\bcounter(?:s|ed)?\b[^.]{0,40}\b'+re.escape(attacker)+r'\b',blob)):
                 continue
         if _requirements(q) and not all(_matches_requirement(q,c,r) for r in _requirements(q)):
             continue
