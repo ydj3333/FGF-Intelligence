@@ -49,3 +49,17 @@ if __name__ == '__main__':
     test_v6_level_question_is_evidence_safe()
     test_v6_known_flagship_fact_is_direct()
     print('FGF v6 query tests: PASS')
+
+def test_v6_shared_moonlight_rewards():
+    r=agent.answer("On this moonlight event what are the best rewards")
+    assert r["answer_type"]=="knowledge_query"
+    assert "exclusive ship skin" in r["answer"].lower()
+    assert "festival crew" in r["answer"].lower()
+    assert len(r["evidence"])<=2
+
+def test_v6_best_dps_champion():
+    r=agent.answer("best dps champion")
+    assert r["answer_type"]=="knowledge_query"
+    assert any(x in r["answer"].lower() for x in ("lily","killer bee","zora domini","evan rogers"))
+    assert "community" in r["answer"].lower()
+    assert len(r["evidence"])<=4
