@@ -11,7 +11,7 @@ from deterministic_synthesis import synthesize_deterministic
 
 ROOT=Path(__file__).parent
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v5.4.6-relevance-guard'
+RELEASE='v6.0.0-knowledge-query-engine'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -1360,6 +1360,14 @@ class H(BaseHTTPRequestHandler):
         self.send_error(404)
 
     def log_message(self,*a):pass
+
+# v6 Knowledge Query Engine is the production answer path.
+try:
+    from knowledge_query_engine import answer as _knowledge_query_answer
+    answer = _knowledge_query_answer
+    RELEASE = 'v6.0.0-knowledge-query-engine'
+except Exception:
+    pass
 
 if __name__=='__main__':
     LLM_HEALTH.update(verify_llm_runtime())
