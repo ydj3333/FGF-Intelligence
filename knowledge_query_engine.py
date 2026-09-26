@@ -94,6 +94,18 @@ def _similarity(a,b):
  char=len(ga&gb)/math.sqrt(max(1,len(ga))*max(1,len(gb)))
  return .7*word+.3*char
 
+def _char_grams(s):
+ s=re.sub(r"\\s+"," ",s.lower())
+ return {s[i:i+3] for i in range(max(0,len(s)-2))}
+
+def _similarity_index(a,bb,bb_tokens,bb_grams):
+ aa=_norm_tokens(a)
+ if not aa or not bb_tokens:return 0.0
+ word=len(aa&bb_tokens)/math.sqrt(len(aa)*len(bb_tokens))
+ ga=_char_grams(a)
+ char=len(ga&bb_grams)/math.sqrt(max(1,len(ga))*max(1,len(bb_grams)))
+ return .7*word+.3*char
+
 class QuestionParser:
  def parse(self,question):
   q=question.strip(); ql=q.lower()
@@ -132,7 +144,9 @@ class QuestionParser:
   return ParsedQuestion(q,entity,prop,qualifier,qtype,sorted(_norm_tokens(q)),list(dict.fromkeys(expansions)))
 
 class KnowledgeQueryEngine:
- def __init__(self,claims): self.claims=claims; self.parser=QuestionParser()
+ def __init__(self,claims):
+  self.claims=claims; self.parser=QuestionParser()
+  self._index=[(c,_blob(c),_norm_tokens(_blob(c)),_char_grams(_blob(c))) for c in claims]
  def parse(self,q): return self.parser.parse(q)
  def _entity_score(self,p,c):
   if p.entity=="unknown": return 0
@@ -147,9 +161,9 @@ class KnowledgeQueryEngine:
   return min(4,sum(1 for x in RELATION_TERMS.get(relation,[]) if x in _blob(c)))
  def rank(self,p,limit=12):
   results=[]
-  for c in self.claims:
+  for c,blob,claim_tokens,claim_grams in self._index:
    if str(c.get("Status",c.get("status",""))).lower() in ("rejected","superseded"): continue
-   score=3.5*_similarity(p.raw,_blob(c))+self._entity_score(p,c)+self._property_score(p,c)+self._relation_score(p,c)+.65*_authority(c)
+   score=3.5*_similarity_index(p.raw,blob,claim_tokens,claim_grams)+self._entity_score(p,c)+self._property_score(p,c)+self._relation_score(p,c)+.65*_authority(c)
    if p.qualifier: score += 2 if p.qualifier in _blob(c) else -.5
    if p.question_type in ("level_threshold","numeric") and not re.search(r"\b(?:level|lvl|core)\b|\b\d+(?:\.\d+)?%?\b",_blob(c)): score-=4
    results.append((c,score))
