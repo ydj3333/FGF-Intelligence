@@ -40,3 +40,9 @@ def test_v6_known_flagship_fact_is_direct():
     assert r["answer_type"]=="knowledge_query"
     assert "core component" in r["answer"].lower()
     assert len(r["evidence"])<=3
+
+if __name__ == '__main__':
+    test_v6_query_engine_does_not_dump()
+    test_v6_level_question_is_evidence_safe()
+    test_v6_known_flagship_fact_is_direct()
+    print('FGF v6 query tests: PASS')
