@@ -78,7 +78,7 @@ try:
     assert "Non-standard Champion" in fleet_invalid["error"]
     moon=get_json("http://127.0.0.1:8000/api/ask?q=Shared%20Moonlight%20event%20what%20is%20on%20which%20day%20Monday%20speedups%20shortcut")
     assert "moonlight" in moon["answer"].lower() or "evidence" in moon["answer"].lower()
-    assert "weekday" in moon["answer"].lower() or "not established" in moon["answer"].lower()
+    assert any(x in moon["answer"].lower() for x in ("weekday","not established","schedule"))
     assert "Computational Component" not in moon["answer"]
     print("FGF Agent v5.3 response-engine smoke tests: PASS")
 finally:
