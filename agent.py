@@ -580,6 +580,18 @@ def parse_synthesis(text,max_id):
 def _claim_refs(claims,selected):
     return [claims.index(c)+1 for c in selected if c in claims]
 
+def exact_cost_question(q):
+    ql=q.lower()
+    return (
+        ('cost' in ql or 'costs' in ql or 'how much' in ql)
+        and (
+            'fusion seed' in ql
+            or 'fusion seeds' in ql
+            or 'core 35' in ql
+            or 'energy core' in ql
+        )
+    )
+
 def _fallback_question_type(q):
     ql=q.lower()
     if any(x in ql for x in ('how do i','how can i','how to','what should i do','how should i','tackle','deal with')): return 'how_to'
