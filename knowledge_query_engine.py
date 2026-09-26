@@ -312,7 +312,9 @@ class KnowledgeQueryEngine:
       parts.append(f"{req_path[0].target} can be obtained through {source_list}")
       provenance.extend(self.graph.provenance(req_path))
       for path in source_paths: provenance.extend(self.graph.provenance(path))
-     text=f"{requirement_paths[0][0].source} requires "+", ".join(x[0].target for x in requirement_paths)+". "+".join(parts)+"."
+     requirements_text=", ".join(x[0].target for x in requirement_paths)
+     detail_text=". ".join(parts)
+     text=f"{requirement_paths[0][0].source} requires {requirements_text}. {detail_text}."
      return self._answer(p,text,provenance,"multi_hop")
     # A multi-hop answer is only valid when every requested link is evidenced.
     established=requirement_paths[0][0].source+" requires "+", ".join(x[0].target for x in requirement_paths)+"."
