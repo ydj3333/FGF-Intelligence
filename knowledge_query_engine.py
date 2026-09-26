@@ -174,6 +174,9 @@ class KnowledgeQueryEngine:
   return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(unique)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":"knowledge_query","uncertainty":"","quality_gate":{"passes":True,"uses_relevant_evidence":True,"reason":"Direct answer composed from ranked evidence."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(unique)}}
  def compose(self,q,limit=8):
   p=self.parse(q); ranked=self.rank(p,limit); rel=[(c,s) for c,s in ranked if s>=5]
+  # Unknown-domain questions require genuine connection; authority alone cannot answer nonsense.
+  if p.entity=="unknown":
+   rel=[(c,s) for c,s in rel if len(_norm_tokens(p.raw)&_norm_tokens(_blob(c)))>=2 or _similarity(p.raw,_blob(c))>=0.28]
   if not rel:return self._empty(p)
   if p.question_type=="level_threshold":
    cand=[]
