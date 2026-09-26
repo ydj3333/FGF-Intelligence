@@ -24,3 +24,5 @@ jobs:
         run: python scripts/run_knowledge_quality.py
       - name: Run FGF agent smoke tests
         run: python tests/test_agent.py
+      - name: Run v6 knowledge query tests
+        run: python -c "from tests.test_v6_query_engine import test_v6_query_engine_does_not_dump, test_v6_level_question_is_evidence_safe, test_v6_known_flagship_fact_is_direct; test_v6_query_engine_does_not_dump(); test_v6_level_question_is_evidence_safe(); test_v6_known_flagship_fact_is_direct(); print(\"FGF v6 query tests: PASS\")"
