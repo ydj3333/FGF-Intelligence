@@ -105,8 +105,12 @@ class QuestionParser:
    m=re.search(r"\b([a-z][a-z-]{2,})\s+"+re.escape(entity)+r"\b",ql)
    if m and m.group(1) not in STOP: qualifier=m.group(1)
   qtype="generic"
-  for kind,patterns in QUESTION_TYPES.items():
-   if any(p in ql for p in patterns): qtype=kind; break
+  if any(p in ql for p in QUESTION_TYPES["event_schedule"]):
+   qtype="event_schedule"
+  else:
+   for kind,patterns in QUESTION_TYPES.items():
+    if kind=="event_schedule": continue
+    if any(p in ql for p in patterns): qtype=kind; break
   prop="general"
   order={
    "unlock_level":["level","appear","available","unlock"],
