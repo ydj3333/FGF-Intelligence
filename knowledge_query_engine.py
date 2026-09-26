@@ -252,6 +252,8 @@ class KnowledgeQueryEngine:
   if p.question_type=="comparison":
    return self._answer(p," ".join(_text(c) for c,_ in rel[:3]),[c for c,_ in rel[:3]],"comparison")
   top,_=rel[0]; direct=self._direct_sentences(p,top); text=direct[0] if direct else _text(top)
+  if re.search(r"\\bwhich\\s+(?:type\\s+of\\s+)?components?\\b", p.raw.lower()) and direct:
+   return self._answer(p,text,[top],"direct_component")
   support=[]
   top_authority=_authority(top)
   for c,s in rel[1:4]:
