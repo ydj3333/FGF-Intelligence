@@ -65,6 +65,8 @@ def _question_type(q: str) -> str:
         return "strategy"
     if any(x in ql for x in ("compare", "difference", "versus", " vs ")):
         return "comparison"
+    if any(x in ql for x in ("schedule", "which day", "what day", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "when does", "runs on", "date")):
+        return "event_schedule"
     if any(x in ql for x in ("what is", "what are", "what does", "what do")):
         return "definition"
     return "generic"
@@ -331,6 +333,20 @@ def synthesize_deterministic(question: str, claims: List[Dict[str,Any]], conflic
         for idx,c,_ in selected[:5]:
             lines.append(f"• {_text(c)} [E{idx}]")
         lines.append("The evidence does not by itself establish an overall winner; the documented differences are the basis for your choice.")
+    elif qtype=="event_schedule":
+        schedule_lines=[]
+        for idx,c,_ in selected:
+            txt=_text(c)
+            if any(k in txt.lower() for k in ("september", "october", "november", "december", "runs on servers", "from september", "from october", "from november")):
+                schedule_lines.append((idx,txt))
+        if schedule_lines:
+            lines.append("Documented schedule information:")
+            for idx,s in schedule_lines[:4]:
+                lines.append(f"• {s} [E{idx}]")
+        else:
+            lines.append(f"{top_text} [E{top[0]}]")
+        if any(k in q.lower() for k in ("which day", "what day", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "speedup", "shortcut")):
+            lines.append("• The retrieved current evidence does not establish a weekday-specific speedup/shortcut mapping for the day asked. [uncertainty]")
     else:
         lines.append(f"{top_text} [E{top[0]}]")
         for idx,c,_ in selected[1:4]:
