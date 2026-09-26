@@ -1,0 +1,42 @@
+{
+  "cycle": "FGF V4 Global Source Discovery",
+  "run_date": "2026-09-26",
+  "scope": [
+    "S1/new-server/Core35",
+    "S2",
+    "S3/future"
+  ],
+  "acquisition": "free/native first",
+  "deduplicated_before_extraction": true,
+  "sources_checked": [
+    "official portal/news/guides",
+    "Steam/SteamDB",
+    "third-party guides/forums",
+    "official/social-derived search",
+    "Reddit/player discovery",
+    "YouTube/video search",
+    "FGF Wiki/Fandom discovery"
+  ],
+  "new_findings": [
+    {
+      "topic": "Official portal platform milestone",
+      "url": "https://www.foundation.game/en",
+      "observed_date": "2026-09-26",
+      "evidence_tier": "T1",
+      "confidence": "medium",
+      "scope": "future/platform",
+      "details": "Homepage currently displays '21ST OCT' and 'Available for Mac With Apple Silicon'. Visible homepage does not explicitly define whether 21 Oct is the Mac release date, Trader Era milestone, or another platform milestone.",
+      "status": "candidate",
+      "canonical": false
+    }
+  ],
+  "cross_checks": {
+    "steam": "SteamDB still reports Coming soon/prerelease; no Steam release date inferred.",
+    "s2_scope": "1-16 vs 1001-1016 conflict preserved.",
+    "lunar_ruins": "1017-1247 Sep 26 vs Sep 27 conflict preserved.",
+    "version": "official App Store v1.1.154 remains latest verified authoritative baseline in V4."
+  },
+  "s3_future": "No reliable new primary S3 mechanics surfaced.",
+  "tier1_promotions": 0,
+  "supabase_ingestion_run_id": "f9f56bbb-1466-4c9e-b20f-d6cee738487c"
+}
