@@ -253,9 +253,12 @@ class KnowledgeQueryEngine:
    return self._answer(p," ".join(_text(c) for c,_ in rel[:3]),[c for c,_ in rel[:3]],"comparison")
   top,_=rel[0]; direct=self._direct_sentences(p,top); text=direct[0] if direct else _text(top)
   support=[]
+  top_authority=_authority(top)
   for c,s in rel[1:4]:
    ss=self._direct_sentences(p,c)
-   if ss:support.append((c,ss[0]))
+   # Do not append low-tier/noisy context to a direct high-tier answer.
+   if ss and _authority(c) >= top_authority-1.0:
+    support.append((c,ss[0]))
   if support:text+=" "+" ".join(x[1] for x in support[:2])
   return self._answer(p,text,[top]+[x[0] for x in support[:2]],"direct")
 
