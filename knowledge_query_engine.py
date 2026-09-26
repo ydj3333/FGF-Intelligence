@@ -26,7 +26,6 @@ ENTITY_ALIASES={
  "shared moonlight":["shared moonlight","shadow moonlight","moonlight event","moonlight","moonsoil","lunar soil"],
  "lunar ruins":["lunar ruins","lunar soil","moonsoil","moonlit market"],
  "energy type":["beam","kinetic","ionic","ion"],
- "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
 }
 PROPERTY_ALIASES={
  "unlock_level":["level","unlock","unlocks","unlocking","appear","appears","available","availability","access","opens","introduced"],
