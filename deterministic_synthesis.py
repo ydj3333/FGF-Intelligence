@@ -61,12 +61,12 @@ def _question_type(q: str) -> str:
         return "procedure"
     if any(x in ql for x in ("cost", "how much", "how many", "price", "per hour", "how long")):
         return "numeric"
+    if any(x in ql for x in ("schedule", "which day", "what day", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "when does", "runs on", "date")):
+        return "event_schedule"
     if any(x in ql for x in ("best", "optimal", "recommended", "should i", "which", "priority", "prioritize")):
         return "strategy"
     if any(x in ql for x in ("compare", "difference", "versus", " vs ")):
         return "comparison"
-    if any(x in ql for x in ("schedule", "which day", "what day", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "when does", "runs on", "date")):
-        return "event_schedule"
     if any(x in ql for x in ("what is", "what are", "what does", "what do")):
         return "definition"
     return "generic"
