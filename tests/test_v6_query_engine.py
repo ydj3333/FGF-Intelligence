@@ -75,3 +75,4 @@ def test_v6_generic_entity_parser_does_not_match_substrings():
     engine=agent.get_engine()
     p=engine.parse("What does Commerce Guild creation require?")
     assert p.entity=="commerce guild creation"
+    assert p.question_type=="requirement"
