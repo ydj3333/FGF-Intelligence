@@ -96,8 +96,27 @@ jobs:
             echo "No corpus changes."
           else
             git commit -m "chore: synchronize canonical FGF knowledge corpus"
-            git push origin main
-            echo "changed=true" >> "$GITHUB_OUTPUT"
+            # Main may receive a normal code commit while this long-running
+            # corpus job is executing. Rebase the generated corpus commit onto
+            # the current main before pushing instead of failing the whole job.
+            for attempt in 1 2 3; do
+              if git fetch origin main && git rebase origin/main && git push origin HEAD:main; then
+                echo "changed=true" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              git rebase --abort || true
+              git reset --hard origin/main
+              python scripts/sync_corpus.py
+              git add data/knowledge.json data/knowledge_manifest.json
+              if git diff --cached --quiet; then
+                echo "changed=false" >> "$GITHUB_OUTPUT"
+                echo "Remote already contains the synchronized corpus."
+                exit 0
+              fi
+              git commit -m "chore: synchronize canonical FGF knowledge corpus"
+            done
+            echo "::error::Could not push synchronized corpus after 3 retries."
+            exit 1
           fi
 
       - name: Trigger Render deployment for synchronized corpus
