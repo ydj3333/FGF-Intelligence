@@ -62,7 +62,7 @@ class EvidenceGraph:
                     m = re.match(pattern, sentence.strip(), flags=re.I)
                     if m:
                         target = m.group("tgt")
-                        for part in re.split(r",\s*(?:and\s+)?|\s+and\s+", target):
+                        for part in re.split(r"(?<!\d),\s*(?:and\s+)?|\s+and\s+", target):
                             self._add(m.group("src"), relation, part, idx)
 
     def outgoing(self, source: str, relation: str | None = None) -> List[Edge]:
