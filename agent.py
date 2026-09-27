@@ -12,6 +12,8 @@ from fgf_orchestrator import FGFOrchestrator
 from live_runtime import LiveObservationRuntime
 
 ROOT=Path(__file__).parent
+ROOT=Path(__file__).parent
+OBSERVER_TOKEN=os.getenv('FGF_OBSERVER_TOKEN','').strip()
 LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/'), os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY'))
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v6.0.0-knowledge-query-engine'
@@ -39,6 +41,13 @@ try:
     CONFLICT_REVIEWS=json.loads(CONFLICT_REVIEWS_FILE.read_text()) if CONFLICT_REVIEWS_FILE.exists() else {}
 except Exception:
     CONFLICT_REVIEWS={}
+
+def _observer_authorized(handler):
+    if not OBSERVER_TOKEN:
+        host=str((handler.client_address or ('',0))[0])
+        return host in ('127.0.0.1','::1','localhost')
+    supplied=handler.headers.get('X-FGF-Observer-Token','').strip()
+    return bool(supplied) and supplied==OBSERVER_TOKEN
 
 def _supabase_headers():
     if not SUPABASE_SECRET:
@@ -1217,8 +1226,12 @@ class H(BaseHTTPRequestHandler):
             synthesis={**LLM_HEALTH,'configured':configured,'model':LLM_MODEL,'average_latency_ms':round(avg,1) if avg is not None else None}
             return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
         if u.path=='/api/v63/live/status':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
             return self._json(LIVE_RUNTIME.status())
         if u.path=='/api/v63/live/experience':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
             qs=parse_qs(u.query)
             try:
                 limit=min(10,max(1,int(qs.get('limit',['5'])[0])))
@@ -1271,6 +1284,8 @@ class H(BaseHTTPRequestHandler):
                 return self._json({'ok':True,'durable':True,'profile':profile})
             except Exception as e:return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/v63/live/session/start':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
             try:
                 n=int(self.headers.get('Content-Length','0'))
                 if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
@@ -1280,6 +1295,8 @@ class H(BaseHTTPRequestHandler):
             except Exception as e:
                 return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/v63/live/session/stop':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
             try:
                 n=int(self.headers.get('Content-Length','0'))
                 if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
@@ -1289,6 +1306,8 @@ class H(BaseHTTPRequestHandler):
             except Exception as e:
                 return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/v63/live/observe':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
             try:
                 n=int(self.headers.get('Content-Length','0'))
                 if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
@@ -1298,12 +1317,16 @@ class H(BaseHTTPRequestHandler):
             except Exception as e:
                 return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/v63/live/experience/rebuild':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
             try:
                 result=LIVE_RUNTIME.rebuild_experience()
                 return self._json(result, 200 if result.get('ok') else 400)
             except Exception as e:
                 return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/v63/live/feedback':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
             try:
                 n=int(self.headers.get('Content-Length','0'))
                 if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
