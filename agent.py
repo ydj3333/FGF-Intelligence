@@ -1362,6 +1362,7 @@ class H(BaseHTTPRequestHandler):
     def log_message(self,*a):pass
 
 # v6 Knowledge Query Engine is the production answer path.
+# Canonical corpus synchronization is applied from the durable Supabase claim store.
 try:
     from knowledge_query_engine import answer as _knowledge_query_answer
     answer = _knowledge_query_answer
