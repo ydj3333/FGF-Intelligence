@@ -51,7 +51,7 @@ QUESTION_TYPES={
  "counter":["what counters","which counters","counter","against"],
  "numeric":["how many","how much","how long","percentage","percent","cost","maximum","max","cap"],
  "definition":["what is","what are"],
- "update":["what changed","hot update","patch update","patch notes","update changes","sep 22","september 22","22 sep"],
+ "update":["what changed","hot update","patch update","patch notes","update changes","sep 22","september 22","22 sep","2026-09-22","epoch of fusion seed","fusion seed prerequisite","combat craft modification"],
  "event_schedule":["which day","what day","weekday","schedule","calendar","monday","tuesday","wednesday","thursday","friday","saturday","sunday"],
 }
 RELATION_TERMS={
@@ -140,14 +140,19 @@ class QuestionParser:
    qtype="multi_hop"
   elif any(p in ql for p in QUESTION_TYPES["event_schedule"]):
    qtype="event_schedule"
-  elif any(p in ql for p in QUESTION_TYPES["numeric"]):
-   qtype="numeric"
-  elif any(p in ql for p in QUESTION_TYPES["comparison"]):
+  elif any(p in ql for p in QUESTION_TYPES["update"]):
+   qtype="update"
+  elif any(p in ql for p in QUESTION_TYPES["comparison"]) or ("youtube" in ql and any(x in ql for x in ("official","disagree","conflict","trust"))):
    qtype="comparison"
   elif any(p in ql for p in QUESTION_TYPES["strategy"]):
    qtype="strategy"
-  elif any(p in ql for p in QUESTION_TYPES["update"]):
-   qtype="update"
+  elif any(p in ql for p in QUESTION_TYPES["numeric"]):
+   # Numeric intent wins only when the user is actually asking for a value,
+   # not when a value/cost is merely mentioned inside a strategy question.
+   if re.search(r"\b(?:how many|how much|how long|what is the maximum|what is the max|what is the cap|what percentage|what percent)\b", ql):
+    qtype="numeric"
+   else:
+    qtype="generic"
   elif re.search(r"\b(?:what|which)\b.*\b(?:unlock|unlocks)\b.*\bat\s+(?:energy\s+core\s+)?level\s+\d+\b", ql):
    qtype="effect"
   elif re.search(r"\b(?:what|which)\b.*\blevel\b.*\b(?:do|does)\b", ql):
@@ -318,7 +323,7 @@ class KnowledgeQueryEngine:
     return self._answer(p,text,[x[0] for x in top],"event_schedule")
    return self._empty(p,"The current knowledge base does not establish the requested event-day schedule.")
   if p.question_type=="update":
-   update_terms=("hot update","sep 22","september 22","22 sep","patch")
+   update_terms=("hot update","sep 22","september 22","22 sep","2026-09-22","patch","epoch of fusion seed","fusion seed prerequisite","combat craft modification")
    cand=[(c,s) for c,s in rel if any(x in _blob(c) for x in update_terms)]
    if cand:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
