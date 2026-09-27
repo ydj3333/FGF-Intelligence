@@ -109,3 +109,11 @@ def test_v6_multihop_abstains_on_incomplete_chain():
     r=e.compose("What does Research Academy require and how do I get the requirement?")
     assert r["answer_type"]=="knowledge_abstention"
     assert "does not establish the acquisition path" in r["answer"]
+
+def test_v6_benchmark_does_not_flag_question_numbers_as_unsupported():
+    from scripts.run_v6_objective1_benchmark import numeric_tokens
+    question = "What unlocks at Energy Core level 40?"
+    answer = "The current knowledge base does not establish what unlocks at Energy Core level 40."
+    evidence = ""
+    unsupported = numeric_tokens(answer) - numeric_tokens(evidence) - numeric_tokens(question)
+    assert unsupported == set()
