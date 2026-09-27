@@ -2,8 +2,8 @@
 
 Supabase is the canonical claim store. This exporter is intentionally
 one-directional: it does not promote claims, resolve conflicts, or delete
-historical knowledge. It exports the current claim rows, preserves the richer
-metadata already stored with each claim, attaches lifecycle/temporal metadata,
+historical knowledge. It also serves as the promotion bridge for newly verified
+official evidence captured in the durable Supabase evidence layer. It preserves
 validates identity/duplicates, and writes a deterministic corpus manifest.
 
 Usage:
