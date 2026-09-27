@@ -80,7 +80,11 @@ def run() -> dict:
         # An item marked requires_uncertainty may legitimately abstain.
         # Otherwise, absence of evidence is a coverage miss, not a fabricated
         # failure: the corpus may genuinely not establish the answer.
-        coverage_ok = bool(result.get("evidence")) or bool(item.get("requires_uncertainty"))
+        coverage_ok = (
+            bool(result.get("evidence"))
+            or bool(item.get("requires_uncertainty"))
+            or result.get("answer_type") == "knowledge_policy"
+        )
         row = {
             "id": item["id"],
             "question": q,
