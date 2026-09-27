@@ -10,6 +10,7 @@ from claim_lifecycle import summarize_states, normalize_state
 from deterministic_synthesis import synthesize_deterministic
 from fgf_orchestrator import FGFOrchestrator
 from live_runtime import LiveObservationRuntime
+from operational_intelligence import build_operational_output
 
 ROOT=Path(__file__).parent
 ROOT=Path(__file__).parent
@@ -1467,9 +1468,20 @@ try:
             'experience_evidence': result.get('experience', []),
             'youtube_evidence': result.get('youtube', []),
         })
+        # v6.4: transform operational questions into a player-facing structure
+        # without changing the canonical evidence path. This is additive: the
+        # prose answer remains available, while tables/plans become first-class.
+        try:
+            merged['operational'] = build_operational_output(
+                question,
+                core.get('evidence', []) if isinstance(core.get('evidence'), list) else []
+            )
+        except Exception as exc:
+            merged['operational'] = None
+            merged['operational_warning'] = 'Operational renderer unavailable: ' + type(exc).__name__
         return merged
 
-    RELEASE = 'v6.3.0-live-experiential-intelligence'
+    RELEASE = 'v6.4.0-operational-intelligence'
 except Exception:
     pass
 
