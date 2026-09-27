@@ -1,0 +1,127 @@
+{
+  "schema_version": "v6.3.0-shop-intelligence-1",
+  "scope_note": "Known shops and shop-like exchange systems established by the current FGF corpus as of 2026-09-27. This is not a claim that the inventory is exhaustive.",
+  "priority_method": "Strategic priority is a gameplay interpretation, separate from evidence authority. It is based on documented progression leverage, repeatability, scarcity, and resource efficiency in the current corpus.",
+  "shops": [
+    {
+      "id": "commerce_guild_shop",
+      "name": "Commerce Guild Shop",
+      "aliases": ["Guild Store", "Guild Shop"],
+      "currency": "Guild Vouchers",
+      "documented_inventory": ["resources", "Champion Ascendancy Fragments", "Training Manuals"],
+      "access": "Commerce Guild membership/system",
+      "evidence_level": "confirmed",
+      "strategic_priority": "P1",
+      "priority_reason": "Directly tied to champion progression and useful resource/item exchange.",
+      "strategy_status": "The corpus separately contains community recommendations to prioritize Multidimensional Beacons and research speedups; these are strategy claims, not official inventory priorities."
+    },
+    {
+      "id": "glory_shop",
+      "name": "Glory Shop",
+      "aliases": ["Glory Store"],
+      "currency": "Glory currency (exact currency naming/inventory not fully normalized)",
+      "documented_inventory": ["Flagship Components"],
+      "access": "Glory system",
+      "evidence_level": "confirmed",
+      "strategic_priority": "P1",
+      "priority_reason": "Flagship Components are a progression-gated resource with limited documented acquisition routes.",
+      "strategy_status": "Inventory beyond Flagship Components is not established in the current canonical corpus."
+    },
+    {
+      "id": "discount_shop",
+      "name": "Discount Shop",
+      "aliases": ["weekly free discount shop"],
+      "currency": "Varies / privilege-based access also documented",
+      "documented_inventory": ["Weapon Prism (added in 2026-09-22 hot update)"],
+      "access": "Shop/privilege system; exact universal unlock conditions are not fully established",
+      "evidence_level": "confirmed_current_for_weapon_prism",
+      "strategic_priority": "P1",
+      "priority_reason": "Discounted or free acquisition can create unusually high resource efficiency; exact basket depends on live rotation.",
+      "strategy_status": "Community evidence also reports weekly/free discount privileges, but exact live inventory must be verified."
+    },
+    {
+      "id": "black_market_trader",
+      "name": "Black Market Trader",
+      "aliases": ["Black Market", "Black Market Trader"],
+      "currency": "Credits",
+      "documented_inventory": ["Speedups", "Crystals"],
+      "access": "Trader/shop system; exact rotation/access conditions require live verification",
+      "evidence_level": "community_supported",
+      "strategic_priority": "P1",
+      "priority_reason": "The current tested/community layer identifies discounted speedups and repeated rotating discounts as a major Credit-efficiency opportunity.",
+      "strategy_status": "The 50% speedup discount and preferred Credit-value framing are community/tested claims currently marked Under Review, so the engine must label them as strategy rather than fact."
+    },
+    {
+      "id": "intel_shop",
+      "name": "Intel Shop",
+      "aliases": ["Kaboom Robot Intel Shop"],
+      "currency": "Intel",
+      "documented_inventory": ["Weapon Prisms", "Cocoun Crystals", "Venturous Memories", "Manuals"],
+      "access": "Kaboom Robot event",
+      "evidence_level": "community_supported",
+      "strategic_priority": "P1_event",
+      "priority_reason": "Community event analysis identifies Weapon Prisms as a high-priority purchase and the shop as a recurring progression sink.",
+      "strategy_status": "Inventory and priority ordering are community/event-summary evidence and require current-event verification."
+    },
+    {
+      "id": "arena_shop",
+      "name": "Arena Shop",
+      "aliases": ["Arena store"],
+      "currency": "Arena/Holo Arena currency (exact currency naming requires verification)",
+      "documented_inventory": ["Lily (community-reported acquisition)"],
+      "access": "Arena system",
+      "evidence_level": "community_supported",
+      "strategic_priority": "P2",
+      "priority_reason": "The current corpus establishes a Champion acquisition route but does not yet establish a complete inventory/value curve.",
+      "strategy_status": "Community-only until independently verified."
+    },
+    {
+      "id": "moonlit_market",
+      "name": "Moonlit Market",
+      "aliases": ["Moonlit Treasures market", "Shared Moonlight shop"],
+      "currency": "Crescent Coins and Full Moon Coins",
+      "documented_inventory": ["limited event rewards including exclusive ship skin, name frame, Avatar Frame, Killing Effect, Festival Crew choice"],
+      "access": "Shared Moonlight / Moonlit Treasures",
+      "evidence_level": "confirmed_current_event",
+      "strategic_priority": "P1_event",
+      "priority_reason": "Official event evidence establishes limited/unique rewards; community F2P guidance recommends limited/rare rewards before common materials.",
+      "strategy_status": "The exact purchase priority is community/test-server strategy and must not be presented as official."
+    },
+    {
+      "id": "recycle_shop",
+      "name": "Recycle Shop",
+      "aliases": ["Renewal Shop", "Recycling Store"],
+      "currency": "Loopback Tokens / recycled materials (exact economy not fully normalized)",
+      "documented_inventory": [],
+      "access": "Community YouTube evidence reports unlock after obtaining the first Loopback Token; server-age gating is also reported.",
+      "evidence_level": "youtube_community",
+      "strategic_priority": "P2",
+      "priority_reason": "Potentially important because it converts recycled material into a dedicated shop economy, but current inventory/value is not canonical.",
+      "strategy_status": "Interpret from multiple videos only; do not promote transcript fragments into facts without corroboration."
+    },
+    {
+      "id": "valor_store",
+      "name": "Valor Store",
+      "aliases": ["Valor Store"],
+      "currency": "Valor/event currency",
+      "documented_inventory": [],
+      "access": "Event system",
+      "evidence_level": "youtube_community",
+      "strategic_priority": "P2_event",
+      "priority_reason": "The YouTube corpus demonstrates an active Valor Store, but current canonical inventory/value is insufficient for a purchase ranking.",
+      "strategy_status": "Needs event-specific inventory extraction before recommendation."
+    },
+    {
+      "id": "event_specific_stores",
+      "name": "Event-specific stores",
+      "aliases": ["event shop", "event store"],
+      "currency": "Event-specific currencies",
+      "documented_inventory": ["event-limited rewards", "event progression materials"],
+      "access": "Event-specific",
+      "evidence_level": "mixed",
+      "strategic_priority": "P1_event_when_limited",
+      "priority_reason": "Limited-time items can have scarcity value that does not exist in permanent resource shops.",
+      "strategy_status": "Evaluate per event; do not apply one universal ranking."
+    }
+  ]
+}
