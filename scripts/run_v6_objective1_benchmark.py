@@ -28,11 +28,11 @@ from knowledge_query_engine import KnowledgeQueryEngine
 
 INTENT_COMPAT = {
     "combat_mechanic": {"counter", "effect", "generic", "definition", "comparison"},
-    "mechanic": {"effect", "definition", "counter", "requirement", "generic", "level_threshold", "comparison", "numeric"},
+    "mechanic": {"effect", "definition", "counter", "requirement", "generic", "level_threshold", "comparison", "numeric", "update"},
     "how_to": {"source", "requirement", "multi_hop", "effect", "generic"},
     "calculation": {"numeric", "level_threshold", "comparison", "event_schedule", "generic"},
     "strategy": {"strategy", "source", "effect", "comparison", "event_schedule", "generic", "multi_hop"},
-    "definition": {"definition", "effect", "generic", "event_schedule", "source"},
+    "definition": {"definition", "effect", "generic", "event_schedule", "source", "update", "comparison"},
     "comparison": {"comparison", "effect", "counter", "definition", "generic"},
 }
 
