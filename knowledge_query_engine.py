@@ -14,7 +14,16 @@ from evidence_graph import EvidenceGraph
 STOP={"what","which","when","where","why","how","does","do","is","are","the","a","an","to","of","for","and","or","i","my","you","your","can","could","would","should","with","on","in","at","from","it","they","them","their","me","we","this","that","these","those","be","before","after","into","about","get","give","use","appear","appears"}
 
 # Expansion relationships are not identity relationships.
-GRAPH_ENTITY_ALIASES = [\n ["energy core", "core level"],\n ["shared moonlight", "moonlight event"],\n ["lunar ruins", "lunar soil"],\n ["champion", "hero"],\n ["credits", "credit"],\n ["crystals", "crystal"],\n]\n\nENTITY_ALIASES={
+GRAPH_ENTITY_ALIASES = [
+    ["energy core", "core level"],
+    ["shared moonlight", "moonlight event"],
+    ["lunar ruins", "lunar soil"],
+    ["champion", "hero"],
+    ["credits", "credit"],
+    ["crystals", "crystal"],
+]
+
+ENTITY_ALIASES={
  "flagship components":["flagship component","ship component","components"],
  "core component":["core components","core component","flagship core"],
  "computational components":["computational component","computational components"],
@@ -200,8 +209,8 @@ class QuestionParser:
   return ParsedQuestion(q,entity,prop,qualifier,qtype,sorted(_norm_tokens(q)),list(dict.fromkeys(expansions)))
 
 class KnowledgeQueryEngine:
- def __init__(self,claims):
-  self.claims=claims; self.parser=QuestionParser(); self.graph=EvidenceGraph(claims)
+ def __init__(self,claims, alias_groups=None):
+  self.claims=claims; self.parser=QuestionParser(); self.graph=EvidenceGraph(claims, alias_groups=alias_groups)
   self._index=[(c,_blob(c),_norm_tokens(_blob(c)),_char_grams(_blob(c))) for c in claims]
  def parse(self,q): return self.parser.parse(q)
  def _entity_score(self,p,c):
@@ -451,7 +460,7 @@ class KnowledgeQueryEngine:
     if r:return r
   if p.question_type=="multi_hop" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
-   requirement_paths=self.graph.derive(aliases, ("requires",), max_hops=1)
+   requirement_paths=self.graph.derive(aliases, ("requires",), max_hops=1, require_current=True, min_tier_score=2.0)
    if requirement_paths:
     complete=[]; incomplete=[]
     for req_path in requirement_paths:
