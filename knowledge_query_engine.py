@@ -492,6 +492,20 @@ class KnowledgeQueryEngine:
    if cand:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
     return self._answer(p,cand[0][2],[cand[0][0]],"duplicate")
+   related_duplicates=[]
+   for c,score in ranked[:20]:
+    low=_blob(c)
+    if "duplicate" in low and ("crew" in low or "star level" in low):
+     related_duplicates.append((c,score))
+   if related_duplicates:
+    related_duplicates.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    related=related_duplicates[0][0]
+    return self._empty(
+     p,
+     "The current corpus documents duplicates for Crew star-level promotion, but it does not establish that duplicate Champions are required for Champion upgrades.",
+     claims=[related],
+     mode="duplicate_partial_abstention",
+    )
    return self._empty(p,"The current knowledge base does not establish whether duplicate Champions are required for the requested upgrade.")
   if p.question_type=="requirement" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
