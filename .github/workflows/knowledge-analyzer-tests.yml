@@ -26,3 +26,5 @@ jobs:
         run: python tests/test_agent.py
       - name: Run v6 knowledge query tests
         run: python tests/test_v6_query_engine.py
+      - name: Run v6 Objective #1 safety benchmark
+        run: python scripts/run_v6_objective1_benchmark.py
