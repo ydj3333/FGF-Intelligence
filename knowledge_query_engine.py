@@ -34,7 +34,7 @@ PROPERTY_ALIASES={
  "requirement":["require","requires","need","needed","prerequisite","before","condition","unlock"],
  "cost":["cost","costs","price","spend","resources","resource"],
  "effect":["effect","does","gives","boost","bonus","increase","changes"],
- "comparison":["difference","different","versus","vs","compare","compared"],
+ "comparison":["difference","different","versus","vs","compare","compared","disagree","disagreement","conflict","conflicts","trust","official evidence","youtube disagree"],
  "counter":["counter","counters","against","beats","advantage"],
  "upgrade":["upgrade","upgrading","level","empowerment","power up"],
  "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
@@ -138,9 +138,15 @@ class QuestionParser:
    qtype="multi_hop"
   elif any(p in ql for p in QUESTION_TYPES["event_schedule"]):
    qtype="event_schedule"
+  elif any(p in ql for p in QUESTION_TYPES["numeric"]):
+   qtype="numeric"
+  elif any(p in ql for p in QUESTION_TYPES["comparison"]):
+   qtype="comparison"
+  elif any(p in ql for p in QUESTION_TYPES["strategy"]):
+   qtype="strategy"
   else:
    for kind,patterns in QUESTION_TYPES.items():
-    if kind=="event_schedule": continue
+    if kind in ("event_schedule","numeric","comparison","strategy"): continue
     if any(p in ql for p in patterns): qtype=kind; break
   prop="general"
   order={
