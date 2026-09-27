@@ -65,7 +65,11 @@ def run() -> dict:
         ]
         answer_nums = numeric_tokens(answer)
         evidence_nums = numeric_tokens(evidence_text)
-        unsupported_nums = sorted(answer_nums - evidence_nums)
+        question_nums = numeric_tokens(q)
+        # Repeating a number supplied by the player in a safe abstention is not
+        # an unsupported factual assertion. Only new numeric content must be
+        # traceable to evidence.
+        unsupported_nums = sorted(answer_nums - evidence_nums - question_nums)
 
         quality_ok = bool(result.get("quality_gate", {}).get("passes") is True)
         evidence_ok = len(result.get("evidence", [])) <= 4
