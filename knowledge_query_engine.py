@@ -465,7 +465,9 @@ class KnowledgeQueryEngine:
     complete=[]; incomplete=[]
     for req_path in requirement_paths:
      target=req_path[0].target
-     source_paths=self.graph.derive(\n      [target], ("obtained_from",), max_hops=1, require_current=True, min_tier_score=2.0\n     )
+     source_paths=self.graph.derive(
+      [target], ("obtained_from",), max_hops=1, require_current=True, min_tier_score=2.0
+     )
      if source_paths:
       complete.append((req_path,source_paths))
      else:
