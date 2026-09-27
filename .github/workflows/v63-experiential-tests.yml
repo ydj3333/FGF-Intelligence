@@ -22,4 +22,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest
       - name: Run v6.3 architecture tests
+        env:
+          PYTHONPATH: .
         run: pytest -q tests/test_v63_experiential_architecture.py
