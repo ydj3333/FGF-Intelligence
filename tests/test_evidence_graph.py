@@ -18,6 +18,27 @@ def test_graph_never_invents_edges():
     assert not g.find_sources("Energy Core", "requires")
     assert not g.outgoing("Energy Core", "requires")
 
+def test_graph_does_not_match_level_qualified_entities_by_substring():
+    g = EvidenceGraph([
+        {"Claim": "Energy Core Level 10 requires Core progression."},
+        {"Claim": "Energy Core unlocks new features."},
+    ])
+    assert g.outgoing("Energy Core Level 10", "requires")
+    assert not g.outgoing("Energy Core", "requires")
+
+def test_graph_extracts_extended_explicit_relations():
+    claims = [
+        {"Claim": "Lunar Ruins is available in Shared Moonlight."},
+        {"Claim": "Shared Moonlight affects Moonsoil Diggers."},
+        {"Claim": "A feature is enabled by Research Academy."},
+        {"Claim": "Fusion Seeds can be found in the Glory Shop."},
+    ]
+    g = EvidenceGraph(claims)
+    assert any(e.relation == "available_at" for e in g.edges)
+    assert any(e.relation == "affects" for e in g.edges)
+    assert any(e.relation == "enabled_by" for e in g.edges)
+    assert any(e.relation == "obtained_from" for e in g.edges)
+
 def test_graph_preserves_provenance():
     claims = [{"Claim": "A requires B."}, {"Claim": "B is available from C."}]
     g = EvidenceGraph(claims)
