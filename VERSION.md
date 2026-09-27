@@ -1,10 +1,17 @@
 # FGF Intelligence Version Contract
 
 ## Current architecture
-- Version: 6.3.0
-- Name: Live Experiential Intelligence
+- Version: 6.4.0
+- Name: Operational Intelligence
 - Baseline: v6.2 green core plus Evidence Graph v2
-- Branch: feature/v6.3-live-experiential-intelligence
+- Branch: feature/v6-4-operational-intelligence
+
+## v6.4 adds
+1. Event day-plan generation with explicit unknowns and evidence-state labels.
+2. Shop-by-shop buying matrices with USE/SAVE/AVOID guardrails.
+3. Resource allocation matrices for event spending.
+4. Player-facing structured operational output in Ask FGF.
+5. Operational regression tests.
 
 ## v6.3 adds
 1. Core policy gate for authority, intent and lifecycle-aware evidence use.
@@ -27,4 +34,4 @@ v6.3 must preserve:
 - no automatic promotion of community/YouTube/live observations into canonical facts.
 
 ## Next version boundary
-v6.4 may add semantic OCR/UI extraction, richer action-to-outcome modeling, and validated YouTube fallback integration. It must not remove the v6.3 rules.
+v6.5 may add semantic OCR/UI extraction, richer action-to-outcome modeling, and validated YouTube fallback integration. It must not remove the v6.3/v6.4 rules.
