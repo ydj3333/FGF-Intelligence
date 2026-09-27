@@ -14,6 +14,8 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Optional
 
+from policy_engine import classify_intent, enforce
+
 
 @dataclass
 class OrchestrationResult:
@@ -39,20 +41,7 @@ def _is_abstention(result: Dict[str, Any]) -> bool:
 
 
 def _policy_intent(question: str, core: Dict[str, Any]) -> str:
-    q = question.lower()
-    qt = str((core.get("query") or {}).get("question_type", "")).lower()
-    if any(x in q for x in (
-        "best ", "optimal", "recommended", "should i", "priority",
-        "most efficient", "worth it", "what should i"
-    )) or qt == "strategy":
-        return "strategy"
-    if any(x in q for x in (
-        "interpret", "why does this mean", "implication", "what does this suggest"
-    )):
-        return "interpretation"
-    if qt == "generic":
-        return "ambiguous"
-    return "factual"
+    return classify_intent(question, str((core.get("query") or {}).get("question_type", "")))
 
 
 class FGFOrchestrator:
@@ -64,6 +53,24 @@ class FGFOrchestrator:
     def answer(self, question: str, player_context: Optional[Dict[str, Any]] = None):
         core = self.core_answer(question, player_context)
         intent = _policy_intent(question, core)
+        core_claims = core.get("evidence", []) if isinstance(core.get("evidence"), list) else []
+        policy = enforce(
+            core.get("answer", ""),
+            core_claims,
+            question,
+            str((core.get("query") or {}).get("question_type", "")),
+        )
+        if policy.get("abstained") and intent == "factual":
+            core = dict(core)
+            core["answer"] = policy["answer"]
+            core["answer_type"] = "knowledge_policy"
+            core["evidence"] = []
+            core["evidence_used"] = []
+            core["uncertainty"] = (
+                policy["warnings"][0]
+                if policy.get("warnings")
+                else "Official evidence is insufficient."
+            )
         core_abstains = _is_abstention(core)
 
         # Established factual answers stop at Core.
