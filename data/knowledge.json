@@ -1,6 +1,6 @@
 {
   "name": "FGF Knowledge Engine — S2 Evidence Pack v2",
-  "generated": "2026-09-26",
+  "generated": "2026-09-27",
   "authority_order": [
     "Tier 1 — Ultimate/Official",
     "Tier 2 — Tested Community",
@@ -89355,6 +89355,326 @@
         },
         "temporal": {}
       }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "Rewards for occupying a port for the first time in S2 were improved in the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-s2-port-rewards",
+      "supabase_id": "0d4bd51e-f1ce-4c84-a392-20377439b0ae",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "Rally List sorting was optimized in the September 22, 2026 hot update so rallies initiated by the player are prioritized at the top.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-rally-sorting",
+      "supabase_id": "194af8f5-42e5-4084-adee-dea2a5873195",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "The required completion progress for the Combat Craft Modification Tech Tree prerequisite of the Epoch of Fusion Seed Tech Tree is 40% following the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-epoch-fusion-seed-40",
+      "supabase_id": "596e0aa8-ee2e-475c-a49f-b0ed70833923",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "Before the September 22, 2026 hot update, the required completion progress for the Combat Craft Modification Tech Tree prerequisite of the Epoch of Fusion Seed Tech Tree was 60%.",
+      "Category": "Official Update — Historical",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Superseded",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-epoch-fusion-seed-60-historical",
+      "supabase_id": "5fba37b5-7e72-45e9-8abe-275d113f9225",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "superseded",
+          "legacy_status": "Superseded",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "The item-info display of acquisition sources and Quick Use functionality for Fusion Seed and Stellar Fragment were improved in the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-fusion-seed-stellar-fragment-ui",
+      "supabase_id": "9a7819f5-6b01-4eb7-a609-12ae807992ca",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "Several S2-related issues and other bugs were fixed in the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-bug-fixes",
+      "supabase_id": "b341ed7b-6b21-4c89-b3fd-7494b708c2e7",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "Commerce Guild rewards in Shadowfront were increased in the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-commerce-guild-rewards",
+      "supabase_id": "b77856cd-b090-4391-94af-07c5bec186c0",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "Weapon Prism was added to the Discount Shop in the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-weapon-prism-discount-shop",
+      "supabase_id": "d20ce420-a29b-42de-a625-391eda2b2c75",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "On Windows and macOS clients, pressing Enter can quickly access the chat input field following the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-client-enter-chat",
+      "supabase_id": "dad3f1b0-3536-4fd1-9a1a-9afc3e29304f",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "official": true,
+      "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+      "source_layer": "official_developer",
+      "Claim": "The Enemy Info interface on the map received visual-presentation improvements in the September 22, 2026 hot update.",
+      "Category": "Official Update",
+      "Source": "",
+      "Season/Version": "S2 / 2026 / 2026-09-22",
+      "Evidence Type": "update",
+      "Evidence Tier": "Tier 2 — Official Developer",
+      "Confidence": "High",
+      "Status": "Current",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "update",
+      "claim_key": "official-update-2026-09-22-enemy-info",
+      "supabase_id": "e13fdd63-34c6-492e-99b4-9291e15c6584",
+      "metadata": {
+        "official": true,
+        "source_url": "https://www.facebook.com/FoundationGalacticFrontier/posts/-update-notice-september-22nd-2026-dear-traders-in-order-to-ensure-server-stabil/122267525558252135/",
+        "source_layer": "official_developer",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Current",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026 / 2026-09-22"
+        }
+      }
     }
   ],
   "conflicts": [
@@ -89421,6 +89741,6 @@
     "tier1_claims": 451,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1528
+    "total_claims": 1538
   }
 }
