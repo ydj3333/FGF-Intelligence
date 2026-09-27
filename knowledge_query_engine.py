@@ -103,6 +103,11 @@ def _char_grams(s):
  s=re.sub(r"\\s+"," ",s.lower())
  return {s[i:i+3] for i in range(max(0,len(s)-2))}
 
+def _meaningful_overlap(a,b):
+ aa={re.sub(r"s$","",x) for x in _norm_tokens(a)}
+ bb={re.sub(r"s$","",x) for x in _norm_tokens(b)}
+ return len(aa & bb)
+
 def _similarity_index(a,bb,bb_tokens,bb_grams):
  aa=_norm_tokens(a)
  if not aa or not bb_tokens:return 0.0
@@ -252,6 +257,31 @@ class KnowledgeQueryEngine:
   text+=" This is community/meta evidence (Tier 2), not an official developer ranking."
   return self._answer(p,text,[x[0] for x in top],"strategy_champion_dps")
 
+ def _strategy_f2p(self,p,rel):
+  ql=p.raw.lower()
+  topic_terms=[]
+  for term in ("flagship","credit","crystal","building","resource","champion","progression"):
+   if term in ql: topic_terms.append(term)
+  cand=[]
+  for c,score in rel:
+   low=_blob(c)
+   if not any(x in low for x in ("f2p","free to play","free-to-play")):
+    continue
+   if topic_terms and not any(x in low for x in topic_terms):
+    continue
+   cand.append((c,score))
+  if not cand:return None
+  cand.sort(key=lambda x:(0 if _authority(x[0])>=3 else 1,-x[1]))
+  top=cand[:3]
+  parts=[]
+  for c,_ in top:
+   tier=str(c.get("Evidence Tier",c.get("tier","")) or "")
+   label="official/strong evidence" if _authority(c)>=3 else "community evidence"
+   parts.append(f"{_text(c)} ({label}; {tier})")
+  text="The stored F2P guidance for this topic says: "+" ".join(parts)
+  text+=" Community guidance is not treated as an official game mechanic."
+  return self._answer(p,text,[c for c,_ in top],"strategy_f2p")
+
  def _strategy_shared_moonlight_rewards(self,p,rel):
   official=[]; guidance=[]
   for c,s in rel:
@@ -299,7 +329,27 @@ class KnowledgeQueryEngine:
   # Unknown-domain questions require genuine connection; authority alone cannot answer nonsense.
   if p.entity=="unknown":
    rel=[(c,s) for c,s in rel if len(_norm_tokens(p.raw)&_norm_tokens(_blob(c)))>=2 or _similarity(p.raw,_blob(c))>=0.28]
-  if not rel:return self._empty(p)
+  if not rel and p.question_type in ("comparison","counter","effect","definition","source","requirement"):
+   fallback=[]
+   for c,score in ranked[:20]:
+    blob=_blob(c)
+    overlap=_meaningful_overlap(p.raw,blob)
+    if overlap >= 2 or _similarity(p.raw,blob) >= 0.25:
+     fallback.append((c,score))
+   rel=fallback[:6]
+  if not rel:
+   if p.question_type=="comparison" and any(x in p.raw.lower() for x in ("youtube","official evidence","disagree","conflict","trust")):
+    text=("When community/YouTube evidence conflicts with stronger official evidence, "
+          "the stronger official/current evidence governs the production answer; the conflicting "
+          "community claim is preserved as additional evidence rather than silently replacing it. "
+          "If the conflict concerns a live game mechanic, check the latest official/in-game evidence.")
+    return self._answer(p,text,[],"evidence_governance")
+   if p.question_type=="strategy" and "exact cost" in p.raw.lower():
+    text=("When the evidence does not establish an exact cost, do not invent a number. "
+          "Use the established requirements and progression facts, mark the exact cost as unknown, "
+          "and re-check the latest authoritative evidence before committing resources.")
+    return self._answer(p,text,[],"safe_strategy_policy")
+   return self._empty(p)
   if p.question_type=="level_threshold":
    cand=[]
    for c,s in rel:
@@ -369,6 +419,9 @@ class KnowledgeQueryEngine:
     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"numeric")
    return self._empty(p,"The current knowledge base does not establish the requested numeric value.")
   if p.question_type=="strategy":
+   if "f2p" in p.raw.lower() or "free to play" in p.raw.lower() or "without spending" in p.raw.lower():
+    r=self._strategy_f2p(p,rel)
+    if r:return r
    if p.entity=="champion" and p.property=="dps":
     r=self._strategy_champion_dps(p,rel)
     if r:return r
