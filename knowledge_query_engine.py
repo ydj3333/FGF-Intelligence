@@ -27,6 +27,13 @@ ENTITY_ALIASES={
  "shared moonlight":["shared moonlight","shadow moonlight","moonlight event","moonlight","moonsoil","lunar soil"],
  "lunar ruins":["lunar ruins","lunar soil","moonsoil","moonlit market"],
  "energy type":["beam","kinetic","ionic","ion"],
+ "command points":["command point","command points","cp"],
+ "formation":["formation","fleet formation","attribute formation"],
+ "flagship":["flagship","flagships"],
+ "credits":["credit","credits"],
+ "crystals":["crystal","crystals","universal crystals"],
+ "building":["building","buildings","facility","facilities"],
+ "resources":["resource","resources","materials","metals","water"],
 }
 PROPERTY_ALIASES={
  "unlock_level":["level","unlock","unlocks","unlocking","appear","appears","available","availability","access","opens","introduced"],
