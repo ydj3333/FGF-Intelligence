@@ -460,6 +460,21 @@ class KnowledgeQueryEngine:
     if r:return r
   if p.question_type=="multi_hop" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
+   wants_availability=bool(re.search(r"\\b(?:where|available|shop|location)\\b", p.raw.lower()))
+   if wants_availability:
+    paths=self.graph.derive(
+     aliases,
+     ("requires","obtained_from","available_at"),
+     max_hops=3,
+     require_current=True,
+     min_tier_score=2.0,
+    )
+    if paths:
+     path=paths[0]
+     req,source,location=path[0].target,path[1].target,path[2].target
+     text=(f"{path[0].source} requires {req}. {req} can be obtained through {source}. "
+           f"{source} is available at {location}.")
+     return self._answer(p,text,self.graph.provenance(path),"multi_hop_3")
    requirement_paths=self.graph.derive(aliases, ("requires",), max_hops=1, require_current=True, min_tier_score=2.0)
    if requirement_paths:
     complete=[]; incomplete=[]
