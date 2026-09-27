@@ -246,8 +246,21 @@ class KnowledgeQueryEngine:
    text+=" For F2P play, the stored guide recommends prioritizing limited/rare rewards and comparing the Grand Prize against the Moonsoil Diggers/resources required; that guidance is test-server/community evidence."
   return self._answer(p,text,[official[0][0]]+([guidance[0][0]] if guidance else []),"strategy_shared_moonlight_rewards")
 
- def _empty(self,p,note=""):
-  return {"answer":"I cannot establish the exact answer from the current FGF knowledge base." if not note else note,"evidence":[],"evidence_used":[],"model":"fgf-v6-knowledge-query-engine","answer_type":"knowledge_abstention","uncertainty":note or "No sufficiently relevant evidence was found.","quality_gate":{"passes":True,"uses_relevant_evidence":False,"reason":"Evidence-safe abstention."},"query":p.as_dict()}
+ def _evidence_records(self,claims):
+  unique=[];seen=set()
+  for c in claims or []:
+   k=_text(c).strip()
+   if k and k not in seen:
+    seen.add(k); unique.append(c)
+  evidence=[{"id":f"E{i+1}","claim":_text(c),"tier":c.get("Evidence Tier",c.get("tier","")),"status":c.get("Status",c.get("status","")),"source":c.get("Source",c.get("source","")),"category":c.get("Category",c.get("category",""))} for i,c in enumerate(unique)]
+  return unique,evidence
+
+ def _empty(self,p,note="",claims=None,mode="abstention"):
+  unique,evidence=self._evidence_records(claims)
+  answer="I cannot establish the exact answer from the current FGF knowledge base." if not note else note
+  for i in range(len(unique)):
+   answer+=f" [E{i+1}]"
+  return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(evidence)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":"knowledge_abstention","uncertainty":note or "No sufficiently relevant evidence was found.","quality_gate":{"passes":True,"uses_relevant_evidence":bool(evidence),"reason":"Evidence-safe abstention with partial provenance." if evidence else "Evidence-safe abstention."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(evidence)}}
  def _answer(self,p,text,claims,mode):
   unique=[];seen=set()
   for c in claims:
@@ -318,7 +331,15 @@ class KnowledgeQueryEngine:
      return self._answer(p,text,provenance,"multi_hop")
     # A multi-hop answer is only valid when every requested link is evidenced.
     established=requirement_paths[0][0].source+" requires "+", ".join(x[0].target for x in requirement_paths)+"."
-    return self._empty(p,established+" The knowledge base does not establish the acquisition path for every requirement, so I will not infer it.")
+    established_claims=[]
+    for req_path in requirement_paths:
+     established_claims.extend(self.graph.provenance(req_path))
+    return self._empty(
+     p,
+     established+" The knowledge base does not establish the acquisition path for every requirement, so I will not infer it.",
+     claims=established_claims,
+     mode="multi_hop_incomplete",
+    )
   if p.question_type=="requirement" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    paths=self.graph.derive(aliases, ("requires",), max_hops=1)
