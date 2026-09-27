@@ -12,6 +12,7 @@ Safety:
 """
 from __future__ import annotations
 import ctypes, json, os, time, uuid
+from ctypes import wintypes
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import URLError, HTTPError
@@ -62,7 +63,7 @@ def _windows():
         user32.GetWindowTextW(hwnd,buf,length+1)
         title=buf.value.strip()
         if not title: return True
-        rect=ctypes.wintypes.RECT()
+        rect=wintypes.RECT()
         if not user32.GetWindowRect(hwnd,ctypes.byref(rect)): return True
         width=rect.right-rect.left; height=rect.bottom-rect.top
         if width>=300 and height>=200:
