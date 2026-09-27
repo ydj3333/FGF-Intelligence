@@ -1,0 +1,72 @@
+{
+  "version": "6.3.0",
+  "name": "FGF Live Experiential Intelligence",
+  "status": "architecture_skeleton",
+  "branches": {
+    "core": {
+      "priority": 1,
+      "status": "primary",
+      "purpose": "canonical game knowledge and evidence-grounded answers"
+    },
+    "observation": {
+      "priority": 2,
+      "status": "live",
+      "purpose": "direct gameplay observation and state/event capture"
+    },
+    "experience": {
+      "priority": 3,
+      "status": "live",
+      "purpose": "learn patterns from repeated observations and outcomes"
+    },
+    "youtube": {
+      "priority": 4,
+      "status": "deferred_ingestion",
+      "purpose": "gap fallback and interpretation; never overrides core"
+    }
+  },
+  "decision_order": [
+    "core",
+    "experience",
+    "youtube"
+  ],
+  "rules": [
+    "Core/canonical FGF knowledge is checked first.",
+    "Direct observation is evidence, not automatic canonical truth.",
+    "YouTube is fallback/enrichment only when core knowledge does not establish the requested information.",
+    "Learned experience is a candidate signal until repeated, comparable evidence validates it.",
+    "Higher-authority current evidence outranks lower-authority or stale evidence.",
+    "Conflicts are preserved and surfaced; never silently overwritten.",
+    "Every observation carries timestamp, session, game/version context when available, and provenance.",
+    "No unsupported numeric values, costs, timers, requirements, rewards, or mechanics may be invented.",
+    "User feedback is a learning signal, not factual proof.",
+    "Personal/player context may personalize recommendations but cannot rewrite global game truth.",
+    "The observer must fail closed: unknown screen/state becomes unknown, not a guessed fact.",
+    "The local observer enforces a maximum two-hour daily observation budget."
+  ],
+  "evidence_states": [
+    "CONFIRMED",
+    "SUPPORTED",
+    "COMMUNITY_CONSENSUS",
+    "COMMUNITY_INTERPRETATION",
+    "OBSERVED_CANDIDATE",
+    "LEARNED_CANDIDATE",
+    "CONFLICTED",
+    "INSUFFICIENT_EVIDENCE"
+  ],
+  "promotion_pipeline": [
+    "observation",
+    "deduplicate",
+    "context_match",
+    "repeat",
+    "cross_check",
+    "conflict_check",
+    "under_review",
+    "validated"
+  ],
+  "query_behavior": {
+    "factual": "core official/curated evidence only; abstain if not established",
+    "strategy": "core facts first, then validated experience, then clearly-labelled community/YouTube fallback",
+    "interpretation": "core facts plus clearly-labelled community/experience interpretation",
+    "ambiguous": "ask only for context that can materially change the answer"
+  }
+}
