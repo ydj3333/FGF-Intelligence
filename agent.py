@@ -8,8 +8,13 @@ from gap_detector import GapDetector
 from knowledge_analyzer import KnowledgeAnalyzer
 from claim_lifecycle import summarize_states, normalize_state
 from deterministic_synthesis import synthesize_deterministic
+from fgf_orchestrator import FGFOrchestrator
+from live_runtime import LiveObservationRuntime
 
 ROOT=Path(__file__).parent
+ROOT=Path(__file__).parent
+OBSERVER_TOKEN=os.getenv('FGF_OBSERVER_TOKEN','').strip()
+LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/'), os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY'))
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v6.0.0-knowledge-query-engine'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
@@ -37,15 +42,27 @@ try:
 except Exception:
     CONFLICT_REVIEWS={}
 
+def _observer_authorized(handler):
+    if not OBSERVER_TOKEN:
+        host=str((handler.client_address or ('',0))[0])
+        return host in ('127.0.0.1','::1','localhost')
+    supplied=handler.headers.get('X-FGF-Observer-Token','').strip()
+    return bool(supplied) and supplied==OBSERVER_TOKEN
+
 def _supabase_headers():
     if not SUPABASE_SECRET:
         return None
-    return {
+    headers={
         'apikey':SUPABASE_SECRET,
-        'Authorization':'Bearer '+SUPABASE_SECRET,
         'Content-Type':'application/json',
         'Accept':'application/json'
     }
+    # Modern sb_secret_* / sb_publishable_* keys are opaque API keys and
+    # must not be sent as JWT Bearer tokens. Legacy service_role JWTs still
+    # use the Authorization header.
+    if not SUPABASE_SECRET.startswith('sb_'):
+        headers['Authorization']='Bearer '+SUPABASE_SECRET
+    return headers
 
 def load_remote_conflict_reviews():
     headers=_supabase_headers()
@@ -1208,6 +1225,19 @@ class H(BaseHTTPRequestHandler):
             avg=(sum(LLM_HEALTH['latencies_ms'])/len(LLM_HEALTH['latencies_ms'])) if LLM_HEALTH['latencies_ms'] else None
             synthesis={**LLM_HEALTH,'configured':configured,'model':LLM_MODEL,'average_latency_ms':round(avg,1) if avg is not None else None}
             return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
+        if u.path=='/api/v63/live/status':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
+            return self._json(LIVE_RUNTIME.status())
+        if u.path=='/api/v63/live/experience':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
+            qs=parse_qs(u.query)
+            try:
+                limit=min(10,max(1,int(qs.get('limit',['5'])[0])))
+            except Exception:
+                limit=5
+            return self._json({'ok':True,'results':LIVE_RUNTIME.find_relevant(qs.get('q',[''])[0], limit=limit)})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
@@ -1253,6 +1283,58 @@ class H(BaseHTTPRequestHandler):
                 if not ok:return self._json({'ok':False,'durable':False,'error':detail},503)
                 return self._json({'ok':True,'durable':True,'profile':profile})
             except Exception as e:return self._json({'ok':False,'error':str(e)},400)
+        if u.path=='/api/v63/live/session/start':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                result=LIVE_RUNTIME.start_session(body)
+                return self._json(result, 200 if result.get('ok') else 400)
+            except Exception as e:
+                return self._json({'ok':False,'error':str(e)},400)
+        if u.path=='/api/v63/live/session/stop':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                result=LIVE_RUNTIME.stop_session(body)
+                return self._json(result, 200 if result.get('ok') else 400)
+            except Exception as e:
+                return self._json({'ok':False,'error':str(e)},400)
+        if u.path=='/api/v63/live/observe':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                result=LIVE_RUNTIME.ingest_observation(body)
+                return self._json(result, 200 if result.get('ok') else 400)
+            except Exception as e:
+                return self._json({'ok':False,'error':str(e)},400)
+        if u.path=='/api/v63/live/experience/rebuild':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
+            try:
+                result=LIVE_RUNTIME.rebuild_experience()
+                return self._json(result, 200 if result.get('ok') else 400)
+            except Exception as e:
+                return self._json({'ok':False,'error':str(e)},400)
+        if u.path=='/api/v63/live/feedback':
+            if not _observer_authorized(self):
+                return self._json({'ok':False,'error':'Observer authorization required'},401)
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                result=LIVE_RUNTIME.record_feedback(body)
+                return self._json(result, 200 if result.get('ok') else 400)
+            except Exception as e:
+                return self._json({'ok':False,'error':str(e)},400)
         if u.path=='/api/player/profile':
             qs=parse_qs(u.query);pid=qs.get('player_id',[''])[0].strip()
             if not pid:return self._json({'ok':False,'error':'player_id is required'},400)
@@ -1365,8 +1447,29 @@ class H(BaseHTTPRequestHandler):
 # Canonical corpus synchronization is applied from the durable Supabase claim store.
 try:
     from knowledge_query_engine import answer as _knowledge_query_answer
-    answer = _knowledge_query_answer
-    RELEASE = 'v6.0.0-knowledge-query-engine'
+    _FGF_ORCHESTRATOR = FGFOrchestrator(
+        _knowledge_query_answer,
+        experience_store=LIVE_RUNTIME,
+        youtube_provider=None,
+    )
+    _CORE_ANSWER = _knowledge_query_answer
+
+    def answer(question, player_context=None):
+        result = _FGF_ORCHESTRATOR.answer(question, player_context)
+        core = result.get('core') or {}
+        merged = dict(core)
+        merged.update({
+            'answer': result.get('answer', core.get('answer', '')),
+            'orchestration_branch': result.get('branch'),
+            'evidence_state': result.get('evidence_state'),
+            'orchestration_warnings': result.get('warnings', []),
+            'orchestration_provenance': result.get('provenance', {}),
+            'experience_evidence': result.get('experience', []),
+            'youtube_evidence': result.get('youtube', []),
+        })
+        return merged
+
+    RELEASE = 'v6.3.0-live-experiential-intelligence'
 except Exception:
     pass
 

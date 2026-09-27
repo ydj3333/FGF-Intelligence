@@ -1,6 +1,22 @@
-# FGF Intelligence v4 — V4 Foundation
+# FGF Intelligence v6.3 — Live Experiential Intelligence
 
 Evidence-first, continuously learning Foundation: Galactic Frontier intelligence engine.
+
+## v6.3 architecture
+- **Core Knowledge:** canonical facts, Evidence Graph v2, lifecycle and authority-aware retrieval.
+- **Live Observation & Experience:** direct gameplay observation, structured events, repeated-pattern learning and player feedback.
+- **YouTube/Community:** fallback/enrichment evidence; ingestion can be populated gradually.
+- **Human feedback:** learning signal only; never factual proof.
+
+Decision order: **Core → validated Experience → YouTube fallback**.
+
+Live observation is capped at **2 hours/day**, raw gameplay is local by default, and observations never silently overwrite canonical knowledge.
+
+See:
+- ARCHITECTURE_V6_3.md
+- VERSION.md
+- data/v6_3_rules.md
+- observer/README.md
 
 ## Product layers
 - **Notion:** evidence control room, source registry, claims, conflicts, verification, operating standards and human promotion decisions.
@@ -52,4 +68,4 @@ A Firecrawl 6-hour FGF discovery monitor is configured to detect S2 changes, pat
 `python agent.py` then open `http://127.0.0.1:8000`.
 
 ## Current production status
-The public application and evidence corpus are operational, but V4 persistent-learning infrastructure still requires a provisioned Supabase project and ingestion/evaluation services. The canonical evidence layer remains protected while adaptive intelligence is built around it.
+The public application and evidence corpus are operational. v6.3 now adds the live experiential architecture and persistent observation/experience tables; semantic OCR and gradual YouTube fallback ingestion remain incremental next steps. The canonical evidence layer remains protected while adaptive intelligence is built around it.

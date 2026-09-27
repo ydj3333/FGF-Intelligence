@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "required": [
+    "session_id",
+    "event_type",
+    "observed_at"
+  ],
+  "fields": {
+    "session_id": "string",
+    "event_type": "enum",
+    "entity_type": "string",
+    "entity_key": "string",
+    "property": "string",
+    "old_value": "json",
+    "new_value": "json",
+    "context": "json",
+    "outcome": "json",
+    "observed_at": "ISO-8601",
+    "confidence": "0..1",
+    "source_capture": "string",
+    "pattern": "string"
+  },
+  "allowed_event_types": [
+    "screen_changed",
+    "menu_opened",
+    "entity_selected",
+    "resource_changed",
+    "level_changed",
+    "upgrade_started",
+    "upgrade_completed",
+    "battle_started",
+    "battle_ended",
+    "action",
+    "reward_received",
+    "tech_unlocked",
+    "building_upgraded",
+    "fleet_changed",
+    "timer_changed",
+    "unknown"
+  ]
+}
