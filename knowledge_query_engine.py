@@ -311,6 +311,23 @@ class KnowledgeQueryEngine:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
     c,s,sent=cand[0]; return self._answer(p,sent,[c],"direct_level")
    return self._empty(p,"The corpus contains related component evidence, but it does not establish the requested unlock/appearance level.")
+  # Exact level-specific questions must never be answered with generic
+  # progression evidence. If the requested level is not explicitly evidenced,
+  # abstain rather than substitute another level.
+  if p.question_type=="effect" and p.property=="unlock_level":
+   requested=re.findall(r"\b(?:core\s+)?level\s+(\d+)\b",p.raw.lower())
+   if requested:
+    n=requested[-1]
+    cand=[]
+    for c,score in rel:
+     for sent in self._sentences(_text(c)):
+      sl=sent.lower()
+      if n in re.findall(r"\b\d+\b",sl) and any(x in sl for x in ("unlock","available","opens","introduced","facility","tier")):
+       cand.append((c,score,sent))
+    if cand:
+     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+     return self._answer(p,cand[0][2],[cand[0][0]],"direct_level_effect")
+    return self._empty(p,f"The current knowledge base does not establish what unlocks at Energy Core level {n}.")
   if p.question_type=="event_schedule":
    cand=[]
    for c,s in rel:
@@ -338,6 +355,12 @@ class KnowledgeQueryEngine:
      if not re.search(r"\b\d[\d,]*(?:\.\d+)?%?\b",sl):
       continue
      if p.entity!="unknown" and not any(x in sl for x in ENTITY_ALIASES.get(p.entity,[p.entity])):
+      continue
+     requested_levels=re.findall(r"\b(?:core\s+)?level\s+(\d+)\b",p.raw.lower())
+     if not requested_levels:
+      m=re.search(r"\bcore\s+(\d+)\b",p.raw.lower())
+      requested_levels=[m.group(1)] if m else []
+     if requested_levels and not any(n in re.findall(r"\b\d+\b",sl) for n in requested_levels):
       continue
      cand.append((c,s,sent))
    if cand:
