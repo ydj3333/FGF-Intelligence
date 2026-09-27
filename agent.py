@@ -43,12 +43,17 @@ except Exception:
 def _supabase_headers():
     if not SUPABASE_SECRET:
         return None
-    return {
+    headers={
         'apikey':SUPABASE_SECRET,
-        'Authorization':'Bearer '+SUPABASE_SECRET,
         'Content-Type':'application/json',
         'Accept':'application/json'
     }
+    # Modern sb_secret_* / sb_publishable_* keys are opaque API keys and
+    # must not be sent as JWT Bearer tokens. Legacy service_role JWTs still
+    # use the Authorization header.
+    if not SUPABASE_SECRET.startswith('sb_'):
+        headers['Authorization']='Bearer '+SUPABASE_SECRET
+    return headers
 
 def load_remote_conflict_reviews():
     headers=_supabase_headers()
