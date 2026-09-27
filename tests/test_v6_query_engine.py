@@ -117,3 +117,58 @@ def test_v6_benchmark_does_not_flag_question_numbers_as_unsupported():
     evidence = ""
     unsupported = numeric_tokens(answer) - numeric_tokens(evidence) - numeric_tokens(question)
     assert unsupported == set()
+
+def test_v6_graph_entity_resolution_uses_explicit_aliases_only():
+    from evidence_graph import EvidenceGraph
+    claims=[{
+        "Claim":"Energy Core requires Core progression.",
+        "Evidence Tier":"Tier 1 — Ultimate/Official",
+        "Status":"Confirmed",
+    }]
+    graph=EvidenceGraph(claims, alias_groups=[["energy core", "core level"]])
+    assert graph.outgoing("core level", "requires")
+    assert graph.outgoing("energy core", "requires")
+    assert not graph.outgoing("unrelated core", "requires")
+
+
+def test_v6_graph_supports_three_hop_complete_chain_with_provenance():
+    from evidence_graph import EvidenceGraph
+    claims=[
+        {"Claim":"Research Academy requires Energy Core Level 10.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Energy Core Level 10 can be obtained through Core progression.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Core progression is available at Research Academy.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    graph=EvidenceGraph(claims)
+    paths=graph.derive(
+        ["Research Academy"],
+        ("requires","obtained_from","available_at"),
+        max_hops=3,
+        require_current=True,
+        min_tier_score=3.0,
+    )
+    assert len(paths)==1
+    assert len(paths[0])==3
+    assert [e.relation for e in paths[0]] == ["requires","obtained_from","available_at"]
+    assert len(graph.provenance(paths[0]))==3
+
+
+def test_v6_graph_rejects_under_review_link_from_production_chain():
+    from evidence_graph import EvidenceGraph
+    claims=[
+        {"Claim":"Research Academy requires Energy Core Level 10.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Energy Core Level 10 can be obtained through Core progression.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Under Review"},
+    ]
+    graph=EvidenceGraph(claims)
+    paths=graph.derive(
+        ["Research Academy"],
+        ("requires","obtained_from"),
+        max_hops=2,
+        require_current=True,
+        min_tier_score=3.0,
+    )
+    assert paths==[]
