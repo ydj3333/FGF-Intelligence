@@ -92,7 +92,9 @@ class InMemoryExperienceStore:
         self.events = []
         self.candidates = []
         for item in candidates or []:
-            if item.get("pattern_key") is not None:
+            if item.get("pattern_key") is not None or (
+                item.get("status") in VALIDATED_STATUSES and item.get("pattern")
+            ):
                 self.candidates.append(item)
             else:
                 self.events.append(item)
