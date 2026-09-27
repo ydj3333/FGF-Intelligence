@@ -10,6 +10,7 @@ import re, math
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Tuple
 from evidence_graph import EvidenceGraph
+from shop_intelligence import answer_shop_question
 
 STOP={"what","which","when","where","why","how","does","do","is","are","the","a","an","to","of","for","and","or","i","my","you","your","can","could","would","should","with","on","in","at","from","it","they","them","their","me","we","this","that","these","those","be","before","after","into","about","get","give","use","appear","appears"}
 
@@ -242,6 +243,14 @@ class KnowledgeQueryEngine:
   return out
  def search(self,q,limit=12):
   p=self.parse(q); ranked=self.rank(p,limit); rel=[(c,s) for c,s in ranked if s>=5]
+  # v6.3 shop intelligence: answer shop/catalog/priority questions from a
+  # structured shop model instead of echoing transcript fragments. The model
+  # keeps inventory facts, evidence authority, and strategic interpretation
+  # separate, and attaches at most four corroborating claims.
+  if any(x in p.raw.lower() for x in ("shop", "store", "merchant", "market")):
+   shop_result=answer_shop_question(p.raw, self.claims)
+   if shop_result:
+    return self._answer(p, shop_result["text"], shop_result.get("claims", []), shop_result["mode"])
   return {"query":p.as_dict(),"results":[{"claim":c,"score":round(s,3)} for c,s in rel],"answerable":bool(rel)}
  def _sentences(self,text): return [x.strip(" •-") for x in re.split(r"(?<=[.!?])\s+|\n+",text) if x.strip()]
  def _direct_sentences(self,p,c):
@@ -604,6 +613,6 @@ def get_engine():
  return _ENGINE
 def answer(question,player_context=None):
  r=get_engine().compose(question)
- r["engine_version"]="v6.0.0-knowledge-query-engine"
+ r["engine_version"]="v6.3.0-shop-intelligence"
  if player_context:r["player_context_applied"]={"season":player_context.get("season"),"core_level":player_context.get("core_level")}
  return r
