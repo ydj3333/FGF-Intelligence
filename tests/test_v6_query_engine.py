@@ -90,6 +90,16 @@ def test_v6_multihop_reasoning_requires_complete_chain():
     assert "Core progression" in r["answer"]
     assert len(r["evidence"])==2
 
+def test_v6_graph_exact_matching_does_not_cross_level_entities():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Energy Core Level 10 requires Core progression.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Energy Core unlocks new features.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    e=KnowledgeQueryEngine(claims)
+    assert e.graph.outgoing("Energy Core Level 10","requires")
+    assert not e.graph.outgoing("Energy Core","requires")
+
 def test_v6_multihop_abstains_on_incomplete_chain():
     from knowledge_query_engine import KnowledgeQueryEngine
     claims=[
