@@ -14,7 +14,7 @@ from evidence_graph import EvidenceGraph
 STOP={"what","which","when","where","why","how","does","do","is","are","the","a","an","to","of","for","and","or","i","my","you","your","can","could","would","should","with","on","in","at","from","it","they","them","their","me","we","this","that","these","those","be","before","after","into","about","get","give","use","appear","appears"}
 
 # Expansion relationships are not identity relationships.
-ENTITY_ALIASES={
+GRAPH_ENTITY_ALIASES = [\n ["energy core", "core level"],\n ["shared moonlight", "moonlight event"],\n ["lunar ruins", "lunar soil"],\n ["champion", "hero"],\n ["credits", "credit"],\n ["crystals", "crystal"],\n]\n\nENTITY_ALIASES={
  "flagship components":["flagship component","ship component","components"],
  "core component":["core components","core component","flagship core"],
  "computational components":["computational component","computational components"],
@@ -456,7 +456,7 @@ class KnowledgeQueryEngine:
     complete=[]; incomplete=[]
     for req_path in requirement_paths:
      target=req_path[0].target
-     source_paths=self.graph.derive([target], ("obtained_from",), max_hops=1)
+     source_paths=self.graph.derive(\n      [target], ("obtained_from",), max_hops=1, require_current=True, min_tier_score=2.0\n     )
      if source_paths:
       complete.append((req_path,source_paths))
      else:
@@ -572,7 +572,7 @@ def get_engine():
  global _ENGINE
  if _ENGINE is None:
   import agent
-  _ENGINE=KnowledgeQueryEngine(agent.CLAIMS)
+  _ENGINE=KnowledgeQueryEngine(agent.CLAIMS, alias_groups=GRAPH_ENTITY_ALIASES)
  return _ENGINE
 def answer(question,player_context=None):
  r=get_engine().compose(question)
