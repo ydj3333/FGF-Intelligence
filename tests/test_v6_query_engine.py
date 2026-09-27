@@ -172,3 +172,22 @@ def test_v6_graph_rejects_under_review_link_from_production_chain():
         min_tier_score=3.0,
     )
     assert paths==[]
+
+def test_v6_engine_answers_three_hop_chain_only_when_complete():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Research Academy requires Energy Core Level 10.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Energy Core Level 10 can be obtained through Core progression.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Core progression is available at Research Academy.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    e=KnowledgeQueryEngine(claims)
+    r=e.compose("What does Research Academy require, how do I get it, and where is it available?")
+    assert r["answer_type"]=="knowledge_query"
+    assert r["reasoning"]["mode"]=="multi_hop_3"
+    assert "Energy Core Level 10" in r["answer"]
+    assert "Core progression" in r["answer"]
+    assert "available at Research Academy" in r["answer"]
+    assert len(r["evidence"])==3
