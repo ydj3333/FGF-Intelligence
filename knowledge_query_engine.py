@@ -11,6 +11,7 @@ from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Tuple
 from evidence_graph import EvidenceGraph
 from shop_intelligence import answer_shop_question
+from policy_engine import classify_policy_intent, is_official
 
 STOP={"what","which","when","where","why","how","does","do","is","are","the","a","an","to","of","for","and","or","i","my","you","your","can","could","would","should","with","on","in","at","from","it","they","them","their","me","we","this","that","these","those","be","before","after","into","about","get","give","use","appear","appears"}
 
@@ -243,6 +244,12 @@ class KnowledgeQueryEngine:
   return out
  def search(self,q,limit=12):
   p=self.parse(q); ranked=self.rank(p,limit); rel=[(c,s) for c,s in ranked if s>=5]
+  # v6.3 policy gate: factual questions may use only authoritative official/developer
+  # evidence. Community/YouTube evidence remains available for strategy and
+  # interpretation, but it cannot silently become game truth.
+  policy_intent=classify_policy_intent(p.question_type, p.raw)
+  if policy_intent==\"factual\":
+   rel=[(c,s) for c,s in rel if is_official(c)]
   # v6.3 shop intelligence: answer shop/catalog/priority questions from a
   # structured shop model instead of echoing transcript fragments. The model
   # keeps inventory facts, evidence authority, and strategic interpretation
