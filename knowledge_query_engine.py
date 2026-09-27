@@ -496,6 +496,8 @@ class KnowledgeQueryEngine:
       for path in source_paths: provenance.extend(self.graph.provenance(path))
      requirements_text=", ".join(x[0].target for x in requirement_paths)
      detail_text=". ".join(parts)
+     if wants_availability:
+      detail_text += " The evidence does not establish where that source is available."
      text=f"{requirement_paths[0][0].source} requires {requirements_text}. {detail_text}."
      return self._answer(p,text,provenance,"multi_hop")
     # A multi-hop answer is only valid when every requested link is evidenced.
