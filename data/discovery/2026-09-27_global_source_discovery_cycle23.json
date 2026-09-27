@@ -1,0 +1,34 @@
+{
+  "cycle": "FGF V4 Global Source Discovery",
+  "date": "2026-09-27",
+  "scope": [
+    "S1/new-server baseline",
+    "S2",
+    "S3/future"
+  ],
+  "new_evidence": [
+    {
+      "source_url": "https://www.foundation.game/thetraderera",
+      "title": "Official FGF portal — Trader Era",
+      "tier": "T1 source / candidate evidence",
+      "confidence": "high observed text; medium interpretation",
+      "observed": [
+        "Welcome to the Trader Era",
+        "21ST OCT",
+        "Available for Mac With Apple Silicon"
+      ],
+      "interpretation": "21ST OCT meaning unresolved; do not treat as confirmed release date or season date"
+    }
+  ],
+  "cross_checks": {
+    "shared_moonlight": "Sep 15-21 on 1001-1016; Sep 21-27 on 1017-1247",
+    "steam": "no confirmed new release-date evidence",
+    "s2_scope": "1001-1016 current operational evidence; older 1-16 references preserved"
+  },
+  "governance": {
+    "tier1_promotions": 0,
+    "conflicts_preserved": 2,
+    "deduplication": true,
+    "free_native_first": true
+  }
+}
