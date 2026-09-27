@@ -24,17 +24,35 @@ def _clean(value: str) -> str:
 def _key(value: str) -> str:
     value = _clean(value).lower()
     value = re.sub(r"\b(the|a|an)\b", " ", value)
-    return re.sub(r"\s+", " ", value).strip()
+    value = re.sub(r"\s+", " ", value).strip()
+    return value
+
+def _variants(value: str) -> set[str]:
+    """Return only safe lexical variants; never use substring matching."""
+    key = _key(value)
+    if not key:
+        return set()
+    out = {key}
+    if key.endswith("s") and not key.endswith("ss"):
+        out.add(key[:-1])
+    else:
+        out.add(key + "s")
+    return out
 
 class EvidenceGraph:
     PATTERNS: Tuple[Tuple[str, str], ...] = (
         ("requires", r"(?P<src>.+?)\s+requires\s+(?P<tgt>.+?)(?:\.|$)"),
         ("requires", r"(?P<src>.+?)\s+need(?:s)?\s+(?P<tgt>.+?)(?:\.|$)"),
         ("unlocks", r"(?P<src>.+?)\s+unlock(?:s|ed)?\s+(?P<tgt>.+?)(?:\.|$)"),
+        ("requires", r"to create\s+(?P<src>.+?),?\s+(?:you\s+)?need\s+(?P<tgt>.+?)(?:\.|$)"),
         ("obtained_from", r"(?P<src>.+?)\s+(?:can be )?obtained (?:through|from)\s+(?P<tgt>.+?)(?:\.|$)"),
-        ("available_at", r"(?P<src>.+?)\s+(?:is|are) available (?:at|from|through)\s+(?P<tgt>.+?)(?:\.|$)"),
+        ("obtained_from", r"(?P<src>.+?)\s+(?:can be )?found\s+(?:in|at|from)\s+(?P<tgt>.+?)(?:\.|$)"),
+        ("obtained_from", r"(?P<src>.+?)\s+comes\s+from\s+(?P<tgt>.+?)(?:\.|$)"),
+        ("available_at", r"(?P<src>.+?)\s+(?:is|are) available (?:at|from|through|in)\s+(?P<tgt>.+?)(?:\.|$)"),
+        ("enabled_by", r"(?P<src>.+?)\s+(?:is|are) enabled by\s+(?P<tgt>.+?)(?:\.|$)"),
+        ("affects", r"(?P<src>.+?)\s+affects\s+(?P<tgt>.+?)(?:\.|$)"),
         ("counters", r"(?P<src>.+?)\s+counters?\s+(?P<tgt>.+?)(?:\.|$)"),
-        ("modifies", r"(?P<src>.+?)\s+(?:modifies|changes|affects)\s+(?P<tgt>.+?)(?:\.|$)"),
+        ("modifies", r"(?P<src>.+?)\s+(?:modifies|changes)\s+(?P<tgt>.+?)(?:\.|$)"),
         ("upgrades", r"(?P<src>.+?)\s+upgrad(?:es|ing)\s+(?P<tgt>.+?)(?:\.|$)"),
         ("belongs_to", r"(?P<src>.+?)\s+(?:belongs to|is part of)\s+(?P<tgt>.+?)(?:\.|$)"),
         ("supersedes", r"(?P<src>.+?)\s+supersedes\s+(?P<tgt>.+?)(?:\.|$)"),
@@ -77,8 +95,9 @@ class EvidenceGraph:
         return [e for e in self.edges if e.relation == relation and _key(e.target) == tk]
 
     def _matches(self, value: str, aliases: List[str]) -> bool:
-        v = _key(value)
-        return any(_key(a) == v or _key(a) in v or v in _key(a) for a in aliases)
+        """Match exact normalized entities or safe singular/plural variants."""
+        variants = _variants(value)
+        return any(variants & _variants(a) for a in aliases)
 
     def edges_for_aliases(self, aliases: List[str], relation: str | None = None) -> List[Edge]:
         return [e for e in self.edges if (not relation or e.relation == relation) and (self._matches(e.source, aliases) or self._matches(e.target, aliases))]
