@@ -323,7 +323,8 @@ class KnowledgeQueryEngine:
   for i in range(len(unique)):
    if f"[E{i+1}]" not in answer: answer+=f" [E{i+1}]"
   evidence=[{"id":f"E{i+1}","claim":_text(c),"tier":c.get("Evidence Tier",c.get("tier","")),"status":c.get("Status",c.get("status","")),"source":c.get("Source",c.get("source","")),"category":c.get("Category",c.get("category",""))} for i,c in enumerate(unique)]
-  return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(unique)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":"knowledge_query","uncertainty":"","quality_gate":{"passes":True,"uses_relevant_evidence":True,"reason":"Direct answer composed from ranked evidence."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(unique)}}
+  answer_type="knowledge_query" if unique else "knowledge_policy"
+  return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(unique)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":answer_type,"uncertainty":"","quality_gate":{"passes":True,"uses_relevant_evidence":bool(unique),"reason":"Direct answer composed from ranked evidence." if unique else "System governance/policy response; no game-claim evidence asserted."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(unique)}}
  def compose(self,q,limit=8):
   p=self.parse(q); ranked=self.rank(p,limit); rel=[(c,s) for c,s in ranked if s>=5]
   # Unknown-domain questions require genuine connection; authority alone cannot answer nonsense.
