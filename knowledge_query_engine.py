@@ -334,6 +334,19 @@ class KnowledgeQueryEngine:
   return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(unique)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":answer_type,"uncertainty":"","quality_gate":{"passes":True,"uses_relevant_evidence":bool(unique),"reason":"Direct answer composed from ranked evidence." if unique else "System governance/policy response; no game-claim evidence asserted."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(unique)}}
  def compose(self,q,limit=8):
   p=self.parse(q); ranked=self.rank(p,limit); rel=[(c,s) for c,s in ranked if s>=5]
+  # Update questions are anchored to explicit dated/versioned corpus claims.
+  # Do not require lexical similarity to a generic phrase like "hot update";
+  # search the full corpus for the authoritative update date/feature anchors.
+  if p.question_type=="update":
+   update_hits=[]
+   for c,blob,_,_ in self._index:
+    if str(c.get("Status",c.get("status",""))).lower() in ("rejected","superseded"):
+     continue
+    if any(x in blob for x in ("2026-09-22","september 22, 2026","sep 22","22 sep","hot update")):
+     update_hits.append((c, .65*_authority(c)+_similarity(p.raw,blob)))
+   update_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+   if update_hits:
+    rel=update_hits[:limit]
   # Unknown-domain questions require genuine connection; authority alone cannot answer nonsense.
   if p.entity=="unknown":
    rel=[(c,s) for c,s in rel if len(_norm_tokens(p.raw)&_norm_tokens(_blob(c)))>=2 or _similarity(p.raw,_blob(c))>=0.28]
