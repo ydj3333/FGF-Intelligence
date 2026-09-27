@@ -44,7 +44,7 @@ class EntityResolver:
 
 
 def _clean(value: str) -> str:
-    value = re.sub(r"^[\s\'".,:;()\[\]]+|[\s\'".,:;()\[\]]+$", "", value)
+    value = re.sub(r"^[\s\'\".,:;()\[\]]+|[\s\'\".,:;()\[\]]+$", "", value)
     return re.sub(r"\s+", " ", value).strip()
 
 
