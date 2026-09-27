@@ -60,7 +60,11 @@ class FGFOrchestrator:
             question,
             str((core.get("query") or {}).get("question_type", "")),
         )
-        if policy.get("abstained") and intent == "factual":
+        if (
+            policy.get("abstained")
+            and intent == "factual"
+            and core.get("answer_type") not in {"knowledge_abstention", "knowledge_policy"}
+        ):
             core = dict(core)
             core["answer"] = policy["answer"]
             core["answer_type"] = "knowledge_policy"
