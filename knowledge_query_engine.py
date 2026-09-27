@@ -39,17 +39,19 @@ PROPERTY_ALIASES={
  "upgrade":["upgrade","upgrading","level","empowerment","power up"],
  "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
  "dps":["dps","damage","attacker","attacking"],
+ "duplicate":["duplicate","duplicates","dupe","dupes","same champion"],
 }
 QUESTION_TYPES={
- "level_threshold":["which level","what level","at what level","level do","level does"],
+ "level_threshold":["which level","what level","at what level"],
  "source":["how do i get","where do i get","how to get","where can i get","source","sources","obtain","farm"],
  "requirement":["what unlocks","what do i need","what is required","requires","requirement","prerequisite","before i can"],
  "comparison":["difference","different","versus"," vs ","compare"],
  "strategy":["best","optimal","recommended","should i","priority","most efficient"],
  "effect":["what happens","what does","what do","effect","benefit","bonus"],
  "counter":["what counters","which counters","counter","against"],
- "numeric":["how many","how much","how long","percentage","percent","cost"],
+ "numeric":["how many","how much","how long","percentage","percent","cost","maximum","max","cap"],
  "definition":["what is","what are"],
+ "update":["what changed","hot update","patch update","patch notes","update changes","sep 22","september 22","22 sep"],
  "event_schedule":["which day","what day","weekday","schedule","calendar","monday","tuesday","wednesday","thursday","friday","saturday","sunday"],
 }
 RELATION_TERMS={
@@ -144,9 +146,17 @@ class QuestionParser:
    qtype="comparison"
   elif any(p in ql for p in QUESTION_TYPES["strategy"]):
    qtype="strategy"
+  elif any(p in ql for p in QUESTION_TYPES["update"]):
+   qtype="update"
+  elif re.search(r"\b(?:what|which)\b.*\b(?:unlock|unlocks)\b.*\bat\s+(?:energy\s+core\s+)?level\s+\d+\b", ql):
+   qtype="effect"
+  elif re.search(r"\b(?:what|which)\b.*\blevel\b.*\b(?:do|does)\b", ql):
+   qtype="effect"
+  elif re.search(r"\b(?:all|only|just)\b.*\bor\b", ql):
+   qtype="comparison"
   else:
    for kind,patterns in QUESTION_TYPES.items():
-    if kind in ("event_schedule","numeric","comparison","strategy"): continue
+    if kind in ("event_schedule","numeric","comparison","strategy","update"): continue
     if any(p in ql for p in patterns): qtype=kind; break
   prop="general"
   order={
@@ -156,13 +166,15 @@ class QuestionParser:
    "cost":["cost","price","spend"],"comparison":["difference","different","versus","compare"],
    "counter":["counter","against","beats"],"effect":["effect","bonus","boost","change","happen"],
    "upgrade":["upgrade","empowerment","power up"],
+   "duplicate":["duplicate","duplicates","dupe","dupes","same champion"],
    "reward":["reward","prize","shop"],
    "dps":["dps","damage","attacker"]}
   for p,words in order.items():
    if any(w in ql for w in words): prop=p; break
   if prop in ("requirement","source") and qtype in ("effect","generic"):
    qtype=prop
-  if "dps" in ql: prop="dps"
+  if "duplicate" in ql or "duplicates" in ql or re.search(r"\bdupes?\b", ql): prop="duplicate"
+  elif "dps" in ql: prop="dps"
   elif any(w in ql for w in ("reward","rewards","prize","prizes")): prop="reward"
   expansions=[q]
   if entity in ENTITY_ALIASES: expansions+=ENTITY_ALIASES[entity]
@@ -305,6 +317,29 @@ class KnowledgeQueryEngine:
     text+=" The current evidence does not establish a weekday-specific speedup/shortcut mapping." if any(x in p.raw.lower() for x in ("weekday","which day","what day","monday","tuesday","wednesday","thursday","friday","saturday","sunday")) else ""
     return self._answer(p,text,[x[0] for x in top],"event_schedule")
    return self._empty(p,"The current knowledge base does not establish the requested event-day schedule.")
+  if p.question_type=="update":
+   update_terms=("hot update","sep 22","september 22","22 sep","patch")
+   cand=[(c,s) for c,s in rel if any(x in _blob(c) for x in update_terms)]
+   if cand:
+    cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    top=cand[:4]
+    return self._answer(p," ".join(_text(c) for c,_ in top),[c for c,_ in top],"update")
+   return self._empty(p,"The current knowledge base does not establish the requested update details.")
+  if p.question_type=="numeric":
+   cand=[]
+   for c,s in rel:
+    for sent in self._sentences(_text(c)):
+     sl=sent.lower()
+     if not re.search(r"\b\d[\d,]*(?:\.\d+)?%?\b",sl):
+      continue
+     if p.entity!="unknown" and not any(x in sl for x in ENTITY_ALIASES.get(p.entity,[p.entity])):
+      continue
+     cand.append((c,s,sent))
+   if cand:
+    cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    top=cand[:2]
+    return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"numeric")
+   return self._empty(p,"The current knowledge base does not establish the requested numeric value.")
   if p.question_type=="strategy":
    if p.entity=="champion" and p.property=="dps":
     r=self._strategy_champion_dps(p,rel)
@@ -346,6 +381,16 @@ class KnowledgeQueryEngine:
      claims=established_claims,
      mode="multi_hop_incomplete",
     )
+  if p.property=="duplicate":
+   cand=[]
+   for c,s in rel:
+    for sent in self._direct_sentences(p,c):
+     if re.search(r"\b(?:duplicate|duplicates|dupe|dupes|same champion)\b",sent.lower()):
+      cand.append((c,s,sent))
+   if cand:
+    cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    return self._answer(p,cand[0][2],[cand[0][0]],"duplicate")
+   return self._empty(p,"The current knowledge base does not establish whether duplicate Champions are required for the requested upgrade.")
   if p.question_type=="requirement" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    paths=self.graph.derive(aliases, ("requires",), max_hops=1)
