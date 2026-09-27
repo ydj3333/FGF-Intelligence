@@ -24,6 +24,8 @@ jobs:
         run: python scripts/run_knowledge_quality.py
       - name: Run FGF agent smoke tests
         run: python tests/test_agent.py
+      - name: Run YouTube Supabase auth regression
+        run: python tests/test_youtube_supabase_auth.py
       - name: Run v6 knowledge query tests
         run: python tests/test_v6_query_engine.py
       - name: Run v6 Objective #1 safety benchmark

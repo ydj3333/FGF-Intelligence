@@ -10,17 +10,30 @@ BUCKET = os.getenv("FGF_TRANSCRIPT_BUCKET", "fgf-video-transcripts")
 BASE = os.getenv("FGF_SUPABASE_URL", "https://qdoixzfkkmvzjfkhzups.supabase.co").rstrip("/")
 
 def key():
+    # Prefer the explicitly named server key. Supabase supports opaque
+    # sb_secret_* keys in addition to legacy JWT service_role keys.
     k = os.getenv("FGF_SUPABASE_SECRET_KEY") or os.getenv("FGF_SUPABASE_SERVICE_ROLE_KEY")
     if not k:
-        raise RuntimeError("Set FGF_SUPABASE_SERVICE_ROLE_KEY.")
+        raise RuntimeError("Set FGF_SUPABASE_SECRET_KEY (preferred) or FGF_SUPABASE_SERVICE_ROLE_KEY.")
     return k
+
+def auth_headers(k, content_type="application/json"):
+    """Build Supabase headers for both legacy JWT and new opaque API keys.
+
+    New sb_secret_* / sb_publishable_* keys are API keys, not JWTs. They must
+    be sent via the apikey header; putting an sb_* key in Authorization: Bearer
+    makes Supabase/Storage attempt JWT parsing and produces Invalid Compact
+    JWS/JWT. Legacy service_role JWT keys remain compatible with both headers.
+    """
+    headers = {"apikey": k, "Content-Type": content_type}
+    if not k.startswith("sb_"):
+        headers["Authorization"] = f"Bearer {k}"
+    return headers
 
 def request(method, path, payload=None, raw=False, content_type="application/json"):
     k = key()
     body = payload if raw else (json.dumps(payload).encode() if payload is not None else None)
-    req = Request(BASE + path, data=body, method=method, headers={
-        "apikey": k, "Authorization": f"Bearer {k}", "Content-Type": content_type
-    })
+    req = Request(BASE + path, data=body, method=method, headers=auth_headers(k, content_type))
     try:
         with urlopen(req, timeout=60) as r:
             return r.read()
@@ -64,12 +77,7 @@ def upload(path, object_path, content_type):
         BASE + "/storage/v1/object/" + BUCKET + "/" + encoded,
         data=body,
         method="POST",
-        headers={
-            "apikey": k,
-            "Authorization": f"Bearer {k}",
-            "Content-Type": content_type,
-            "x-upsert": "true",
-        },
+        headers={**auth_headers(k, content_type), "x-upsert": "true"},
     )
     try:
         with urlopen(req, timeout=60) as r:
