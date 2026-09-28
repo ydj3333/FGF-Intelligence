@@ -44,6 +44,7 @@ ENTITY_ALIASES={
  "building":["building","buildings","facility","facilities"],
  "resources":["resource","resources","materials","metals","water"],
  "kaboom robot":["kaboom robot","kaboom robots","kaboom, robots","kaboom"],
+ "shadowfront":["shadowfront","shadowfront event","outer rim outpost shadowfront"],
 }
 PROPERTY_ALIASES={
  "unlock_level":["level","unlock","unlocks","unlocking","appear","appears","available","availability","access","opens","introduced"],
