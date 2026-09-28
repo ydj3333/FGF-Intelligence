@@ -135,6 +135,41 @@ def _similarity_index(a,bb,bb_tokens,bb_grams):
  return .7*word+.3*char
 
 class QuestionParser:
+ def __init__(self, claims=None):
+  # Tier-1/Tier-2 terminology is a first-class vocabulary. Manual aliases
+  # remain for semantic synonyms, but canonical names must never depend on
+  # a hand-maintained alias list.
+  self.canonical_keywords=set()
+  self.canonical_phrases=set()
+  for c in claims or []:
+   tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
+   if "tier 1" not in tier and "tier 2" not in tier:
+    continue
+   text=" ".join(str(c.get(k,"") or "") for k in (
+    "Claim","claim","Category","category","Source","source","Claim Type","claim_type"
+   ))
+   toks=[t for t in _tokens(text) if t not in STOP and len(t)>2]
+   self.canonical_keywords.update(toks)
+   # Preserve multi-word named terminology, especially capitalized game
+   # entities (Shadowfront, Commerce Guild, Outer Rim Outpost, etc.).
+   for m in re.finditer(r"\b[A-Z][A-Za-z0-9'&-]*(?:\s+[A-Z][A-Za-z0-9'&-]*){1,5}\b", text):
+    phrase=m.group(0).strip().lower()
+    if len(phrase.split()) >= 2:
+     self.canonical_phrases.add(phrase)
+
+ def _canonical_entity(self, ql):
+  candidates=[]
+  for phrase in self.canonical_phrases:
+   if re.search(r"\b"+re.escape(phrase)+r"\b", ql):
+    candidates.append((len(phrase.split()), len(phrase), phrase))
+  if candidates:
+   return max(candidates)[2]
+  q_tokens=_tokens(ql)
+  single=[t for t in q_tokens if t in self.canonical_keywords and t not in STOP]
+  if single:
+   return max(single, key=lambda x:(len(x), x))
+  return "unknown"
+
  def parse(self,question):
   q=question.strip(); ql=q.lower()
   entity="unknown"
@@ -150,6 +185,8 @@ class QuestionParser:
      entity_candidates.append((max(len(phrase) for phrase in matched),e))
    if entity_candidates:
     entity=max(entity_candidates)[1]
+   else:
+    entity=self._canonical_entity(ql)
   qualifier=""
   if entity!="unknown":
    m=re.search(r"\b([a-z][a-z-]{2,})\s+"+re.escape(entity)+r"\b",ql)
@@ -212,7 +249,7 @@ class QuestionParser:
 
 class KnowledgeQueryEngine:
  def __init__(self,claims, alias_groups=None):
-  self.claims=claims; self.parser=QuestionParser(); self.graph=EvidenceGraph(claims, alias_groups=alias_groups)
+  self.claims=claims; self.parser=QuestionParser(claims); self.graph=EvidenceGraph(claims, alias_groups=alias_groups)
   self._index=[(c,_blob(c),_norm_tokens(_blob(c)),_char_grams(_blob(c))) for c in claims]
  def parse(self,q): return self.parser.parse(q)
  def _entity_score(self,p,c):
