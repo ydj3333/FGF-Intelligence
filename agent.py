@@ -12,6 +12,7 @@ from fgf_orchestrator import FGFOrchestrator
 from live_runtime import LiveObservationRuntime
 from operational_intelligence import build_operational_output
 from youtube_evidence_provider import YouTubeEvidenceProvider
+from knowledge_query_engine import QuestionParser
 
 ROOT=Path(__file__).parent
 ROOT=Path(__file__).parent
@@ -20,6 +21,7 @@ LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixz
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v6.0.0-knowledge-query-engine'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
+CANONICAL_VOCABULARY_AUDIT=QuestionParser(CLAIMS).vocabulary_audit()
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
 SUPABASE_SECRET=os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY')
@@ -1226,7 +1228,7 @@ class H(BaseHTTPRequestHandler):
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
             avg=(sum(LLM_HEALTH['latencies_ms'])/len(LLM_HEALTH['latencies_ms'])) if LLM_HEALTH['latencies_ms'] else None
             synthesis={**LLM_HEALTH,'configured':configured,'model':LLM_MODEL,'average_latency_ms':round(avg,1) if avg is not None else None}
-            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'knowledge_generated':DATA.get('generated')})
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'canonical_vocabulary':CANONICAL_VOCABULARY_AUDIT,'knowledge_generated':DATA.get('generated')})
         if u.path=='/api/v63/live/status':
             if not _observer_authorized(self):
                 return self._json({'ok':False,'error':'Observer authorization required'},401)
