@@ -21,6 +21,12 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertIn("Intel Shop", shops)
         self.assertIn("Regular Shop", shops)
 
+    def test_kaboom_combo_is_structured(self):
+        out=build_operational_output("best combo for Kaboom event", [])
+        self.assertEqual(out["mode"], "event_combo")
+        self.assertTrue(any("Zora + Lily + Jodie" in row[1] for row in out["rows"]))
+        self.assertIn("community", out["basis"].lower())
+
     def test_no_operational_trigger_for_plain_mechanic(self):
         self.assertIsNone(build_operational_output("What does Kinetic counter?", []))
 
