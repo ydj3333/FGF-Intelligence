@@ -43,13 +43,11 @@ def classify_intent(question: str, question_type: str = "") -> str:
         "implication", "what does this suggest"
     )):
         return "interpretation"
-    # A generic event/entity lookup is factual by default. Returning
+    # Generic event/entity lookups are factual by default. Returning
     # "ambiguous" here caused valid canonical queries such as "shadowfront
     # event" to be answered correctly by Core but then mislabeled as an
     # abstention by the orchestration layer. Ambiguity should be reserved for
     # questions whose missing context can materially change the factual answer.
-    if question_type in {"generic", ""}:
-        return "factual"
     return "factual"
 
 
