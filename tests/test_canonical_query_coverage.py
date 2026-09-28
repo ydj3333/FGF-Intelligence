@@ -37,6 +37,7 @@ def test_supported_specialized_queries_are_not_invented():
     by_intent = {(c["entity"], c["intent"]) for c in cases}
     assert ("weapon prisms", "source") in by_intent
     assert ("commerce guild", "update") in by_intent
+    assert ("commerce guild", "numeric") not in by_intent
     assert ("shadowfront", "numeric") in by_intent
 
 
