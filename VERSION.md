@@ -1,7 +1,7 @@
 # FGF Intelligence Version Contract
 
 ## Current release
-- Version: 6.5.1
+- Version: 6.5.2
 - Name: Evidence-Safe Video Retrieval + Canonical Vocabulary Hardening
 - Baseline: v6.2 green core plus Evidence Graph v2
 - Branch: main
@@ -38,6 +38,11 @@
 4. Distinctive-token selection reduces generic-token entity collisions.
 5. CI explicitly checks Tier-1/Tier-2 vocabulary discoverability.
 6. Regression workflow YAML is syntax-correct and runs on main pushes and pull requests.
+
+## v6.5.2 — Generic Lookup Policy Fix
+1. Evidence-backed generic entity/event lookups are treated as factual by default.
+2. Generic canonical queries no longer get mislabeled as orchestration abstentions.
+3. Regression coverage locks the Core branch for generic lookups with official evidence.
 
 ## Non-regression contract
 The system must preserve:
