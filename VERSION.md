@@ -2,7 +2,7 @@
 
 ## Current release
 - Version: 6.5.2
-- Name: Evidence-Safe Video Retrieval + Canonical Vocabulary Hardening
+- Name: Canonical Vocabulary Audit & Evidence-Safe Retrieval
 - Baseline: v6.2 green core plus Evidence Graph v2
 - Branch: main
 
@@ -43,6 +43,14 @@
 1. Evidence-backed generic entity/event lookups are treated as factual by default.
 2. Generic canonical queries no longer get mislabeled as orchestration abstentions.
 3. Regression coverage locks the Core branch for generic lookups with official evidence.
+
+## v6.6.0 — Canonical Vocabulary Audit & Observability
+1. Production derives Tier-1/Tier-2 vocabulary directly from the canonical claim corpus.
+2. Multi-word canonical entities and singular/plural variants are audited deterministically.
+3. Production health exposes vocabulary coverage metrics so deployment health is observable.
+4. Regression tests cover canonical vocabulary counts and common query variants.
+5. Generic evidence-backed entity/event lookups remain factual and Core-first.
+6. No new source or claim is introduced by the audit layer; it only measures the canonical corpus.
 
 ## Non-regression contract
 The system must preserve:
