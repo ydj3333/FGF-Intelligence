@@ -97,17 +97,77 @@ class FGFOrchestrator:
                 limit=4, validated_only=True
             )
 
-        if intent in ("strategy", "interpretation") and experience:
+        # YouTube/community is a strategy/interpretation enrichment layer, not
+        # merely an emergency path. This closes the loophole where a video is
+        # indexed but never consulted because Core already returned something.
+        # Factual answers remain canonical-only.
+        youtube = []
+        youtube_allowed = intent in ("strategy", "interpretation")
+        if youtube_allowed and self.youtube_provider is not None:
+            youtube = self.youtube_provider.find_relevant(
+                question, player_context=player_context, limit=4
+            )
+
+        if intent in ("strategy", "interpretation") and (experience or youtube):
             answer = core.get("answer", "")
             additions = [
                 f"Observed/validated experience: {item.get('pattern', '')}"
                 for item in experience
             ]
+            if youtube:
+                additions.extend(
+                    f"YouTube/community enrichment: {item.get('summary', item.get('claim', ''))}"
+                    for item in youtube
+                )
             if additions:
                 answer = (answer + "\n\n" if answer else "") + "\n".join(
                     f"• {x}" for x in additions
                 )
+            branches = ["core"]
+            if experience:
+                branches.append("experience")
+            if youtube:
+                branches.append("youtube")
             return OrchestrationResult(
+                answer=answer,
+                branch="+".join(branches),
+                evidence_state="SUPPORTED" if experience else "COMMUNITY_INTERPRETATION",
+                abstained=False,
+                core_answerable=not core_abstains,
+                warnings=(
+                    ["Experience comes from repeated gameplay observations and is not an official mechanic."]
+                    if experience else
+                    [
+                        "YouTube/community evidence is enrichment/fallback material and never canonical truth.",
+                        "Check current official/in-game evidence before treating it as a mechanic."
+                    ]
+                ),
+                core=core, experience=experience, youtube=youtube,
+                provenance={"branches_used": branches},
+            ).as_dict()
+
+        if core_abstains and youtube_allowed and youtube:
+            answer = (
+                "The current canonical FGF corpus does not establish this. "
+                "The following YouTube/community material is fallback evidence "
+                "and must not be treated as canonical game truth.\n\n"
+                + "\n".join(
+                    f"• {x.get('summary', x.get('claim', ''))}" for x in youtube
+                )
+            )
+            return OrchestrationResult(
+                answer=answer, branch="youtube_fallback",
+                evidence_state="COMMUNITY_INTERPRETATION",
+                abstained=False, core_answerable=False,
+                warnings=[
+                    "YouTube/community evidence is fallback material and never canonical truth.",
+                    "Check current official/in-game evidence before treating it as a mechanic."
+                ],
+                core=core, experience=[], youtube=youtube,
+                provenance={"branches_used": ["core", "youtube"]},
+            ).as_dict()
+
+        return OrchestrationResult(
                 answer=answer,
                 branch="core+experience",
                 evidence_state="SUPPORTED",
