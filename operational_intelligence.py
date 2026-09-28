@@ -51,6 +51,13 @@ PLAYBOOKS = {
     }
 }
 
+KABOOM_COMBO_ROWS = [
+    ["Primary community combo","Zora + Lily + Jodie","Zora grouping + Lily AoE/bomb damage + Jodie weapon effects are reported as working together against grouped enemies.","COMMUNITY — Under Review"],
+    ["Core strategy","Fast AoE wave clearing","Community guidance prioritizes clearing waves quickly rather than relying on slow single-target damage.","COMMUNITY — Under Review"],
+    ["Key mechanic","Enemy grouping","Zora is reported to group enemies tightly; grouping is reported to improve clear efficiency.","COMMUNITY — Under Review"],
+    ["Performance caveat","Wave/spawn RNG matters","Community material reports that spawn positioning can affect clear times; treat this as experience, not a guaranteed mechanic.","COMMUNITY — Under Review"],
+]
+
 SHOP_ROWS = [
     {"shop":"Intel Shop","priority":"Weapon Prisms; then Deep Space Beacons","buy_when":"When the item advances a current progression need and the exchange is supported by the shop's current inventory/value.","save":"Currency for higher-value progression items if not immediately needed.","avoid":"Unverified items or purchases whose current exchange value is unknown.","state":"COMMUNITY_GUIDE"},
     {"shop":"Black Market","priority":"Discounted Speedups and rare materials","buy_when":"When the discount materially supports a current event/progression objective.","save":"Currency for unusually strong discounts and scarce materials.","avoid":"Routine purchases without a current need.","state":"COMMUNITY_GUIDE"},
@@ -75,6 +82,18 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
     wants_event = key is not None or any(x in ql for x in ("day by day","day-by-day","daily plan","event schedule","event plan","what should i do each day"))
     wants_shop = any(x in ql for x in ("shop","shops","store","stores","buy in different shops","what to buy"))
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
+    wants_combo = any(x in ql for x in ("combo","team","lineup","champion")) and "kaboom" in ql
+    if wants_combo:
+        return {
+            "mode":"event_combo",
+            "title":"Kaboom, Robots! — evidence-backed combo",
+            "basis":"Official evidence establishes the event mechanics; no official 'best combo' claim was found. The lineup below is community evidence and remains Under Review.",
+            "core_evidence_count":len(evidence),
+            "source_state":"COMMUNITY_ENRICHMENT",
+            "columns":["Aspect","Current answer","Why","Evidence state"],
+            "rows":KABOOM_COMBO_ROWS,
+            "guardrail":"Do not treat the community lineup as a canonical game rule. Re-check current Season 2/in-game behavior and your available Champion levels before committing resources."
+        }
     if key and wants_event:
         p=PLAYBOOKS[key]
         return {
