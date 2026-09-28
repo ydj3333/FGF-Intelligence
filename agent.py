@@ -1244,7 +1244,19 @@ class H(BaseHTTPRequestHandler):
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
             if qs.get('core_level',[''])[0]: ctx['core_level']=qs.get('core_level',[''])[0]
-            return self._json(answer(q,ctx or None))
+            try:
+                return self._json(answer(q,ctx or None))
+            except Exception as exc:
+                # API boundary must fail as JSON, never as an upstream HTML/502.
+                # The underlying exception is logged by the process platform;
+                # the client receives a stable diagnostic contract.
+                return self._json({
+                    'ok': False,
+                    'error': 'ask_engine_error',
+                    'message': 'The Ask engine encountered an internal error.',
+                    'exception_type': type(exc).__name__,
+                    'release': RELEASE,
+                }, 500)
         if u.path=='/api/recommend':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];objective=qs.get('objective',['general'])[0];return self._json(recommend(q,objective))
         if u.path=='/api/v5/priority':
