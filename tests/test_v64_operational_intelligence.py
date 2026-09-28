@@ -72,6 +72,35 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertEqual(engine.parse("where are Weapon Prisms").entity, "weapon prisms")
         self.assertEqual(engine.parse("what is the Outer Rim Outpost").entity, "outer rim outpost")
 
+    def test_canonical_vocabulary_audit_is_populated(self):
+        import json
+        from pathlib import Path
+        from knowledge_query_engine import KnowledgeQueryEngine
+        data=json.loads((Path(__file__).resolve().parents[1]/"data"/"knowledge.json").read_text(encoding="utf-8"))
+        engine=KnowledgeQueryEngine(data.get("claims",[]))
+        audit=engine.parser.vocabulary_audit()
+        self.assertGreater(audit["tier12_keyword_count"], 0)
+        self.assertGreater(audit["tier12_phrase_alias_count"], 0)
+        self.assertGreater(audit["tier12_phrase_count"], 0)
+
+    def test_canonical_named_entities_survive_common_query_variants(self):
+        from knowledge_query_engine import KnowledgeQueryEngine
+        claims=[
+            {"Claim":"Commerce Guild rewards in Shadowfront were increased.","Evidence Tier":"Tier 2 — Official Developer","Status":"Current"},
+            {"Claim":"Weapon Prisms are listed in the Discount Shop.","Evidence Tier":"Tier 2 — Official Developer","Status":"Current"},
+            {"Claim":"The Outer Rim Outpost Shadowfront protects traders.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        ]
+        engine=KnowledgeQueryEngine(claims)
+        variants=[
+            ("Commerce Guild", "Commerce Guilds", "what changed in Commerce Guilds"),
+            ("Weapon Prism", "Weapon Prisms", "where are Weapon Prisms"),
+            ("Outer Rim Outpost", "Outer Rim Outpost", "what is the Outer Rim Outpost"),
+        ]
+        for singular,plural,question in variants:
+            p=engine.parse(question)
+            self.assertNotEqual(p.entity,"unknown")
+            self.assertIn(p.entity, {singular.lower(),plural.lower()})
+
     def test_no_operational_trigger_for_plain_mechanic(self):
         self.assertIsNone(build_operational_output("What does Kinetic counter?", []))
 
