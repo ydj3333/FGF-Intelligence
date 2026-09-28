@@ -1,9 +1,9 @@
-name: FGF v6.4 Operational Intelligence Tests
+name: FGF v6.5 Intelligence Regression Tests
 
 on:
   push:
     branches:
-      - feature/v6.3-live-experiential-intelligence
+      - main\n      - feature/v6-5-video-event-retrieval
   pull_request:
     branches:
       - main
@@ -21,7 +21,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install pytest
-      - name: Run v6.3/v6.4 architecture and operational tests
+      - name: Run v6.3/v6.4/v6.5 architecture, operational and video tests
         env:
           PYTHONPATH: .
-        run: pytest -q tests/test_v63_experiential_architecture.py tests/test_v64_operational_intelligence.py
+        run: pytest -q tests/test_v63_experiential_architecture.py tests/test_v64_operational_intelligence.py tests/test_v65_video_retrieval.py
