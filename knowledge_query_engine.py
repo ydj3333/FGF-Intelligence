@@ -142,7 +142,6 @@ class QuestionParser:
   self.canonical_keywords=set()
   self.canonical_phrases=set()
   self.canonical_phrase_aliases={}
-  self.canonical_keyword_aliases={}
   self._canonical_doc_freq={}
 
   def _singular(token):
@@ -207,7 +206,6 @@ class QuestionParser:
   q_tokens=_tokens(ql)
   single=[t for t in q_tokens if t in self.canonical_keywords and t not in STOP]
   if single:
-   total=max(1,len(self._canonical_doc_freq))
    return max(
     single,
     key=lambda x:(
