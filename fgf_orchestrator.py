@@ -168,48 +168,14 @@ class FGFOrchestrator:
             ).as_dict()
 
         return OrchestrationResult(
-                answer=answer,
-                branch="core+experience",
-                evidence_state="SUPPORTED",
-                abstained=False,
-                core_answerable=not core_abstains,
-                warnings=["Experience comes from repeated gameplay observations and is not an official mechanic."],
-                core=core, experience=experience, youtube=[],
-                provenance={"branches_used": ["core", "experience"]},
-            ).as_dict()
-
-        youtube = []
-        if core_abstains and self.youtube_provider is not None:
-            youtube = self.youtube_provider.find_relevant(
-                question, player_context=player_context, limit=4
-            )
-            if youtube:
-                answer = (
-                    "The current canonical FGF corpus does not establish this. "
-                    "The following YouTube/community material is fallback evidence "
-                    "and must not be treated as canonical game truth.\n\n"
-                    + "\n".join(
-                        f"• {x.get('summary', x.get('claim', ''))}" for x in youtube
-                    )
-                )
-                return OrchestrationResult(
-                    answer=answer, branch="youtube_fallback",
-                    evidence_state="COMMUNITY_INTERPRETATION",
-                    abstained=False, core_answerable=False,
-                    warnings=[
-                        "YouTube/community evidence is fallback material.",
-                        "Check current official/in-game evidence before treating it as a mechanic."
-                    ],
-                    core=core, experience=[], youtube=youtube,
-                    provenance={"branches_used": ["core", "youtube"]},
-                ).as_dict()
-
-        return OrchestrationResult(
             answer=core.get("answer", "The current evidence is insufficient."),
             branch="core_abstention",
             evidence_state="INSUFFICIENT_EVIDENCE",
-            abstained=True, core_answerable=False,
+            abstained=True,
+            core_answerable=False,
             warnings=["No validated experiential or fallback evidence was available."],
-            core=core, experience=experience, youtube=[],
+            core=core,
+            experience=experience,
+            youtube=[],
             provenance={"branches_used": ["core"]},
         ).as_dict()
