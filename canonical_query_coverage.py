@@ -47,8 +47,7 @@ DATE_ONLY = re.compile(
 )
 YEAR_ONLY = re.compile(r"\b(?:19|20)\d{2}\b")
 CARDINALITY = re.compile(
-    r"\b(?:contains?|has|have|includes?|up\s+to|maximum\s+of|total\s+of)\s+"
-    r"\d[\d,.]*\b",
+    r"\b(?:contains?|has|have|includes?)\s+\d[\d,.]*\b",
     re.I,
 )
 
@@ -143,18 +142,41 @@ def canonical_entities(claims: List[Dict[str, Any]]) -> List[Tuple[str, List[Dic
     return sorted(grouped.items())
 
 
-def _numeric_supporting_claims(entity: str, claims: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Only create cardinality cases such as 'Shadowfront contains 8 ...'.
+def _has_non_date_numeric(text: str) -> bool:
+    cleaned = DATE_ONLY.sub(" ", text)
+    cleaned = YEAR_ONLY.sub(" ", cleaned)
+    return bool(re.search(r"\b\d[\d,.]*(?:%|\b)", cleaned))
 
-    A date, level, year, or unrelated numeric value is not enough to manufacture
-    a 'how many' question for an entity.
+
+def _numeric_supporting_claims(entity: str, claims: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Only create cardinality cases where the number belongs to the entity.
+
+    Example accepted: 'Shadowfront contains 8 Lesser Vaults.'
+    Example rejected: 'up to 10 extra Holy Tribute Vessel runs' because the
+    number describes runs, not the number of Tribute Vessels.
     """
     out = []
+    variants = [entity]
+    words = entity.split()
+    if words and not words[-1].endswith("s"):
+        variants.append(" ".join(words[:-1] + [words[-1] + "s"]))
     for claim in claims:
         for sentence in re.split(r"(?<=[.!?])\s+|\n+", _text(claim)):
-            if not _phrase_claims([{"Claim": sentence}], entity):
+            low = sentence.lower()
+            if not any(re.search(r"\b" + re.escape(v) + r"\b", low) for v in variants):
                 continue
-            if CARDINALITY.search(sentence):
+            if not CARDINALITY.search(low):
+                continue
+            # Require the entity to be the subject of the cardinality phrase,
+            # rather than merely appearing later as the object of the number.
+            if any(
+                re.search(
+                    r"\b" + re.escape(v) + r"\b.{0,50}" + CARDINALITY.pattern,
+                    low,
+                    re.I,
+                )
+                for v in variants
+            ):
                 out.append(claim)
                 break
     return out
