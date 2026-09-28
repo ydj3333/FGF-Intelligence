@@ -46,6 +46,11 @@ DATE_ONLY = re.compile(
     re.I,
 )
 YEAR_ONLY = re.compile(r"\b(?:19|20)\d{2}\b")
+CARDINALITY = re.compile(
+    r"\b(?:contains?|has|have|includes?|up\s+to|maximum\s+of|total\s+of)\s+"
+    r"\d[\d,.]*\b",
+    re.I,
+)
 
 
 def load_canonical_claims(path: str | Path | None = None) -> List[Dict[str, Any]]:
@@ -116,10 +121,6 @@ def _manual_canonical_entities(claims: List[Dict[str, Any]]) -> List[str]:
 
 
 def canonical_entities(claims: List[Dict[str, Any]]) -> List[Tuple[str, List[Dict[str, Any]]]]:
-    # The v6.6 parser vocabulary contains useful subphrase aliases for recall.
-    # The benchmark deliberately does not treat every subphrase as a separate
-    # entity. It uses complete capitalized runs plus supported established
-    # aliases, then normalizes each candidate through the production parser.
     parser = QuestionParser(claims)
     grouped: Dict[str, List[Dict[str, Any]]] = {}
 
@@ -142,17 +143,21 @@ def canonical_entities(claims: List[Dict[str, Any]]) -> List[Tuple[str, List[Dic
     return sorted(grouped.items())
 
 
-def _has_non_date_numeric(text: str) -> bool:
-    cleaned = DATE_ONLY.sub(" ", text)
-    cleaned = YEAR_ONLY.sub(" ", cleaned)
-    return bool(re.search(r"\b\d[\d,.]*(?:%|\b)", cleaned))
-
-
 def _numeric_supporting_claims(entity: str, claims: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    return [
-        claim for claim in claims
-        if _phrase_claims([claim], entity) and _has_non_date_numeric(_text(claim))
-    ]
+    """Only create cardinality cases such as 'Shadowfront contains 8 ...'.
+
+    A date, level, year, or unrelated numeric value is not enough to manufacture
+    a 'how many' question for an entity.
+    """
+    out = []
+    for claim in claims:
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", _text(claim)):
+            if not _phrase_claims([{"Claim": sentence}], entity):
+                continue
+            if CARDINALITY.search(sentence):
+                out.append(claim)
+                break
+    return out
 
 
 def _event_supported(entity: str, claims: List[Dict[str, Any]]) -> bool:
