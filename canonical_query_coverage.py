@@ -119,15 +119,27 @@ def canonical_entities(claims: List[Dict[str, Any]]) -> List[Tuple[str, List[Dic
     # The v6.6 parser vocabulary contains useful subphrase aliases for recall.
     # The benchmark deliberately does not treat every subphrase as a separate
     # entity. It uses complete capitalized runs plus supported established
-    # aliases, which is the meaningful player-facing vocabulary.
+    # aliases, then normalizes each candidate through the production parser.
+    parser = QuestionParser(claims)
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+
     candidates = set(_capitalized_entities(claims))
     candidates.update(_manual_canonical_entities(claims))
-    entities = []
-    for phrase in sorted(candidates):
-        supporting = _phrase_claims(claims, phrase)
-        if supporting:
-            entities.append((phrase, supporting))
-    return entities
+
+    for candidate in sorted(candidates):
+        supporting = _phrase_claims(claims, candidate)
+        if not supporting:
+            continue
+        parsed = parser.parse(f"what is {candidate}")
+        entity = parsed.entity
+        if entity == "unknown":
+            continue
+        grouped.setdefault(entity, [])
+        for claim in supporting:
+            if claim not in grouped[entity]:
+                grouped[entity].append(claim)
+
+    return sorted(grouped.items())
 
 
 def _has_non_date_numeric(text: str) -> bool:
@@ -167,8 +179,7 @@ def build_query_cases(claims: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             queries.append(("source", f"how do i get {entity}"))
         if _contains_marker(combined, REQUIREMENT_MARKERS):
             queries.append(("requirement", f"what does {entity} require"))
-        numeric_claims = _numeric_supporting_claims(entity, supporting)
-        if numeric_claims:
+        if _numeric_supporting_claims(entity, supporting):
             queries.append(("numeric", f"how many {entity}"))
         if _event_supported(entity, supporting):
             queries.append(("event", f"{entity} event"))
