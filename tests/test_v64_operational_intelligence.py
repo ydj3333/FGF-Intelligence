@@ -27,6 +27,19 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertTrue(any("Zora + Lily + Jodie" in row[1] for row in out["rows"]))
         self.assertIn("community", out["basis"].lower())
 
+    def test_tier12_terms_are_auto_keywords(self):
+        from knowledge_query_engine import KnowledgeQueryEngine
+        claims=[
+            {
+                "Claim":"Commerce Guild rewards in Shadowfront were increased in the September 22, 2026 hot update.",
+                "Evidence Tier":"Tier 2 — Official Developer",
+                "Status":"Current"
+            }
+        ]
+        engine=KnowledgeQueryEngine(claims)
+        parsed=engine.parse("what changed in Shadowfront")
+        self.assertEqual(parsed.entity, "shadowfront")
+
     def test_no_operational_trigger_for_plain_mechanic(self):
         self.assertIsNone(build_operational_output("What does Kinetic counter?", []))
 
