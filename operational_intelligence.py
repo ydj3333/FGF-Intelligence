@@ -13,6 +13,17 @@ import re
 NOT_ESTABLISHED = "Not established in current evidence"
 
 PLAYBOOKS = {
+    "shadowfront": {
+        "name": "Shadowfront",
+        "kind": "event",
+        "days": [],
+        "global": {
+            "before": "Confirm the current Shadowfront rules, vault objectives and active rewards before committing scarce resources.",
+            "during": "Use the live event objectives and protect traders in the Outer Rim Outpost; current evidence establishes that Shadowfront contains 8 Lesser Vaults and 2 Central Vaults.",
+            "after": "Claim established rewards and record event-specific outcomes for the next cycle."
+        },
+        "source":"Current Tier-1/Tier-2 FGF evidence; no day-by-day Shadowfront schedule is established in the current claim set."
+    },
     "gvg": {
         "name": "Guild vs Guild",
         "kind": "event",
@@ -73,6 +84,7 @@ def _event_key(q: str) -> str | None:
     ql=q.lower()
     if any(x in ql for x in ("guild vs guild","gvg","guild versus guild")): return "gvg"
     if any(x in ql for x in ("top 100 galactic traders","galactic traders","top 100 traders")): return "top100"
+    if "shadowfront" in ql: return "shadowfront"
     return None
 
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
