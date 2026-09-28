@@ -3,7 +3,8 @@ name: FGF v6.5 Intelligence Regression Tests
 on:
   push:
     branches:
-      - main\n      - feature/v6-5-video-event-retrieval
+      - main
+      - feature/v6-5-video-event-retrieval
   pull_request:
     branches:
       - main
