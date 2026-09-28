@@ -216,6 +216,24 @@ class QuestionParser:
    )
   return "unknown"
 
+ def vocabulary_audit(self):
+  """Return machine-readable coverage metrics for canonical Tier-1/Tier-2 terms.
+
+  This is intentionally deterministic and derived from the same corpus used
+  by production parsing. It is an audit surface, not a second source of truth.
+  """
+  phrases=sorted(self.canonical_phrase_aliases.keys())
+  keywords=sorted(self.canonical_keywords)
+  return {
+   "tier12_keyword_count": len(keywords),
+   "tier12_phrase_alias_count": len(phrases),
+   "tier12_phrase_count": len(self.canonical_phrases),
+   "distinctive_keywords": sorted(
+    keywords,
+    key=lambda x:(self._canonical_doc_freq.get(x,1), -len(x), x)
+   )[:100],
+  }
+
  def parse(self,question):
   q=question.strip(); ql=q.lower()
   entity="unknown"
