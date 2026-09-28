@@ -1,10 +1,10 @@
 # FGF Intelligence Version Contract
 
 ## Current architecture
-- Version: 6.4.0
-- Name: Operational Intelligence
+- Version: 6.5.0
+- Name: Evidence-Safe Video Retrieval + Operational Intelligence
 - Baseline: v6.2 green core plus Evidence Graph v2
-- Branch: feature/v6-4-operational-intelligence
+- Branch: main
 
 ## v6.4 adds
 1. Event day-plan generation with explicit unknowns and evidence-state labels.
@@ -13,7 +13,15 @@
 4. Player-facing structured operational output in Ask FGF.
 5. Operational regression tests.
 
-## v6.3 adds
+## v6.5 adds
+1. Event-aware YouTube/community retrieval with alias resolution.
+2. Candidate-to-video provenance with original video URL preserved.
+3. Strategy/interpretation video enrichment even when Core already answers.
+4. Factual-answer gate preventing YouTube candidates from becoming factual truth.
+5. Rejection of generic/unrelated videos for event-specific queries.
+6. Regression tests for event retrieval, leakage prevention, and enrichment.
+
+## v6.4 adds
 1. Core policy gate for authority, intent and lifecycle-aware evidence use.
 2. Live Windows observation contract and runtime API.
 3. Two-hour daily observer budget.
