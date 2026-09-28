@@ -96,6 +96,29 @@ class VideoRetrievalTests(unittest.TestCase):
         )
         self.assertEqual(provider.find_relevant("best combo for Kaboom event"), [])
 
+    def test_strategy_core_answer_is_enriched_by_youtube(self):
+        calls = []
+
+        def core(_q, _ctx=None):
+            return {
+                "answer": "Core establishes the Kaboom event mechanics.",
+                "answer_type": "knowledge_query",
+                "evidence": [{"claim": "Kaboom is an event.", "tier": "Tier 1", "status": "Confirmed"}],
+                "query": {"question_type": "strategy"},
+            }
+
+        class P:
+            def find_relevant(self, *args, **kwargs):
+                calls.append(1)
+                return [{"summary": "Video evidence discusses Kaboom wave-clearing strategy."}]
+
+        result = FGFOrchestrator(core, youtube_provider=P()).answer(
+            "best combo for Kaboom event"
+        )
+        self.assertEqual(len(calls), 1)
+        self.assertIn("YouTube/community enrichment", result["answer"])
+        self.assertEqual(result["branch"], "core+youtube")
+
     def test_factual_core_does_not_use_youtube_fallback(self):
         calls = []
 
