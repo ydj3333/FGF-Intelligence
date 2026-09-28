@@ -106,6 +106,28 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
             "rows":KABOOM_COMBO_ROWS,
             "guardrail":"Do not treat the community lineup as a canonical game rule. Re-check current Season 2/in-game behavior and your available Champion levels before committing resources."
         }
+    if key == "shadowfront":
+        p=PLAYBOOKS[key]
+        return {
+            "mode":"event_overview",
+            "title":"Shadowfront — evidence-backed event overview",
+            "basis":"Current canonical FGF evidence establishes Shadowfront facts; no day-by-day schedule is established in the current claim set.",
+            "core_evidence_count":len(evidence),
+            "source_state":"CANONICAL_CORE",
+            "global_rules":[
+                {"phase":"Established","action":"Shadowfront contains 8 Lesser Vaults and 2 Central Vaults."},
+                {"phase":"Established","action":"Traders inside the Outer Rim Outpost Shadowfront cannot be attacked by other Commerce Guilds."},
+                {"phase":"Current update","action":"Commerce Guild rewards in Shadowfront were increased in the September 22, 2026 hot update."},
+            ],
+            "columns":["Aspect","Current evidence","Evidence state"],
+            "rows":[
+                ["Vault structure","8 Lesser Vaults + 2 Central Vaults","Tier 1 — Confirmed"],
+                ["Outer Rim Outpost","Traders inside it cannot be attacked by other Commerce Guilds","Tier 1 — Confirmed"],
+                ["September 22, 2026 update","Commerce Guild rewards were increased","Tier 2 — Official Developer / Current"],
+                ["Day-by-day schedule","Not established in current evidence","UNKNOWN — do not guess"],
+            ],
+            "guardrail":"Do not invent Shadowfront day objectives, timers, rewards or spending priorities that are not established by current evidence."
+        }
     if key and wants_event:
         p=PLAYBOOKS[key]
         return {
