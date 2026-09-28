@@ -19,7 +19,7 @@ ROOT=Path(__file__).parent
 OBSERVER_TOKEN=os.getenv('FGF_OBSERVER_TOKEN','').strip()
 LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/'), os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY'))
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v6.0.0-knowledge-query-engine'
+RELEASE='v6.6.1-canonical-query-coverage'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 CANONICAL_VOCABULARY_AUDIT=QuestionParser(CLAIMS).vocabulary_audit()
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
@@ -1497,7 +1497,6 @@ try:
             merged['operational_warning'] = 'Operational renderer unavailable: ' + type(exc).__name__
         return merged
 
-    RELEASE = 'v6.5.2-generic-lookup-policy'
 except Exception:
     pass
 

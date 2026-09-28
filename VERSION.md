@@ -1,9 +1,9 @@
 # FGF Intelligence Version Contract
 
 ## Current release
-- Version: 6.5.2
-- Name: Canonical Vocabulary Audit & Evidence-Safe Retrieval
-- Baseline: v6.2 green core plus Evidence Graph v2
+- Version: 6.6.1
+- Name: Canonical Query Coverage Benchmark
+- Baseline: v6.6.0 canonical vocabulary audit plus Evidence Graph v2
 - Branch: main
 
 ## v6.3 — Live + Experiential Intelligence
@@ -51,6 +51,14 @@
 4. Regression tests cover canonical vocabulary counts and common query variants.
 5. Generic evidence-backed entity/event lookups remain factual and Core-first.
 6. No new source or claim is introduced by the audit layer; it only measures the canonical corpus.
+
+## v6.6.1 — Canonical Query Coverage Benchmark
+1. Deterministic coverage cases are generated from the canonical Tier-1/Tier-2 vocabulary.
+2. Meaningful player-facing entities are normalized through the production parser before benchmarking.
+3. Factual, update, source, requirement, numeric-cardinality and event cases are generated only when supported by canonical evidence.
+4. CI fails when a generated canonical query cannot be parsed to the expected entity or returns evidence-empty output.
+5. Incidental dates and unrelated numeric values cannot manufacture numeric cases.
+6. Benchmark measures retrieval coverage only; it does not promote YouTube/community evidence or invent facts.
 
 ## Non-regression contract
 The system must preserve:
