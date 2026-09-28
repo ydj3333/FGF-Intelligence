@@ -40,6 +40,26 @@ class OperationalIntelligenceTests(unittest.TestCase):
         parsed=engine.parse("what changed in Shadowfront")
         self.assertEqual(parsed.entity, "shadowfront")
 
+    def test_all_tier12_claims_have_keyword_path(self):
+        import json
+        from pathlib import Path
+        from knowledge_query_engine import KnowledgeQueryEngine, STOP, _tokens
+        data=json.loads((Path(__file__).resolve().parents[1]/"data"/"knowledge.json").read_text(encoding="utf-8"))
+        tier12=[c for c in data.get("claims",[]) if "tier 1" in str(c.get("Evidence Tier",c.get("tier",""))).lower() or "tier 2" in str(c.get("Evidence Tier",c.get("tier",""))).lower()]
+        self.assertGreater(len(tier12), 0)
+        engine=KnowledgeQueryEngine(tier12)
+        checked=0
+        for claim in tier12:
+            text=str(claim.get("Claim",claim.get("claim","")))
+            terms=[t for t in _tokens(text) if t not in STOP and len(t)>=5]
+            if not terms:
+                continue
+            term=max(terms,key=len)
+            parsed=engine.parse("what is "+term)
+            self.assertNotEqual(parsed.entity,"unknown",msg="Tier-1/Tier-2 term not discoverable: "+term)
+            checked+=1
+        self.assertGreaterEqual(checked, 1)
+
     def test_no_operational_trigger_for_plain_mechanic(self):
         self.assertIsNone(build_operational_output("What does Kinetic counter?", []))
 
