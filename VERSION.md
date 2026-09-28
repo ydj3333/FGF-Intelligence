@@ -1,37 +1,46 @@
 # FGF Intelligence Version Contract
 
-## Current architecture
-- Version: 6.5.0
-- Name: Evidence-Safe Video Retrieval + Operational Intelligence
+## Current release
+- Version: 6.5.1
+- Name: Evidence-Safe Video Retrieval + Canonical Vocabulary Hardening
 - Baseline: v6.2 green core plus Evidence Graph v2
 - Branch: main
 
-## v6.4 adds
+## v6.3 — Live + Experiential Intelligence
+1. Core-first policy gate for authority, intent and lifecycle-aware evidence use.
+2. Live Windows observation contract and runtime API.
+3. Two-hour daily observer budget.
+4. Structured observation events and repeated-pattern experience learning.
+5. Human feedback ingestion as a learning signal, never canonical proof.
+6. YouTube/community remains enrichment/fallback and never silently becomes canonical truth.
+
+## v6.4 — Operational Intelligence
 1. Event day-plan generation with explicit unknowns and evidence-state labels.
 2. Shop-by-shop buying matrices with USE/SAVE/AVOID guardrails.
 3. Resource allocation matrices for event spending.
 4. Player-facing structured operational output in Ask FGF.
-5. Operational regression tests.
+5. Kaboom and Shadowfront event surfaces with evidence-state guardrails.
+6. Operational regression tests.
 
-## v6.5 adds
+## v6.5 — Evidence-Safe Video Retrieval
 1. Event-aware YouTube/community retrieval with alias resolution.
 2. Candidate-to-video provenance with original video URL preserved.
 3. Strategy/interpretation video enrichment even when Core already answers.
 4. Factual-answer gate preventing YouTube candidates from becoming factual truth.
 5. Rejection of generic/unrelated videos for event-specific queries.
-6. Regression tests for event retrieval, leakage prevention, and enrichment.
+6. Regression tests for event retrieval, leakage prevention and enrichment.
+7. JSON-safe Ask API error handling to prevent internal exceptions becoming HTML/502 responses.
 
-## v6.4 adds
-1. Core policy gate for authority, intent and lifecycle-aware evidence use.
-2. Live Windows observation contract and runtime API.
-3. Two-hour daily observer budget.
-4. Structured observation events.
-5. Repeated-pattern experience learning with promotion gates.
-6. Simple human feedback ingestion.
-7. YouTube remains a deferred fallback/enrichment branch.
+## v6.5.1 — Canonical Vocabulary Hardening
+1. Tier-1/Tier-2 terminology is automatically indexed from the canonical claim corpus.
+2. Multi-word canonical entities are extracted from canonical claim text instead of relying only on manual aliases.
+3. Singular/plural query variants resolve to the same canonical entity.
+4. Distinctive-token selection reduces generic-token entity collisions.
+5. CI explicitly checks Tier-1/Tier-2 vocabulary discoverability.
+6. Regression workflow YAML is syntax-correct and runs on main pushes and pull requests.
 
 ## Non-regression contract
-v6.3 must preserve:
+The system must preserve:
 - core-first retrieval;
 - evidence provenance;
 - lifecycle and conflict safety;
@@ -39,7 +48,5 @@ v6.3 must preserve:
 - numeric safety;
 - existing v6.2 Objective #1 benchmark;
 - Evidence Graph v2 behavior;
-- no automatic promotion of community/YouTube/live observations into canonical facts.
-
-## Next version boundary
-v6.5 may add semantic OCR/UI extraction, richer action-to-outcome modeling, and validated YouTube fallback integration. It must not remove the v6.3/v6.4 rules.
+- no automatic promotion of community/YouTube/live observations into canonical facts;
+- explicit "Not established in current evidence" instead of invented event schedules, rewards, costs, timers or requirements.
