@@ -11,6 +11,7 @@ from deterministic_synthesis import synthesize_deterministic
 from fgf_orchestrator import FGFOrchestrator
 from live_runtime import LiveObservationRuntime
 from operational_intelligence import build_operational_output
+from youtube_evidence_provider import YouTubeEvidenceProvider
 
 ROOT=Path(__file__).parent
 ROOT=Path(__file__).parent
@@ -1448,10 +1449,11 @@ class H(BaseHTTPRequestHandler):
 # Canonical corpus synchronization is applied from the durable Supabase claim store.
 try:
     from knowledge_query_engine import answer as _knowledge_query_answer
+    _YOUTUBE_PROVIDER = YouTubeEvidenceProvider(SUPABASE_URL)
     _FGF_ORCHESTRATOR = FGFOrchestrator(
         _knowledge_query_answer,
         experience_store=LIVE_RUNTIME,
-        youtube_provider=None,
+        youtube_provider=_YOUTUBE_PROVIDER,
     )
     _CORE_ANSWER = _knowledge_query_answer
 
