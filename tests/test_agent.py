@@ -41,7 +41,7 @@ try:
     assert health["tier1"] == EXPECTED_TIER1
     assert health["conflicts"] == EXPECTED_CONFLICTS
     assert health["claim_lifecycle_aware"] is True
-    assert health["version"] == "v6.4.0-operational-intelligence"
+    assert health["version"] == "v6.6.1-canonical-query-coverage"
     assert health["response_engine"]["status"] == "ready"
     assert health["response_engine"]["primary_model"] == "fgf-v6-knowledge-query-engine"
     assert health["response_engine"]["external_api_required"] is False
@@ -80,7 +80,7 @@ try:
     assert "moonlight" in moon["answer"].lower() or "evidence" in moon["answer"].lower()
     assert any(x in moon["answer"].lower() for x in ("weekday","not established","schedule"))
     assert "Computational Component" not in moon["answer"]
-    print("FGF Agent v5.3 response-engine smoke tests: PASS")
+    print("FGF Agent v6.6.1 response-engine smoke tests: PASS")
 finally:
     proc.terminate()
     try:
