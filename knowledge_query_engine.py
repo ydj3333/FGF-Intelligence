@@ -141,33 +141,73 @@ class QuestionParser:
   # a hand-maintained alias list.
   self.canonical_keywords=set()
   self.canonical_phrases=set()
+  self.canonical_phrase_aliases={}
+  self.canonical_keyword_aliases={}
+  self._canonical_doc_freq={}
+
+  def _singular(token):
+   token=token.lower()
+   if len(token)>4 and token.endswith("ies"): return token[:-3]+"y"
+   if len(token)>4 and token.endswith("ses"): return token[:-2]
+   if len(token)>3 and token.endswith("s") and not token.endswith("ss"): return token[:-1]
+   return token
+
+  def _phrase_variants(phrase):
+   parts=phrase.split()
+   variants={phrase}
+   if len(parts)>=2:
+    last=parts[-1]
+    variants.add(" ".join(parts[:-1]+[_singular(last)]))
+    if not last.endswith("s"):
+     variants.add(" ".join(parts[:-1]+[last+"s"]))
+   return {v for v in variants if v}
+
   for c in claims or []:
    tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
    if "tier 1" not in tier and "tier 2" not in tier:
     continue
+   claim_text=str(c.get("Claim",c.get("claim","")) or "")
    text=" ".join(str(c.get(k,"") or "") for k in (
     "Claim","claim","Category","category","Source","source","Claim Type","claim_type"
    ))
    toks=[t for t in _tokens(text) if t not in STOP and len(t)>2]
    self.canonical_keywords.update(toks)
-   # Preserve multi-word named terminology, especially capitalized game
-   # entities (Shadowfront, Commerce Guild, Outer Rim Outpost, etc.).
-   for m in re.finditer(r"\b[A-Z][A-Za-z0-9'&-]*(?:\s+[A-Z][A-Za-z0-9'&-]*){1,5}\b", text):
+   for t in set(toks):
+    self._canonical_doc_freq[t]=self._canonical_doc_freq.get(t,0)+1
+
+   # Preserve multi-word named terminology from the actual claim text,
+   # including singular/plural forms. This closes the common failure where
+   # "Commerce Guilds" or "Weapon Prisms" could otherwise degrade to a
+   # generic single-token entity such as "guilds" or "prisms".
+   for m in re.finditer(r"\b[A-Z][A-Za-z0-9'&-]*(?:\s+[A-Z][A-Za-z0-9'&-]*){1,5}\b", claim_text):
     phrase=m.group(0).strip().lower()
-    if len(phrase.split()) >= 2:
-     self.canonical_phrases.add(phrase)
+    if len(phrase.split()) < 2: continue
+    self.canonical_phrases.add(phrase)
+    for variant in _phrase_variants(phrase):
+     self.canonical_phrase_aliases[variant]=phrase
 
  def _canonical_entity(self, ql):
   candidates=[]
-  for phrase in self.canonical_phrases:
-   if re.search(r"\b"+re.escape(phrase)+r"\b", ql):
-    candidates.append((len(phrase.split()), len(phrase), phrase))
+  for alias,canonical in self.canonical_phrase_aliases.items():
+   if re.search(r"\b"+re.escape(alias)+r"\b", ql):
+    candidates.append((len(alias.split()), len(alias), canonical))
   if candidates:
-   return max(candidates)[2]
+   return max(candidates, key=lambda x:(x[0],x[1],x[2]))[2]
+
+  # Every Tier-1/Tier-2 meaningful token remains discoverable, but choose
+  # the most distinctive matching token rather than simply the longest word.
   q_tokens=_tokens(ql)
   single=[t for t in q_tokens if t in self.canonical_keywords and t not in STOP]
   if single:
-   return max(single, key=lambda x:(len(x), x))
+   total=max(1,len(self._canonical_doc_freq))
+   return max(
+    single,
+    key=lambda x:(
+     1.0/(1.0+self._canonical_doc_freq.get(x,1)),
+     len(x),
+     x
+    )
+   )
   return "unknown"
 
  def parse(self,question):
