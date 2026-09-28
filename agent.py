@@ -1495,7 +1495,7 @@ try:
             merged['operational_warning'] = 'Operational renderer unavailable: ' + type(exc).__name__
         return merged
 
-    RELEASE = 'v6.5.1-canonical-vocabulary-hardening'
+    RELEASE = 'v6.5.2-generic-lookup-policy'
 except Exception:
     pass
 
