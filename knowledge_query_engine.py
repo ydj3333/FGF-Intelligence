@@ -182,9 +182,17 @@ class QuestionParser:
    for m in re.finditer(r"\b[A-Z][A-Za-z0-9'&-]*(?:\s+[A-Z][A-Za-z0-9'&-]*){1,5}\b", claim_text):
     phrase=m.group(0).strip().lower()
     if len(phrase.split()) < 2: continue
-    self.canonical_phrases.add(phrase)
-    for variant in _phrase_variants(phrase):
-     self.canonical_phrase_aliases[variant]=phrase
+    words=phrase.split()
+    if words and words[0] in {"the","a","an"}: words=words[1:]
+    # Index every meaningful 2-5 word sub-phrase so a long canonical
+    # statement such as "The Outer Rim Outpost Shadowfront" also exposes
+    # the player-facing entity "Outer Rim Outpost".
+    for n in range(2,min(5,len(words))+1):
+     for start in range(0,len(words)-n+1):
+      sub=" ".join(words[start:start+n])
+      self.canonical_phrases.add(sub)
+      for variant in _phrase_variants(sub):
+       self.canonical_phrase_aliases[variant]=sub
 
  def _canonical_entity(self, ql):
   candidates=[]
