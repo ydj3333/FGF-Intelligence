@@ -43,6 +43,7 @@ ENTITY_ALIASES={
  "crystals":["crystal","crystals","universal crystals"],
  "building":["building","buildings","facility","facilities"],
  "resources":["resource","resources","materials","metals","water"],
+ "kaboom robot":["kaboom robot","kaboom robots","kaboom, robots","kaboom"],
 }
 PROPERTY_ALIASES={
  "unlock_level":["level","unlock","unlocks","unlocking","appear","appears","available","availability","access","opens","introduced"],
