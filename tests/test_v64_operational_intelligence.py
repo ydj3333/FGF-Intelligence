@@ -60,6 +60,18 @@ class OperationalIntelligenceTests(unittest.TestCase):
             checked+=1
         self.assertGreaterEqual(checked, 1)
 
+    def test_canonical_phrases_accept_plural_queries(self):
+        from knowledge_query_engine import KnowledgeQueryEngine
+        claims=[
+            {"Claim":"Commerce Guild rewards in Shadowfront were increased.","Evidence Tier":"Tier 2 — Official Developer","Status":"Current"},
+            {"Claim":"Weapon Prisms are listed in the Discount Shop.","Evidence Tier":"Tier 2 — Official Developer","Status":"Current"},
+            {"Claim":"The Outer Rim Outpost Shadowfront protects traders.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        ]
+        engine=KnowledgeQueryEngine(claims)
+        self.assertEqual(engine.parse("what changed in Commerce Guilds").entity, "commerce guild")
+        self.assertEqual(engine.parse("where are Weapon Prisms").entity, "weapon prisms")
+        self.assertEqual(engine.parse("what is the Outer Rim Outpost").entity, "outer rim outpost")
+
     def test_no_operational_trigger_for_plain_mechanic(self):
         self.assertIsNone(build_operational_output("What does Kinetic counter?", []))
 
