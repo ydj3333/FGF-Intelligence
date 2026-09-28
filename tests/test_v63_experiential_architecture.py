@@ -45,6 +45,17 @@ def test_learning_needs_repetition_before_validation():
     assert candidates[0]["status"]=="validated"
 
 
+def test_generic_canonical_lookup_with_core_evidence_is_factual():
+    core=lambda q,ctx=None:{
+        "answer":"Shadowfront facts established.","answer_type":"knowledge_query",
+        "evidence":[{"id":"E1","claim":"Shadowfront contains 8 Lesser Vaults.","tier":"Tier 1 — Ultimate/Official"}],
+        "query":{"question_type":"generic"},
+    }
+    result=FGFOrchestrator(core).answer("shadowfront event")
+    assert result["branch"]=="core"
+    assert result["evidence_state"]=="CONFIRMED"
+    assert not result["abstained"]
+
 def test_core_remains_first():
     core=lambda q,ctx=None:{
         "answer":"Core fact: established.","answer_type":"knowledge_query",
