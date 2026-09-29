@@ -1,9 +1,9 @@
 # FGF Intelligence Version Contract
 
 ## Current release
-- Version: 6.6.1
-- Name: Canonical Query Coverage Benchmark
-- Baseline: v6.6.0 canonical vocabulary audit plus Evidence Graph v2
+- Version: 6.6.2
+- Name: Canonical Query Coverage Benchmark — Relation-Gated Hardening
+- Baseline: v6.6.1 canonical query coverage benchmark plus Evidence Graph v2
 - Branch: main
 
 ## v6.3 — Live + Experiential Intelligence
@@ -59,6 +59,13 @@
 4. CI fails when a generated canonical query cannot be parsed to the expected entity or returns evidence-empty output.
 5. Incidental dates and unrelated numeric values cannot manufacture numeric cases.
 6. Benchmark measures retrieval coverage only; it does not promote YouTube/community evidence or invent facts.
+
+## v6.6.2 — Canonical Query Coverage Relation-Gated Hardening
+1. Specialized source/update/requirement cases require an entity-local relation in the canonical claim.
+2. Numeric cases are generated from canonical cardinality statements instead of generic entity-number guesses.
+3. Numeric questions preserve the canonical counted object, improving player-facing query realism.
+4. Event cases require event evidence or an explicit event marker tied to the entity.
+5. Regression tests protect against marker leakage and numeric-case distortion.
 
 ## Non-regression contract
 The system must preserve:

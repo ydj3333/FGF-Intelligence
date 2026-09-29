@@ -52,6 +52,37 @@ def test_canonical_coverage_has_zero_retrieval_failures():
     )
 
 
+def test_specialized_cases_require_entity_local_relations():
+    claims = [
+        {
+            "Claim": "Weapon Prisms are listed in the Discount Shop. The Commerce Guild has permanent rewards.",
+            "Evidence Tier": "Tier 1 — Ultimate/Official",
+            "Status": "Confirmed",
+        },
+    ]
+    cases = build_query_cases(claims)
+    by_intent = {(c["entity"], c["intent"]) for c in cases}
+    assert ("weapon prisms", "source") not in by_intent
+    assert ("discount shop", "source") not in by_intent
+    assert ("commerce guild", "event") not in by_intent
+
+
+def test_numeric_case_uses_the_canonical_cardinality_object():
+    claims = [
+        {
+            "Claim": "Shadowfront contains 8 Lesser Vaults and 2 Central Vaults.",
+            "Evidence Tier": "Tier 1 — Ultimate/Official",
+            "Status": "Confirmed",
+            "Category": "Events",
+        },
+    ]
+    cases = build_query_cases(claims)
+    numeric = [c["query"] for c in cases if c["intent"] == "numeric"]
+    assert numeric
+    assert any("lesser vaults" in q for q in numeric)
+    assert any("shadowfront" in q for q in numeric)
+
+
 if __name__ == "__main__":
     claims = load_canonical_claims()
     report = run_coverage_benchmark(claims)
