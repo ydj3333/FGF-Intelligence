@@ -102,10 +102,10 @@ def _requested_option_count(question: str) -> int | None:
     """Extract an explicit requested alternative count without guessing."""
     ql = question.lower()
     patterns = [
-        r"\\b(?:top|give me|show me|need|want)\\s+(\\d{1,2})\\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\b",
-        r"\\b(\\d{1,2})\\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\b",
-        r"\\b(?:five|four|three|two)\\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\b",
-        r"\\b(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\s+(?:of|=)\\s*(\\d{1,2})\\b",
+        r"\b(?:top|give me|show me|need|want)\s+(\d{1,2})\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
+        r"\b(\d{1,2})\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
+        r"\b(?:five|four|three|two)\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
+        r"\b(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\s+(?:of|=)\s*(\d{1,2})\b",
     ]
     words = {"two": 2, "three": 3, "four": 4, "five": 5}
     for pattern in patterns:
