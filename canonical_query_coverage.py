@@ -28,7 +28,7 @@ UPDATE_MARKERS = (
 )
 SOURCE_MARKERS = (
     "obtain", "obtained", "get", "source", "sources", "drop", "drops",
-    "earn", "farm", "shop", "available at", "through",
+    "earn", "farm", "available at", "through",
 )
 REQUIREMENT_MARKERS = (
     "requires", "require", "need", "needed", "prerequisite", "before",
@@ -105,8 +105,15 @@ def _relation_supported(entity: str, claims: List[Dict[str, Any]], markers: Iter
             low = sentence.lower()
             if not _entity_present(low, entity):
                 continue
-            positions = [low.find(marker) for marker in marker_list if low.find(marker) >= 0]
-            entity_positions = [low.find(v) for v in _entity_variants(entity) if low.find(v) >= 0]
+            positions = []
+            for marker in marker_list:
+                for match in re.finditer(r"\b" + re.escape(marker) + r"\b", low):
+                    positions.append(match.start())
+            entity_positions = []
+            for variant in _entity_variants(entity):
+                match = re.search(r"\b" + re.escape(variant) + r"\b", low)
+                if match:
+                    entity_positions.append(match.start())
             if positions and entity_positions and min(abs(p - e) for p in positions for e in entity_positions) <= 90:
                 return True
     return False
