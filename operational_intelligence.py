@@ -69,6 +69,17 @@ KABOOM_COMBO_ROWS = [
     ["Performance caveat","Wave/spawn RNG matters","Community material reports that spawn positioning can affect clear times; treat this as experience, not a guaranteed mechanic.","COMMUNITY — Under Review"],
 ]
 
+# Five-lineup presentation is deliberately roster-aware. The current corpus establishes
+# one concrete Kaboom lineup, not five named lineups. The remaining four rows are
+# selection templates, not invented champion recommendations.
+KABOOM_LINEUP_OPTIONS = [
+    ["Lineup 1","Zora + Lily + Jodie","Known community-tested trio: grouping + AoE/bomb damage + weapon effects.","COMMUNITY — Under Review","Concrete"],
+    ["Lineup 2","Zora + Lily + [weapon-effect champion]","Keep Zora's grouping and Lily's AoE; replace Jodie only with a player-owned champion whose weapon effect is suitable for grouped targets.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+    ["Lineup 3","Zora + [AoE champion] + [weapon-effect champion]","Preserve the documented grouping core; substitute Lily and/or Jodie with owned champions matching the required roles.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+    ["Lineup 4","[grouping/control champion] + Lily + [weapon-effect champion]","Preserve Lily's documented AoE role; replace Zora only if the player has another grouping/control option supported by evidence.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+    ["Lineup 5","[control/stun] + [AoE] + [damage/weapon-effect]","Fallback when the named trio is unavailable: prioritize control/grouping, wave-clearing AoE, and a third damage/weapon-effect role.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+]
+
 SHOP_ROWS = [
     {"shop":"Intel Shop","priority":"Weapon Prisms; then Deep Space Beacons","buy_when":"When the item advances a current progression need and the exchange is supported by the shop's current inventory/value.","save":"Currency for higher-value progression items if not immediately needed.","avoid":"Unverified items or purchases whose current exchange value is unknown.","state":"COMMUNITY_GUIDE"},
     {"shop":"Black Market","priority":"Discounted Speedups and rare materials","buy_when":"When the discount materially supports a current event/progression objective.","save":"Currency for unusually strong discounts and scarce materials.","avoid":"Routine purchases without a current need.","state":"COMMUNITY_GUIDE"},
@@ -96,6 +107,20 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
     wants_combo = any(x in ql for x in ("combo","team","lineup","champion")) and "kaboom" in ql
     if wants_combo:
+        wants_five_lineups = bool(re.search(r"\b5\b|five", ql)) and any(
+            x in ql for x in ("line up", "lineup", "team", "combo")
+        )
+        if wants_five_lineups:
+            return {
+                "mode":"event_combo_options",
+                "title":"Kaboom, Robots! — 5 lineup options",
+                "basis":"The current evidence corpus establishes one concrete community lineup. Four additional rows are roster-aware selection templates rather than invented champion combinations.",
+                "core_evidence_count":len(evidence),
+                "source_state":"COMMUNITY_ENRICHMENT",
+                "columns":["Option","Lineup","Why","Evidence state","Selection state"],
+                "rows":KABOOM_LINEUP_OPTIONS,
+                "guardrail":"Only Lineup 1 is a named Kaboom community combination in the current corpus. Do not treat the four templates as validated champion combinations. Provide the player's available Champions/levels to resolve the placeholders into real alternatives without guessing."
+            }
         return {
             "mode":"event_combo",
             "title":"Kaboom, Robots! — evidence-backed combo",
