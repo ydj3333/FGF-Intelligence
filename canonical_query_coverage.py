@@ -171,14 +171,46 @@ def _manual_canonical_entities(claims: List[Dict[str, Any]]) -> List[str]:
 
 
 def canonical_entities(claims: List[Dict[str, Any]]) -> List[Tuple[str, List[Dict[str, Any]]]]:
+    """Resolve canonical entities with an indexed single pass over the corpus."""
     parser = QuestionParser(claims)
     grouped: Dict[str, List[Dict[str, Any]]] = {}
+    phrase_index: Dict[str, List[Dict[str, Any]]] = {}
 
-    candidates = set(_capitalized_entities(claims))
-    candidates.update(_manual_canonical_entities(claims))
+    # Capitalized player-facing terminology can be indexed while each claim is
+    # visited once. The previous implementation repeatedly scanned the entire
+    # 1.5k-claim corpus for every candidate phrase, which made the benchmark
+    # unnecessarily expensive as canonical vocabulary grew.
+    for claim in claims:
+        text = _text(claim)
+        for match in re.finditer(
+            r"\b[A-Z][A-Za-z0-9'&-]*(?:\s+[A-Z][A-Za-z0-9'&-]*){1,5}\b",
+            text,
+        ):
+            words = match.group(0).strip().split()
+            while words and words[0].lower() in LEADING_WORDS_TO_TRIM:
+                words.pop(0)
+            phrase = " ".join(words).lower()
+            if len(phrase.split()) >= 2:
+                phrase_index.setdefault(phrase, []).append(claim)
 
+    # Manual aliases are few and semantically established, so resolve them
+    # with a single claim scan rather than multiplying corpus-wide regex passes.
+    manual_alias_hits: Dict[str, List[Dict[str, Any]]] = {}
+    for claim in claims:
+        low = _text(claim).lower()
+        for entity, aliases in ENTITY_ALIASES.items():
+            if any(
+                re.search(r"\b" + re.escape(alias.lower()) + r"\b", low)
+                for alias in (entity, *aliases)
+            ):
+                manual_alias_hits.setdefault(entity.lower(), []).append(claim)
+
+    candidates = set(phrase_index) | set(manual_alias_hits)
     for candidate in sorted(candidates):
-        supporting = _phrase_claims(claims, candidate)
+        supporting = list(phrase_index.get(candidate, []))
+        for claim in manual_alias_hits.get(candidate, []):
+            if claim not in supporting:
+                supporting.append(claim)
         if not supporting:
             continue
         parsed = parser.parse(f"what is {candidate}")
