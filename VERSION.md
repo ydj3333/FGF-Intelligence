@@ -1,3 +1,10 @@
+## v6.6.3 — Requested-Option Verification & Roster-Aware Kaboom Output
+
+- Explicit alternative counts (for example, 5 lineups) are detected and structurally verified against returned options.
+- Kaboom five-lineup requests return one evidence-backed named combination plus roster-dependent templates rather than invented Champion names.
+- Output verification exposes requested count, returned count, concrete validated options, roster-required options, and whether player roster context is required.
+- No new game claims or unsupported Champion combinations are introduced.
+
 # FGF Intelligence Version Contract
 
 ## Current release
