@@ -27,6 +27,16 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertTrue(any("Zora + Lily + Jodie" in row[1] for row in out["rows"]))
         self.assertIn("community", out["basis"].lower())
 
+    def test_kaboom_five_lineup_request_returns_five_options(self):
+        out=build_operational_output("best strategy for kaboom champions combo 5 line ups", [])
+        self.assertEqual(out["mode"], "event_combo_options")
+        self.assertEqual(len(out["rows"]), 5)
+        self.assertIn("Zora + Lily + Jodie", out["rows"][0][1])
+        self.assertEqual(out["rows"][0][4], "Concrete")
+        self.assertTrue(all(row[4] in {"Concrete", "Roster required"} for row in out["rows"]))
+        self.assertTrue(any("Roster required" == row[4] for row in out["rows"][1:]))
+        self.assertIn("without guessing", out["guardrail"])
+
     def test_tier12_terms_are_auto_keywords(self):
         from knowledge_query_engine import KnowledgeQueryEngine
         claims=[
