@@ -41,7 +41,7 @@ try:
     assert health["tier1"] == EXPECTED_TIER1
     assert health["conflicts"] == EXPECTED_CONFLICTS
     assert health["claim_lifecycle_aware"] is True
-    assert health["version"] == "v6.6.2-canonical-query-coverage-hardening"
+    assert health["version"] == "v6.6.3-kaboom-five-lineup-options"
     assert health["response_engine"]["status"] == "ready"
     assert health["response_engine"]["primary_model"] == "fgf-v6-knowledge-query-engine"
     assert health["response_engine"]["external_api_required"] is False
