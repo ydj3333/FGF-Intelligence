@@ -63,6 +63,11 @@ def load_canonical_claims(path: str | Path | None = None) -> List[Dict[str, Any]
     ]
 
 
+def _contains_marker(text: str, markers: Iterable[str]) -> bool:
+    low = text.lower()
+    return any(marker.lower() in low for marker in markers)
+
+
 def _claim_sentences(claim: Dict[str, Any]) -> List[str]:
     return [
         sentence.strip()
@@ -256,38 +261,6 @@ def build_query_cases(claims: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         for numeric_query, _numeric_claim in _numeric_supporting_cases(entity, supporting):
             queries.append(("numeric", numeric_query))
 
-        if _event_supported(entity, supporting):
-            queries.append(("event", f"{entity} event"))
-
-        for intent, query in queries:
-            key = (entity, intent, query)
-            if key in seen:
-                continue
-            seen.add(key)
-            cases.append({
-                "entity": entity,
-                "intent": intent,
-                "query": query,
-                "supporting_claims": supporting,
-            })
-    return cases
-
-
-    cases: List[Dict[str, Any]] = []
-    seen = set()
-
-    for entity, supporting in canonical_entities(claims):
-        queries = [("factual", f"what is {entity}")]
-        combined = " ".join(_text(c) for c in supporting)
-
-        if _contains_marker(combined, UPDATE_MARKERS):
-            queries.append(("update", f"what changed in {entity}"))
-        if _contains_marker(combined, SOURCE_MARKERS):
-            queries.append(("source", f"how do i get {entity}"))
-        if _contains_marker(combined, REQUIREMENT_MARKERS):
-            queries.append(("requirement", f"what does {entity} require"))
-        if _numeric_supporting_claims(entity, supporting):
-            queries.append(("numeric", f"how many {entity}"))
         if _event_supported(entity, supporting):
             queries.append(("event", f"{entity} event"))
 
