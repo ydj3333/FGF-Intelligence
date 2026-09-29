@@ -55,7 +55,7 @@ def test_canonical_coverage_has_zero_retrieval_failures():
 def test_specialized_cases_require_entity_local_relations():
     claims = [
         {
-            "Claim": "Weapon Prisms are listed in the Discount Shop. The Commerce Guild has a daily schedule.",
+            "Claim": "Weapon Prisms are listed in the Discount Shop. The Commerce Guild has permanent rewards.",
             "Evidence Tier": "Tier 1 — Ultimate/Official",
             "Status": "Confirmed",
         },
