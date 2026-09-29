@@ -378,6 +378,6 @@ def format_failure_report(report: Dict[str, Any], limit: int = 20) -> str:
             f"- {item['intent']}: {item['query']} | "
             f"parsed={item['parsed_entity']} | "
             f"type={item['answer_type']} | evidence={item['evidence_count']} | "
-            f"mode={item['reasoning_mode']}"
+            f"scores={item['retrieval_scores']}"
         )
     return "\n".join(lines)
