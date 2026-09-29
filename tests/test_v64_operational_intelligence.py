@@ -37,6 +37,21 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertTrue(any("Roster required" == row[4] for row in out["rows"][1:]))
         self.assertIn("without guessing", out["guardrail"])
 
+    def test_kaboom_five_lineup_request_is_verified(self):
+        out=build_operational_output("give me 5 Kaboom lineups", [])
+        verification=out["verification"]
+        self.assertEqual(verification["requested_option_count"], 5)
+        self.assertEqual(verification["returned_option_count"], 5)
+        self.assertTrue(verification["count_match"])
+        self.assertEqual(verification["concrete_validated_options"], 1)
+        self.assertEqual(verification["roster_required_options"], 4)
+        self.assertTrue(verification["requires_player_roster"])
+
+    def test_option_count_parser_supports_word_form(self):
+        out=build_operational_output("show five Kaboom combos", [])
+        self.assertEqual(out["verification"]["requested_option_count"], 5)
+        self.assertTrue(out["verification"]["count_match"])
+
     def test_tier12_terms_are_auto_keywords(self):
         from knowledge_query_engine import KnowledgeQueryEngine
         claims=[
