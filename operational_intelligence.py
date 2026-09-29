@@ -101,26 +101,28 @@ def _event_key(q: str) -> str | None:
 def _requested_option_count(question: str) -> int | None:
     """Extract an explicit requested alternative count without guessing."""
     ql = question.lower()
-    patterns = [
+    numeric_patterns = [
         r"\b(?:top|give me|show me|need|want)\s+(\d{1,2})\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
         r"\b(\d{1,2})\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
-        r"\b(?:five|four|three|two)\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
         r"\b(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\s+(?:of|=)\s*(\d{1,2})\b",
     ]
-    words = {"two": 2, "three": 3, "four": 4, "five": 5}
-    for pattern in patterns:
+    for pattern in numeric_patterns:
         m = re.search(pattern, ql)
-        if not m:
-            continue
-        raw = m.group(1)
-        if raw.isdigit():
-            n = int(raw)
-        else:
-            n = words.get(raw)
-        if n and 2 <= n <= 20:
-            return n
-    return None
+        if m:
+            n = int(m.group(1))
+            if 2 <= n <= 20:
+                return n
 
+    word_patterns = [
+        r"\b(?:top|give me|show me|need|want)\s+(five|four|three|two)\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
+        r"\b(five|four|three|two)\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
+    ]
+    words = {"two": 2, "three": 3, "four": 4, "five": 5}
+    for pattern in word_patterns:
+        m = re.search(pattern, ql)
+        if m:
+            return words[m.group(1)]
+    return None
 
 def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> Dict[str, Any] | None:
     """Verify that an operational response satisfies explicit user constraints.
