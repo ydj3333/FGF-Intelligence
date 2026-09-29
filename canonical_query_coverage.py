@@ -337,9 +337,9 @@ def run_coverage_benchmark(
 
     for case in cases:
         parsed = engine.parse(case["query"])
-        result = engine.compose(case["query"])
+        result = engine.search(case["query"], limit=8)
         entity_ok = parsed.entity == case.get("expected_entity", case["entity"])
-        answer_ok = result.get("answer_type") == "knowledge_query" and bool(result.get("evidence"))
+        answer_ok = bool(result.get("answerable")) and bool(result.get("results"))
         if entity_ok and answer_ok:
             passed += 1
             continue
@@ -348,9 +348,9 @@ def run_coverage_benchmark(
             "intent": case["intent"],
             "query": case["query"],
             "parsed_entity": parsed.entity,
-            "answer_type": result.get("answer_type"),
-            "evidence_count": len(result.get("evidence") or []),
-            "reasoning_mode": (result.get("reasoning") or {}).get("mode"),
+            "answerable": result.get("answerable"),
+            "evidence_count": len(result.get("results") or []),
+            "retrieval_scores": [x.get("score") for x in (result.get("results") or [])[:3]],
         })
         if max_failures is not None and len(failures) >= max_failures:
             break
