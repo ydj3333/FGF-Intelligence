@@ -98,6 +98,69 @@ def _event_key(q: str) -> str | None:
     if "shadowfront" in ql: return "shadowfront"
     return None
 
+def _requested_option_count(question: str) -> int | None:
+    """Extract an explicit requested alternative count without guessing."""
+    ql = question.lower()
+    patterns = [
+        r"\\b(?:top|give me|show me|need|want)\\s+(\\d{1,2})\\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\b",
+        r"\\b(\\d{1,2})\\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\b",
+        r"\\b(?:five|four|three|two)\\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\b",
+        r"\\b(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\\s+(?:of|=)\\s*(\\d{1,2})\\b",
+    ]
+    words = {"two": 2, "three": 3, "four": 4, "five": 5}
+    for pattern in patterns:
+        m = re.search(pattern, ql)
+        if not m:
+            continue
+        raw = m.group(1)
+        if raw.isdigit():
+            n = int(raw)
+        else:
+            n = words.get(raw)
+        if n and 2 <= n <= 20:
+            return n
+    return None
+
+
+def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> Dict[str, Any] | None:
+    """Verify that an operational response satisfies explicit user constraints.
+
+    This is a structural safety check, not a factuality score. It prevents the
+    renderer from silently returning fewer alternatives than requested and
+    makes roster-dependent placeholders visible instead of presenting them as
+    validated combinations.
+    """
+    if not output:
+        return None
+    requested = _requested_option_count(question)
+    rows = output.get("rows") if isinstance(output.get("rows"), list) else []
+    verification = {
+        "requested_option_count": requested,
+        "returned_option_count": len(rows) if rows else 0,
+        "count_match": requested is None or len(rows) == requested,
+        "validation_scope": "structural_only",
+    }
+    if output.get("mode") == "event_combo_options":
+        concrete = sum(1 for row in rows if len(row) >= 5 and row[4] == "Concrete")
+        roster_required = sum(1 for row in rows if len(row) >= 5 and row[4] == "Roster required")
+        verification.update({
+            "concrete_validated_options": concrete,
+            "roster_required_options": roster_required,
+            "requires_player_roster": roster_required > 0,
+        })
+        if requested is not None and len(rows) != requested:
+            raise ValueError(
+                f"Operational option-count validation failed: requested {requested}, returned {len(rows)}"
+            )
+    if not verification["count_match"]:
+        raise ValueError(
+            f"Operational option-count validation failed: requested {requested}, returned {len(rows)}"
+        )
+    output = dict(output)
+    output["verification"] = verification
+    return output
+
+
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
@@ -111,7 +174,7 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
             x in ql for x in ("line up", "lineup", "team", "combo")
         )
         if wants_five_lineups:
-            return {
+            return _verify_operational_output(question, {
                 "mode":"event_combo_options",
                 "title":"Kaboom, Robots! — 5 lineup options",
                 "basis":"The current evidence corpus establishes one concrete community lineup. Four additional rows are roster-aware selection templates rather than invented champion combinations.",
@@ -120,7 +183,7 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
                 "columns":["Option","Lineup","Why","Evidence state","Selection state"],
                 "rows":KABOOM_LINEUP_OPTIONS,
                 "guardrail":"Only Lineup 1 is a named Kaboom community combination in the current corpus. Do not treat the four templates as validated champion combinations. Provide the player's available Champions/levels to resolve the placeholders into real alternatives without guessing."
-            }
+            })
         return {
             "mode":"event_combo",
             "title":"Kaboom, Robots! — evidence-backed combo",
