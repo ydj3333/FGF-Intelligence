@@ -61,7 +61,7 @@ class OperationalIntelligenceTests(unittest.TestCase):
     def test_anti_plunder_operation_is_recognized_as_event(self):
         out=build_operational_output("Anti-Plunder Operation event", [])
         self.assertIsNotNone(out)
-        self.assertEqual(out.get("mode"), "event_playbook")
+        self.assertEqual(out.get("mode"), "event_day_plan")
         self.assertEqual(out.get("event"), "Anti-Plunder Operation")
         self.assertEqual(len(out.get("days", [])), 3)
         self.assertEqual(out["days"][0]["date"], "2026-10-02")
