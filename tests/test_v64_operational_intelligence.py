@@ -192,6 +192,18 @@ class OperationalIntelligenceTests(unittest.TestCase):
             self.assertNotEqual(p.entity,"unknown")
             self.assertIn(p.entity, {singular.lower(),plural.lower()})
 
+    def test_broad_canonical_keyword_does_not_leak_unrelated_answer(self):
+        from knowledge_query_engine import KnowledgeQueryEngine
+        claims=[
+            {"Claim":"Rotating events named in the screenshot include Operation Blackout, Kaboom, and Arms Race.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+            {"Claim":"Upgraded warehouses protect stored Metal, Food, and Water from enemy siege-attacking plunder up to the Warehouse Safe Capacity threshold.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+            {"Claim":"Other traders can plunder ruins being excavated by another trader.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        ]
+        engine=KnowledgeQueryEngine(claims)
+        result=engine.search("anti plunder operation", limit=8)
+        self.assertFalse(result["answerable"])
+        self.assertEqual(result["results"], [])
+
     def test_no_operational_trigger_for_plain_mechanic(self):
         self.assertIsNone(build_operational_output("What does Kinetic counter?", []))
 
