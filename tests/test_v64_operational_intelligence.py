@@ -37,6 +37,27 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertTrue(any("Roster required" == row[4] for row in out["rows"][1:]))
         self.assertIn("without guessing", out["guardrail"])
 
+    def test_operational_output_has_uniform_player_context_contract(self):
+        out=build_operational_output(
+            "shadowfront event",
+            [{"Claim":"Shadowfront contains 8 Lesser Vaults and 2 Central Vaults.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"}],
+            player_context={
+                "season":"S2",
+                "core_level":32,
+                "flagship_level":20,
+                "champion_levels":{"Lily":30,"Zora Domini":30},
+                "fleet_styles":["Kinetic"],
+                "resources":{"credits":100},
+                "preferences":{"f2p":True},
+            },
+            all_claims=[]
+        )
+        self.assertEqual(out["player_context"]["season"],"S2")
+        self.assertEqual(out["player_context"]["core_level"],32)
+        self.assertEqual(out["player_context"]["owned_champion_count"],2)
+        self.assertIn("personalization constraint",out["personalization_guardrail"])
+
+
     def test_kaboom_roster_aware_generates_actual_owned_lineups(self):
         profile={"champion_levels":{
             "Zora Domini":30,"Lily":30,"Jodie Beart":30,
