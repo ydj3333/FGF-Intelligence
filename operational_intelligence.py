@@ -101,10 +101,13 @@ def _event_key(q: str) -> str | None:
 def _requested_option_count(question: str) -> int | None:
     """Extract an explicit requested alternative count without guessing."""
     ql = question.lower()
+
+    # Allow the subject/topic between the requested count and the option noun,
+    # e.g. "give me 5 Kaboom lineups" or "show five Kaboom combos".
     numeric_patterns = [
-        r"\b(?:top|give me|show me|need|want)\s+(\d{1,2})\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
-        r"\b(\d{1,2})\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
-        r"\b(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\s+(?:of|=)\s*(\d{1,2})\b",
+        r"\b(?:top|give me|show me|need|want)\s+(\d{1,2})(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
+        r"\b(\d{1,2})(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
+        r"\b(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\s+(?:of|=)\s*(\d{1,2})\b",
     ]
     for pattern in numeric_patterns:
         m = re.search(pattern, ql)
@@ -114,8 +117,8 @@ def _requested_option_count(question: str) -> int | None:
                 return n
 
     word_patterns = [
-        r"\b(?:top|give me|show me|need|want)\s+(five|four|three|two)\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
-        r"\b(five|four|three|two)\s+(?:options?|alternatives?|lineups?|line ups?|teams?|combos?)\b",
+        r"\b(?:top|give me|show me|need|want)\s+(five|four|three|two)(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
+        r"\b(five|four|three|two)(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
     ]
     words = {"two": 2, "three": 3, "four": 4, "five": 5}
     for pattern in word_patterns:
