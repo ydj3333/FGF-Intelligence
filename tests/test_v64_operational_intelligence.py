@@ -58,6 +58,17 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertIn("personalization constraint",out["personalization_guardrail"])
 
 
+    def test_anti_plunder_operation_is_recognized_as_event(self):
+        out=build_operational_output("Anti-Plunder Operation event", [])
+        self.assertIsNotNone(out)
+        self.assertEqual(out.get("mode"), "event_playbook")
+        self.assertEqual(out.get("event"), "Anti-Plunder Operation")
+        self.assertEqual(len(out.get("days", [])), 3)
+        self.assertEqual(out["days"][0]["date"], "2026-10-02")
+        self.assertEqual(out["days"][2]["date"], "2026-10-04")
+        self.assertIn("USER_SCREENSHOT_OBSERVED", out["days"][0]["state"])
+        self.assertEqual(out["days"][0]["do"], "Not established in current evidence")
+
     def test_kaboom_roster_aware_generates_actual_owned_lineups(self):
         profile={"champion_levels":{
             "Zora Domini":30,"Lily":30,"Jodie Beart":30,
