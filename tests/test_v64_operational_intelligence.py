@@ -37,6 +37,50 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertTrue(any("Roster required" == row[4] for row in out["rows"][1:]))
         self.assertIn("without guessing", out["guardrail"])
 
+    def test_kaboom_roster_aware_generates_actual_owned_lineups(self):
+        profile={"champion_levels":{
+            "Zora Domini":30,"Lily":30,"Jodie Beart":30,
+            "Evan Rogers":30,"Kama Moai":30,"Killer Bee":30
+        }}
+        claims=[
+            {"Claim":"Zora Domini is described as specializing in burst damage, penetration, multi-hit attacks, and AoE pressure","Evidence Tier":"Tier 2 — Tested Community","Status":"Under Review"},
+            {"Claim":"Zora's active skill is reported by the community to group enemies tightly in Kaboom Robot.","Evidence Tier":"Tier 3 — Creator/Community","Status":"Under Review"},
+            {"Claim":"Lily is recommended by the community for Kaboom Robot because of high AoE damage and effectiveness against grouped enemies.","Evidence Tier":"Tier 3 — Creator/Community","Status":"Under Review"},
+            {"Claim":"Jodie is reported by the community to work well alongside Zora and Lily in Kaboom Robot because her weapon effects add damage against grouped enemies.","Evidence Tier":"Tier 3 — Creator/Community","Status":"Under Review"},
+            {"Claim":"Evan Rogers is described as providing sustained Beam damage and formation-wide benefits","Evidence Tier":"Tier 2 — Tested Community","Status":"Under Review"},
+            {"Claim":"Killer Bee is described as combining high damage with health recovery/sustain","Evidence Tier":"Tier 2 — Tested Community","Status":"Under Review"},
+            {"Claim":"Kama Moai is described as a dependable Kinetic damage dealer and alternative when Zora Domini is unavailable","Evidence Tier":"Tier 2 — Tested Community","Status":"Under Review"},
+        ]
+        out=build_operational_output(
+            "give me 5 Kaboom lineups",
+            [],
+            player_context=profile,
+            all_claims=claims
+        )
+        self.assertEqual(out["mode"],"event_combo_roster_options")
+        self.assertEqual(out["verification"]["requested_option_count"],5)
+        self.assertEqual(out["verification"]["returned_option_count"],5)
+        self.assertTrue(out["verification"]["count_match"])
+        self.assertIn("Zora Domini + Lily + Jodie Beart", [row[1] for row in out["rows"]])
+        self.assertTrue(any("not Kaboom-validated" in row[2] for row in out["rows"][1:]))
+
+    def test_kaboom_roster_aware_refuses_unsupported_count(self):
+        profile={"champion_levels":{"Zora Domini":30,"Lily":30}}
+        claims=[
+            {"Claim":"Zora's active skill is reported by the community to group enemies tightly in Kaboom Robot.","Evidence Tier":"Tier 3 — Creator/Community","Status":"Under Review"},
+            {"Claim":"Lily is recommended by the community for Kaboom Robot because of high AoE damage and effectiveness against grouped enemies.","Evidence Tier":"Tier 3 — Creator/Community","Status":"Under Review"},
+        ]
+        out=build_operational_output(
+            "show 5 Kaboom combos",
+            [],
+            player_context=profile,
+            all_claims=claims
+        )
+        self.assertEqual(out["mode"],"event_combo_roster_options")
+        self.assertFalse(out["verification"]["count_match"])
+        self.assertLess(out["verification"]["returned_option_count"],5)
+        self.assertIn("without guessing", out["guardrail"].lower())
+
     def test_kaboom_five_lineup_request_is_verified(self):
         out=build_operational_output("give me 5 Kaboom lineups", [])
         verification=out["verification"]
