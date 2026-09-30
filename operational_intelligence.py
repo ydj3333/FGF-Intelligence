@@ -69,6 +69,17 @@ KABOOM_COMBO_ROWS = [
     ["Performance caveat","Wave/spawn RNG matters","Community material reports that spawn positioning can affect clear times; treat this as experience, not a guaranteed mechanic.","COMMUNITY — Under Review"],
 ]
 
+# Five-lineup presentation is deliberately roster-aware. The current corpus establishes
+# one concrete Kaboom lineup, not five named lineups. The remaining four rows are
+# selection templates, not invented champion recommendations.
+KABOOM_LINEUP_OPTIONS = [
+    ["Lineup 1","Zora + Lily + Jodie","Known community-tested trio: grouping + AoE/bomb damage + weapon effects.","COMMUNITY — Under Review","Concrete"],
+    ["Lineup 2","Zora + Lily + [weapon-effect champion]","Keep Zora's grouping and Lily's AoE; replace Jodie only with a player-owned champion whose weapon effect is suitable for grouped targets.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+    ["Lineup 3","Zora + [AoE champion] + [weapon-effect champion]","Preserve the documented grouping core; substitute Lily and/or Jodie with owned champions matching the required roles.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+    ["Lineup 4","[grouping/control champion] + Lily + [weapon-effect champion]","Preserve Lily's documented AoE role; replace Zora only if the player has another grouping/control option supported by evidence.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+    ["Lineup 5","[control/stun] + [AoE] + [damage/weapon-effect]","Fallback when the named trio is unavailable: prioritize control/grouping, wave-clearing AoE, and a third damage/weapon-effect role.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
+]
+
 SHOP_ROWS = [
     {"shop":"Intel Shop","priority":"Weapon Prisms; then Deep Space Beacons","buy_when":"When the item advances a current progression need and the exchange is supported by the shop's current inventory/value.","save":"Currency for higher-value progression items if not immediately needed.","avoid":"Unverified items or purchases whose current exchange value is unknown.","state":"COMMUNITY_GUIDE"},
     {"shop":"Black Market","priority":"Discounted Speedups and rare materials","buy_when":"When the discount materially supports a current event/progression objective.","save":"Currency for unusually strong discounts and scarce materials.","avoid":"Routine purchases without a current need.","state":"COMMUNITY_GUIDE"},
@@ -87,6 +98,74 @@ def _event_key(q: str) -> str | None:
     if "shadowfront" in ql: return "shadowfront"
     return None
 
+def _requested_option_count(question: str) -> int | None:
+    """Extract an explicit requested alternative count without guessing."""
+    ql = question.lower()
+
+    # Allow the subject/topic between the requested count and the option noun,
+    # e.g. "give me 5 Kaboom lineups" or "show five Kaboom combos".
+    numeric_patterns = [
+        r"\b(?:top|give me|show me|need|want)\s+(\d{1,2})(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
+        r"\b(\d{1,2})(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
+        r"\b(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\s+(?:of|=)\s*(\d{1,2})\b",
+    ]
+    for pattern in numeric_patterns:
+        m = re.search(pattern, ql)
+        if m:
+            n = int(m.group(1))
+            if 2 <= n <= 20:
+                return n
+
+    word_patterns = [
+        r"\b(?:top|give me|show me|need|want)\s+(five|four|three|two)(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
+        r"\b(five|four|three|two)(?:\s+[a-z0-9,&'-]+){0,6}\s+(?:options?|alternatives?|lineups?|line\s+ups?|teams?|combos?)\b",
+    ]
+    words = {"two": 2, "three": 3, "four": 4, "five": 5}
+    for pattern in word_patterns:
+        m = re.search(pattern, ql)
+        if m:
+            return words[m.group(1)]
+    return None
+
+def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> Dict[str, Any] | None:
+    """Verify that an operational response satisfies explicit user constraints.
+
+    This is a structural safety check, not a factuality score. It prevents the
+    renderer from silently returning fewer alternatives than requested and
+    makes roster-dependent placeholders visible instead of presenting them as
+    validated combinations.
+    """
+    if not output:
+        return None
+    requested = _requested_option_count(question)
+    rows = output.get("rows") if isinstance(output.get("rows"), list) else []
+    verification = {
+        "requested_option_count": requested,
+        "returned_option_count": len(rows) if rows else 0,
+        "count_match": requested is None or len(rows) == requested,
+        "validation_scope": "structural_only",
+    }
+    if output.get("mode") == "event_combo_options":
+        concrete = sum(1 for row in rows if len(row) >= 5 and row[4] == "Concrete")
+        roster_required = sum(1 for row in rows if len(row) >= 5 and row[4] == "Roster required")
+        verification.update({
+            "concrete_validated_options": concrete,
+            "roster_required_options": roster_required,
+            "requires_player_roster": roster_required > 0,
+        })
+        if requested is not None and len(rows) != requested:
+            raise ValueError(
+                f"Operational option-count validation failed: requested {requested}, returned {len(rows)}"
+            )
+    if not verification["count_match"]:
+        raise ValueError(
+            f"Operational option-count validation failed: requested {requested}, returned {len(rows)}"
+        )
+    output = dict(output)
+    output["verification"] = verification
+    return output
+
+
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
@@ -96,6 +175,20 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
     wants_combo = any(x in ql for x in ("combo","team","lineup","champion")) and "kaboom" in ql
     if wants_combo:
+        wants_five_lineups = bool(re.search(r"\b5\b|five", ql)) and any(
+            x in ql for x in ("line up", "lineup", "team", "combo")
+        )
+        if wants_five_lineups:
+            return _verify_operational_output(question, {
+                "mode":"event_combo_options",
+                "title":"Kaboom, Robots! — 5 lineup options",
+                "basis":"The current evidence corpus establishes one concrete community lineup. Four additional rows are roster-aware selection templates rather than invented champion combinations.",
+                "core_evidence_count":len(evidence),
+                "source_state":"COMMUNITY_ENRICHMENT",
+                "columns":["Option","Lineup","Why","Evidence state","Selection state"],
+                "rows":KABOOM_LINEUP_OPTIONS,
+                "guardrail":"Only Lineup 1 is a named Kaboom community combination in the current corpus. Do not treat the four templates as validated champion combinations. Provide the player's available Champions/levels to resolve the placeholders into real alternatives without guessing."
+            })
         return {
             "mode":"event_combo",
             "title":"Kaboom, Robots! — evidence-backed combo",

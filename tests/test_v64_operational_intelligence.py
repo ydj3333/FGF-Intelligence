@@ -27,6 +27,31 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertTrue(any("Zora + Lily + Jodie" in row[1] for row in out["rows"]))
         self.assertIn("community", out["basis"].lower())
 
+    def test_kaboom_five_lineup_request_returns_five_options(self):
+        out=build_operational_output("best strategy for kaboom champions combo 5 line ups", [])
+        self.assertEqual(out["mode"], "event_combo_options")
+        self.assertEqual(len(out["rows"]), 5)
+        self.assertIn("Zora + Lily + Jodie", out["rows"][0][1])
+        self.assertEqual(out["rows"][0][4], "Concrete")
+        self.assertTrue(all(row[4] in {"Concrete", "Roster required"} for row in out["rows"]))
+        self.assertTrue(any("Roster required" == row[4] for row in out["rows"][1:]))
+        self.assertIn("without guessing", out["guardrail"])
+
+    def test_kaboom_five_lineup_request_is_verified(self):
+        out=build_operational_output("give me 5 Kaboom lineups", [])
+        verification=out["verification"]
+        self.assertEqual(verification["requested_option_count"], 5)
+        self.assertEqual(verification["returned_option_count"], 5)
+        self.assertTrue(verification["count_match"])
+        self.assertEqual(verification["concrete_validated_options"], 1)
+        self.assertEqual(verification["roster_required_options"], 4)
+        self.assertTrue(verification["requires_player_roster"])
+
+    def test_option_count_parser_supports_word_form(self):
+        out=build_operational_output("show five Kaboom combos", [])
+        self.assertEqual(out["verification"]["requested_option_count"], 5)
+        self.assertTrue(out["verification"]["count_match"])
+
     def test_tier12_terms_are_auto_keywords(self):
         from knowledge_query_engine import KnowledgeQueryEngine
         claims=[
