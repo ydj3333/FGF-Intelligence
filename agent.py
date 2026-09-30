@@ -1246,6 +1246,7 @@ class H(BaseHTTPRequestHandler):
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
             if qs.get('core_level',[''])[0]: ctx['core_level']=qs.get('core_level',[''])[0]
+            if qs.get('player_id',[''])[0]: ctx['player_id']=qs.get('player_id',[''])[0].strip()
             try:
                 return self._json(answer(q,ctx or None))
             except Exception as exc:
@@ -1472,6 +1473,19 @@ try:
     _CORE_ANSWER = _knowledge_query_answer
 
     def answer(question, player_context=None):
+        player_context=dict(player_context or {})
+        # Optional durable player profile. Core retrieval remains independent;
+        # profile data is used only to personalize operational generation.
+        profile_id=str(player_context.get('player_id','')).strip()
+        profile_warning=None
+        if profile_id:
+            profile,profile_error=_player_profile_from_db(profile_id)
+            if profile:
+                merged_context=dict(profile)
+                merged_context.update(player_context)
+                player_context=merged_context
+            elif profile_error:
+                profile_warning='Player profile could not be loaded: '+str(profile_error)
         result = _FGF_ORCHESTRATOR.answer(question, player_context)
         core = result.get('core') or {}
         merged = dict(core)
@@ -1490,8 +1504,12 @@ try:
         try:
             merged['operational'] = build_operational_output(
                 question,
-                core.get('evidence', []) if isinstance(core.get('evidence'), list) else []
+                core.get('evidence', []) if isinstance(core.get('evidence'), list) else [],
+                player_context=player_context,
+                all_claims=CLAIMS
             )
+            if profile_warning:
+                merged['operational_warning']=profile_warning
         except Exception as exc:
             merged['operational'] = None
             merged['operational_warning'] = 'Operational renderer unavailable: ' + type(exc).__name__
