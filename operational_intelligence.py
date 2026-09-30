@@ -308,9 +308,11 @@ def _roster_kaboom_options(question: str, player_context: Dict[str, Any] | None,
     }
 
 
-def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None, player_context: Dict[str, Any] | None = None, all_claims: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
+def _build_operational_output_base(question: str, core_evidence: List[Dict[str, Any]] | None = None, player_context: Dict[str, Any] | None = None, all_claims: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
+    profile=_profile_constraints(player_context)
     ql=question.lower()
     evidence=core_evidence or []
+    profile=_profile_constraints(player_context)
     key=_event_key(question)
     wants_event = key is not None or any(x in ql for x in ("day by day","day-by-day","daily plan","event schedule","event plan","what should i do each day"))
     wants_shop = any(x in ql for x in ("shop","shops","store","stores","buy in different shops","what to buy"))
@@ -418,3 +420,26 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
             "guardrail":"Exact quantities, point values and day assignments are not inferred unless established by evidence."
         }
     return None
+
+
+def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None,
+                             player_context: Dict[str, Any] | None = None,
+                             all_claims: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
+    """Public operational builder with a uniform player-context contract."""
+    output=_build_operational_output_base(question, core_evidence, player_context, all_claims)
+    if not output:
+        return output
+    profile=_profile_constraints(player_context)
+    result=dict(output)
+    result["player_context"]={
+        "available":profile["available"],
+        "season":profile["season"],
+        "core_level":profile["core_level"],
+        "flagship_level":profile["flagship_level"],
+        "owned_champion_count":len(profile["owned_champions"]),
+        "fleet_styles":profile["fleet_styles"],
+        "resource_fields_present":sorted(profile["resources"].keys()),
+        "preferences_present":sorted(profile["preferences"].keys()),
+    }
+    result["personalization_guardrail"]=_profile_guardrail(profile)
+    return result
