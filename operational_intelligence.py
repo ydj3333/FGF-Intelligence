@@ -167,6 +167,44 @@ def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> 
 
 
 
+def _profile_constraints(player_context: Dict[str, Any] | None) -> Dict[str, Any]:
+    """Normalize optional player context without inventing missing fields."""
+    ctx = player_context if isinstance(player_context, dict) else {}
+    champions = ctx.get("champion_levels")
+    if not isinstance(champions, dict):
+        champions = {}
+    fleet_styles = ctx.get("fleet_styles")
+    if not isinstance(fleet_styles, list):
+        fleet_styles = []
+    resources = ctx.get("resources")
+    if not isinstance(resources, dict):
+        resources = {}
+    preferences = ctx.get("preferences")
+    if not isinstance(preferences, dict):
+        preferences = {}
+    return {
+        "available": bool(ctx),
+        "season": ctx.get("season"),
+        "core_level": ctx.get("core_level"),
+        "flagship_level": ctx.get("flagship_level"),
+        "owned_champions": _profile_owned_champions(ctx),
+        "fleet_styles": fleet_styles,
+        "resources": resources,
+        "preferences": preferences,
+    }
+
+
+def _profile_guardrail(profile: Dict[str, Any]) -> str:
+    """State exactly how player context may affect operational output."""
+    if not profile.get("available"):
+        return "No player profile supplied; no personalization assumptions were made."
+    return (
+        "Player context is used only to constrain or personalize operational output. "
+        "Missing profile fields remain unknown, and player context cannot override "
+        "canonical evidence or turn an inference into a validated game fact."
+    )
+
+
 def _profile_owned_champions(player_context: Dict[str, Any] | None) -> List[str]:
     """Return explicitly owned Champions from a persisted player profile."""
     if not isinstance(player_context, dict):
