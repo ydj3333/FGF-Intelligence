@@ -199,7 +199,7 @@ def _profile_guardrail(profile: Dict[str, Any]) -> str:
     if not profile.get("available"):
         return "No player profile supplied; no personalization assumptions were made."
     return (
-        "Player context is used only to constrain or personalize operational output. "
+        "Player context is a personalization constraint only. "
         "Missing profile fields remain unknown, and player context cannot override "
         "canonical evidence or turn an inference into a validated game fact."
     )
