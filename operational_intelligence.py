@@ -166,6 +166,148 @@ def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> 
     return output
 
 
+
+def _profile_owned_champions(player_context: Dict[str, Any] | None) -> List[str]:
+    """Return explicitly owned Champions from a persisted player profile."""
+    if not isinstance(player_context, dict):
+        return []
+    raw=player_context.get("champion_levels")
+    if not isinstance(raw, dict):
+        return []
+    owned=[]
+    for name, value in raw.items():
+        if not isinstance(name, str) or not name.strip():
+            continue
+        if isinstance(value, dict) and value.get("owned") is False:
+            continue
+        if value is False or value is None:
+            continue
+        owned.append(name.strip())
+    return owned
+
+
+KABOOM_ROLE_SIGNALS = {
+    "grouping_control": {
+        "Zora Domini": ("group enemies tightly", "stun-lock", "group clearing"),
+        "Kama Moai": ("stun enemies",),
+        "Riian Dessos": ("clearing groups",),
+    },
+    "aoe_wave_clear": {
+        "Lily": ("AOE", "grouped enemies"),
+        "Zora Domini": ("group clearing", "AoE pressure", "multi-hit"),
+        "Riian Dessos": ("clearing groups",),
+    },
+    "damage": {
+        "Jodie Beart": ("weapon effects", "team damage", "Ion Support/Damage"),
+        "Evan Rogers": ("sustained Beam damage", "high-damage", "formation-wide"),
+        "Killer Bee": ("high damage", "physical damage"),
+        "Lani Verita": ("damage dealer",),
+        "Kama Moai": ("damage dealer",),
+        "Riian Dessos": ("single target damage",),
+        "Zora Domini": ("burst damage", "powerful damage"),
+    },
+}
+
+def _champion_role_fit(name: str, claims: List[Dict[str, Any]]) -> Dict[str, Any]:
+    canonical_name=name.strip()
+    aliases=[canonical_name]
+    if canonical_name=="Jodie Beart": aliases.append("Jodie Béart")
+    if canonical_name=="Zora Domini": aliases.extend(["Zora Dominii","Zora"])
+    matched=[]
+    for claim in claims:
+        cl=str(claim.get("Claim",""))
+        if any(a.lower() in cl.lower() for a in aliases):
+            matched.append({
+                "claim":cl,
+                "tier":claim.get("Evidence Tier",""),
+                "status":claim.get("Status",""),
+                "canonical":claim.get("Canonical",claim.get("canonical",False))
+            })
+    text=" ".join(x["claim"] for x in matched)
+    roles=set()
+    for role,catalog in KABOOM_ROLE_SIGNALS.items():
+        if any(sig.lower() in text.lower() for sig in catalog.get(canonical_name,())):
+            roles.add(role)
+    return {"champion":canonical_name,"roles":sorted(roles),"evidence":matched[:6]}
+
+def _roster_kaboom_options(question: str, player_context: Dict[str, Any] | None,
+                           claims: List[Dict[str, Any]], requested: int) -> Dict[str, Any]:
+    owned=_profile_owned_champions(player_context)
+    standard=["Ajita","Aliya","Cocoon","Doug Rockwell","Eva von Trier","Evan Rogers",
+              "Jodie Beart","Kama Moai","Killer Bee","Klara","Lani Verita","Lily",
+              "Lucius Pullo","Phade","Riian Dessos","Zora Domini"]
+    standard_map={x.lower():x for x in standard}
+    owned=[standard_map[x.lower()] for x in owned if x.lower() in standard_map]
+    role_rows={x:_champion_role_fit(x,claims) for x in owned}
+
+    def has(name):
+        return any(x.lower()==name.lower() for x in owned)
+
+    candidates=[]
+    if has("Zora Domini") and has("Lily") and has("Jodie Beart"):
+        candidates.append({
+            "lineup":[next(x for x in owned if x.lower()=="zora domini"),next(x for x in owned if x.lower()=="lily"),next(x for x in owned if x.lower()=="jodie beart")],
+            "state":"Kaboom evidence — Under Review",
+            "basis":"Named Kaboom community combination: Zora grouping + Lily AoE/bomb damage + Jodie weapon effects.",
+            "evidence_scope":"Kaboom-specific"
+        })
+
+    grouping=[x for x,r in role_rows.items() if "grouping_control" in r["roles"]]
+    aoe=[x for x,r in role_rows.items() if "aoe_wave_clear" in r["roles"]]
+    damage=[x for x,r in role_rows.items() if "damage" in r["roles"]]
+    combos=[]
+    for g in grouping:
+        for a in aoe:
+            for d in damage:
+                combo=[g,a,d]
+                if len({x.lower() for x in combo})<3: continue
+                if any([x for x in candidates if [z.lower() for z in x["lineup"]]==[z.lower() for z in combo]]): continue
+                anchor_score=sum(x in ("Zora Domini","Lily","Jodie Beart") for x in combo)
+                evidence_count=sum(len(role_rows[x]["evidence"]) for x in combo)
+                combos.append((anchor_score,evidence_count,combo))
+    combos.sort(key=lambda x:(-x[0],-x[1],[z.lower() for z in x[2]]))
+    for _,_,combo in combos:
+        candidates.append({
+            "lineup":combo,
+            "state":"Roster-fit inference — not Kaboom-validated",
+            "basis":"All three Champions are owned and their required roles have supporting evidence; the combination itself is an inference, not a Kaboom-specific tested lineup.",
+            "evidence_scope":"Role-compatible inference"
+        })
+        if len(candidates)>=requested: break
+
+    rows=[[i+1," + ".join(x["lineup"]),x["state"],x["basis"],x["evidence_scope"]]
+          for i,x in enumerate(candidates[:requested])]
+    verification={
+        "requested_option_count":requested,
+        "returned_option_count":len(rows),
+        "count_match":len(rows)==requested,
+        "roster_size":len(owned),
+        "roster_available":bool(owned),
+        "validation_scope":"structural + evidence-gated",
+    }
+    if len(rows)<requested:
+        return {
+            "mode":"event_combo_roster_options",
+            "title":f"Kaboom, Robots! — {requested} roster-aware lineup options",
+            "basis":"The requested count cannot be filled from the supplied roster using only evidence-supported roles without inventing Champions or unsupported combinations.",
+            "source_state":"ROSTER_AWARE / EVIDENCE_GATED",
+            "columns":["Option","Lineup","State","Basis","Evidence scope"],
+            "rows":rows,
+            "verification":verification,
+            "guardrail":"Insufficient evidence-supported roster combinations to satisfy the requested count. No invented Champions or unsupported Kaboom combinations were added. Add more owned Champions or request fewer alternatives."
+        }
+    return {
+        "mode":"event_combo_roster_options",
+        "title":f"Kaboom, Robots! — {requested} roster-aware lineup options",
+        "basis":"Options are generated from the player's stored roster. Kaboom-specific evidence is preferred; other combinations are role-compatible inferences and are clearly marked as not Kaboom-validated.",
+        "source_state":"ROSTER_AWARE / EVIDENCE_GATED",
+        "columns":["Option","Lineup","State","Basis","Evidence scope"],
+        "rows":rows,
+        "verification":verification,
+        "guardrail":"The first named combination is supported by Kaboom-specific community evidence and remains Under Review. Other combinations are role-compatible inferences, not established Kaboom meta. Player roster data was required to produce these actual alternatives."
+    }
+
+
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
