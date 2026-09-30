@@ -13,6 +13,21 @@ import re
 NOT_ESTABLISHED = "Not established in current evidence"
 
 PLAYBOOKS = {
+    "anti_plunder": {
+        "name": "Anti-Plunder Operation",
+        "kind": "event",
+        "days": [
+            {"date":"2026-10-02","day":"Fri","objective":"Anti-Plunder Operation","do":NOT_ESTABLISHED,"save":NOT_ESTABLISHED,"avoid":NOT_ESTABLISHED,"state":"USER_SCREENSHOT_OBSERVED"},
+            {"date":"2026-10-03","day":"Sat","objective":"Anti-Plunder Operation","do":NOT_ESTABLISHED,"save":NOT_ESTABLISHED,"avoid":NOT_ESTABLISHED,"state":"USER_SCREENSHOT_OBSERVED"},
+            {"date":"2026-10-04","day":"Sun","objective":"Anti-Plunder Operation","do":NOT_ESTABLISHED,"save":NOT_ESTABLISHED,"avoid":NOT_ESTABLISHED,"state":"USER_SCREENSHOT_OBSERVED"}
+        ],
+        "global": {
+            "before":NOT_ESTABLISHED,
+            "during":NOT_ESTABLISHED,
+            "after":NOT_ESTABLISHED
+        },
+        "source":"User-provided FGF event-calendar screenshot dated 2026-09-30; presence and displayed date span are observed, mechanics/rewards/objectives are not established by this screenshot alone."
+    },
     "shadowfront": {
         "name": "Shadowfront",
         "kind": "event",
@@ -96,6 +111,7 @@ def _event_key(q: str) -> str | None:
     if any(x in ql for x in ("guild vs guild","gvg","guild versus guild")): return "gvg"
     if any(x in ql for x in ("top 100 galactic traders","galactic traders","top 100 traders")): return "top100"
     if "shadowfront" in ql: return "shadowfront"
+    if any(x in ql for x in ("anti-plunder operation","anti plunder operation","anti-plunder","anti plunder")): return "anti_plunder"
     return None
 
 def _requested_option_count(question: str) -> int | None:
