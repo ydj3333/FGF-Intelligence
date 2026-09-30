@@ -308,7 +308,7 @@ def _roster_kaboom_options(question: str, player_context: Dict[str, Any] | None,
     }
 
 
-def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
+def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None, player_context: Dict[str, Any] | None = None, all_claims: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
     key=_event_key(question)
@@ -317,7 +317,15 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
     wants_combo = any(x in ql for x in ("combo","team","lineup","champion")) and "kaboom" in ql
     if wants_combo:
-        wants_five_lineups = bool(re.search(r"\b5\b|five", ql)) and any(
+        requested_options=_requested_option_count(question)
+        if requested_options and player_context and isinstance(player_context.get("champion_levels"), dict):
+            return _roster_kaboom_options(
+                question,
+                player_context,
+                all_claims or core_evidence or [],
+                requested_options
+            )
+        wants_five_lineups = bool(requested_options == 5 or re.search(r"\b5\b|five", ql)) and any(
             x in ql for x in ("line up", "lineup", "team", "combo")
         )
         if wants_five_lineups:
