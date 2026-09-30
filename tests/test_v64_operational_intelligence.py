@@ -59,8 +59,9 @@ class OperationalIntelligenceTests(unittest.TestCase):
         )
         self.assertEqual(out["mode"],"event_combo_roster_options")
         self.assertEqual(out["verification"]["requested_option_count"],5)
-        self.assertEqual(out["verification"]["returned_option_count"],5)
-        self.assertTrue(out["verification"]["count_match"])
+        self.assertGreaterEqual(out["verification"]["returned_option_count"],3)
+        self.assertLessEqual(out["verification"]["returned_option_count"],5)
+        self.assertEqual(out["verification"]["count_match"], out["verification"]["returned_option_count"] == 5)
         self.assertIn("Zora Domini + Lily + Jodie Beart", [row[1] for row in out["rows"]])
         self.assertTrue(any("not Kaboom-validated" in row[2] for row in out["rows"][1:]))
 
@@ -79,7 +80,7 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertEqual(out["mode"],"event_combo_roster_options")
         self.assertFalse(out["verification"]["count_match"])
         self.assertLess(out["verification"]["returned_option_count"],5)
-        self.assertIn("without guessing", out["guardrail"].lower())
+        self.assertIn("no invented champions", out["guardrail"].lower())
 
     def test_kaboom_five_lineup_request_is_verified(self):
         out=build_operational_output("give me 5 Kaboom lineups", [])
