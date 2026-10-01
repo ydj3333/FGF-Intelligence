@@ -13,6 +13,21 @@ import re
 NOT_ESTABLISHED = "Not established in current evidence"
 
 PLAYBOOKS = {
+    "anti_plunder": {
+        "name": "Anti-Plunder Operation",
+        "kind": "event",
+        "days": [
+            {"date":"2026-10-02","day":"Fri","objective":"Anti-Plunder Operation","do":NOT_ESTABLISHED,"save":NOT_ESTABLISHED,"avoid":NOT_ESTABLISHED,"state":"USER_SCREENSHOT_OBSERVED"},
+            {"date":"2026-10-03","day":"Sat","objective":"Anti-Plunder Operation","do":NOT_ESTABLISHED,"save":NOT_ESTABLISHED,"avoid":NOT_ESTABLISHED,"state":"USER_SCREENSHOT_OBSERVED"},
+            {"date":"2026-10-04","day":"Sun","objective":"Anti-Plunder Operation","do":NOT_ESTABLISHED,"save":NOT_ESTABLISHED,"avoid":NOT_ESTABLISHED,"state":"USER_SCREENSHOT_OBSERVED"}
+        ],
+        "global": {
+            "before":NOT_ESTABLISHED,
+            "during":NOT_ESTABLISHED,
+            "after":NOT_ESTABLISHED
+        },
+        "source":"User-provided FGF event-calendar screenshot dated 2026-09-30; presence and displayed date span are observed, mechanics/rewards/objectives are not established by this screenshot alone."
+    },
     "shadowfront": {
         "name": "Shadowfront",
         "kind": "event",
@@ -96,6 +111,7 @@ def _event_key(q: str) -> str | None:
     if any(x in ql for x in ("guild vs guild","gvg","guild versus guild")): return "gvg"
     if any(x in ql for x in ("top 100 galactic traders","galactic traders","top 100 traders")): return "top100"
     if "shadowfront" in ql: return "shadowfront"
+    if any(x in ql for x in ("anti-plunder operation","anti plunder operation","anti-plunder","anti plunder")): return "anti_plunder"
     return None
 
 def _requested_option_count(question: str) -> int | None:
@@ -166,16 +182,206 @@ def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> 
     return output
 
 
-def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
+
+def _profile_constraints(player_context: Dict[str, Any] | None) -> Dict[str, Any]:
+    """Normalize optional player context without inventing missing fields."""
+    ctx = player_context if isinstance(player_context, dict) else {}
+    champions = ctx.get("champion_levels")
+    if not isinstance(champions, dict):
+        champions = {}
+    fleet_styles = ctx.get("fleet_styles")
+    if not isinstance(fleet_styles, list):
+        fleet_styles = []
+    resources = ctx.get("resources")
+    if not isinstance(resources, dict):
+        resources = {}
+    preferences = ctx.get("preferences")
+    if not isinstance(preferences, dict):
+        preferences = {}
+    return {
+        "available": bool(ctx),
+        "season": ctx.get("season"),
+        "core_level": ctx.get("core_level"),
+        "flagship_level": ctx.get("flagship_level"),
+        "owned_champions": _profile_owned_champions(ctx),
+        "fleet_styles": fleet_styles,
+        "resources": resources,
+        "preferences": preferences,
+    }
+
+
+def _profile_guardrail(profile: Dict[str, Any]) -> str:
+    """State exactly how player context may affect operational output."""
+    if not profile.get("available"):
+        return "No player profile supplied; no personalization assumptions were made."
+    return (
+        "Player context is a personalization constraint only. "
+        "Missing profile fields remain unknown, and player context cannot override "
+        "canonical evidence or turn an inference into a validated game fact."
+    )
+
+
+def _profile_owned_champions(player_context: Dict[str, Any] | None) -> List[str]:
+    """Return explicitly owned Champions from a persisted player profile."""
+    if not isinstance(player_context, dict):
+        return []
+    raw=player_context.get("champion_levels")
+    if not isinstance(raw, dict):
+        return []
+    owned=[]
+    for name, value in raw.items():
+        if not isinstance(name, str) or not name.strip():
+            continue
+        if isinstance(value, dict) and value.get("owned") is False:
+            continue
+        if value is False or value is None:
+            continue
+        owned.append(name.strip())
+    return owned
+
+
+KABOOM_ROLE_SIGNALS = {
+    "grouping_control": {
+        "Zora Domini": ("group enemies tightly", "stun-lock", "group clearing"),
+        "Kama Moai": ("stun enemies",),
+        "Riian Dessos": ("clearing groups",),
+    },
+    "aoe_wave_clear": {
+        "Lily": ("AOE", "grouped enemies"),
+        "Zora Domini": ("group clearing", "AoE pressure", "multi-hit"),
+        "Riian Dessos": ("clearing groups",),
+    },
+    "damage": {
+        "Jodie Beart": ("weapon effects", "team damage", "Ion Support/Damage"),
+        "Evan Rogers": ("sustained Beam damage", "high-damage", "formation-wide"),
+        "Killer Bee": ("high damage", "physical damage"),
+        "Lani Verita": ("damage dealer",),
+        "Kama Moai": ("damage dealer",),
+        "Riian Dessos": ("single target damage",),
+        "Zora Domini": ("burst damage", "powerful damage"),
+    },
+}
+
+def _champion_role_fit(name: str, claims: List[Dict[str, Any]]) -> Dict[str, Any]:
+    canonical_name=name.strip()
+    aliases=[canonical_name]
+    if canonical_name=="Jodie Beart": aliases.append("Jodie Béart")
+    if canonical_name=="Zora Domini": aliases.extend(["Zora Dominii","Zora"])
+    matched=[]
+    for claim in claims:
+        cl=str(claim.get("Claim",""))
+        if any(a.lower() in cl.lower() for a in aliases):
+            matched.append({
+                "claim":cl,
+                "tier":claim.get("Evidence Tier",""),
+                "status":claim.get("Status",""),
+                "canonical":claim.get("Canonical",claim.get("canonical",False))
+            })
+    text=" ".join(x["claim"] for x in matched)
+    roles=set()
+    for role,catalog in KABOOM_ROLE_SIGNALS.items():
+        if any(sig.lower() in text.lower() for sig in catalog.get(canonical_name,())):
+            roles.add(role)
+    return {"champion":canonical_name,"roles":sorted(roles),"evidence":matched[:6]}
+
+def _roster_kaboom_options(question: str, player_context: Dict[str, Any] | None,
+                           claims: List[Dict[str, Any]], requested: int) -> Dict[str, Any]:
+    owned=_profile_owned_champions(player_context)
+    standard=["Ajita","Aliya","Cocoon","Doug Rockwell","Eva von Trier","Evan Rogers",
+              "Jodie Beart","Kama Moai","Killer Bee","Klara","Lani Verita","Lily",
+              "Lucius Pullo","Phade","Riian Dessos","Zora Domini"]
+    standard_map={x.lower():x for x in standard}
+    owned=[standard_map[x.lower()] for x in owned if x.lower() in standard_map]
+    role_rows={x:_champion_role_fit(x,claims) for x in owned}
+
+    def has(name):
+        return any(x.lower()==name.lower() for x in owned)
+
+    candidates=[]
+    if has("Zora Domini") and has("Lily") and has("Jodie Beart"):
+        candidates.append({
+            "lineup":[next(x for x in owned if x.lower()=="zora domini"),next(x for x in owned if x.lower()=="lily"),next(x for x in owned if x.lower()=="jodie beart")],
+            "state":"Kaboom evidence — Under Review",
+            "basis":"Named Kaboom community combination: Zora grouping + Lily AoE/bomb damage + Jodie weapon effects.",
+            "evidence_scope":"Kaboom-specific"
+        })
+
+    grouping=[x for x,r in role_rows.items() if "grouping_control" in r["roles"]]
+    aoe=[x for x,r in role_rows.items() if "aoe_wave_clear" in r["roles"]]
+    damage=[x for x,r in role_rows.items() if "damage" in r["roles"]]
+    combos=[]
+    for g in grouping:
+        for a in aoe:
+            for d in damage:
+                combo=[g,a,d]
+                if len({x.lower() for x in combo})<3: continue
+                if any([x for x in candidates if [z.lower() for z in x["lineup"]]==[z.lower() for z in combo]]): continue
+                anchor_score=sum(x in ("Zora Domini","Lily","Jodie Beart") for x in combo)
+                evidence_count=sum(len(role_rows[x]["evidence"]) for x in combo)
+                combos.append((anchor_score,evidence_count,combo))
+    combos.sort(key=lambda x:(-x[0],-x[1],[z.lower() for z in x[2]]))
+    for _,_,combo in combos:
+        candidates.append({
+            "lineup":combo,
+            "state":"Roster-fit inference — not Kaboom-validated",
+            "basis":"All three Champions are owned and their required roles have supporting evidence; the combination itself is an inference, not a Kaboom-specific tested lineup.",
+            "evidence_scope":"Role-compatible inference"
+        })
+        if len(candidates)>=requested: break
+
+    rows=[[i+1," + ".join(x["lineup"]),x["state"],x["basis"],x["evidence_scope"]]
+          for i,x in enumerate(candidates[:requested])]
+    verification={
+        "requested_option_count":requested,
+        "returned_option_count":len(rows),
+        "count_match":len(rows)==requested,
+        "roster_size":len(owned),
+        "roster_available":bool(owned),
+        "validation_scope":"structural + evidence-gated",
+    }
+    if len(rows)<requested:
+        return {
+            "mode":"event_combo_roster_options",
+            "title":f"Kaboom, Robots! — {requested} roster-aware lineup options",
+            "basis":"The requested count cannot be filled from the supplied roster using only evidence-supported roles without inventing Champions or unsupported combinations.",
+            "source_state":"ROSTER_AWARE / EVIDENCE_GATED",
+            "columns":["Option","Lineup","State","Basis","Evidence scope"],
+            "rows":rows,
+            "verification":verification,
+            "guardrail":"Insufficient evidence-supported roster combinations to satisfy the requested count. No invented Champions or unsupported Kaboom combinations were added. Add more owned Champions or request fewer alternatives."
+        }
+    return {
+        "mode":"event_combo_roster_options",
+        "title":f"Kaboom, Robots! — {requested} roster-aware lineup options",
+        "basis":"Options are generated from the player's stored roster. Kaboom-specific evidence is preferred; other combinations are role-compatible inferences and are clearly marked as not Kaboom-validated.",
+        "source_state":"ROSTER_AWARE / EVIDENCE_GATED",
+        "columns":["Option","Lineup","State","Basis","Evidence scope"],
+        "rows":rows,
+        "verification":verification,
+        "guardrail":"The first named combination is supported by Kaboom-specific community evidence and remains Under Review. Other combinations are role-compatible inferences, not established Kaboom meta. Player roster data was required to produce these actual alternatives."
+    }
+
+
+def _build_operational_output_base(question: str, core_evidence: List[Dict[str, Any]] | None = None, player_context: Dict[str, Any] | None = None, all_claims: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
+    profile=_profile_constraints(player_context)
     ql=question.lower()
     evidence=core_evidence or []
+    profile=_profile_constraints(player_context)
     key=_event_key(question)
     wants_event = key is not None or any(x in ql for x in ("day by day","day-by-day","daily plan","event schedule","event plan","what should i do each day"))
     wants_shop = any(x in ql for x in ("shop","shops","store","stores","buy in different shops","what to buy"))
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
     wants_combo = any(x in ql for x in ("combo","team","lineup","champion")) and "kaboom" in ql
     if wants_combo:
-        wants_five_lineups = bool(re.search(r"\b5\b|five", ql)) and any(
+        requested_options=_requested_option_count(question)
+        if requested_options and player_context and isinstance(player_context.get("champion_levels"), dict):
+            return _roster_kaboom_options(
+                question,
+                player_context,
+                all_claims or core_evidence or [],
+                requested_options
+            )
+        wants_five_lineups = bool(requested_options == 5 or re.search(r"\b5\b|five", ql)) and any(
             x in ql for x in ("line up", "lineup", "team", "combo")
         )
         if wants_five_lineups:
@@ -235,6 +441,16 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
                 {"phase":"During event","action":p["global"]["during"]},
                 {"phase":"After event","action":p["global"]["after"]},
             ],
+            "community_enrichment": ([
+                {
+                    "claim":"A community report associates Anti-Plunder Operation with Xarnas star capture, Solar Swords spawning, and a Prismatic Core usage unlock.",
+                    "evidence_state":"Tier 3 — Creator/Community / Under Review",
+                    "confidence":"Low",
+                    "source":"User-provided Discord screenshot",
+                    "raw_text":"Xarnas star capture - Solar swords spawn + prismatic core usage unlock + event",
+                    "validation":"Needs Testing"
+                }
+            ] if key == "anti_plunder" else []),
             "columns":["Day","Objective","DO","SAVE","AVOID","Evidence state"],
             "rows":[[d["day"],d["objective"],d["do"],d["save"],d["avoid"],d["state"]] for d in p["days"]],
             "guardrail":"Any exact day mapping not established by authoritative current evidence is explicitly marked Not established; use the live in-game event/calendar for the server-specific objective."
@@ -268,3 +484,26 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
             "guardrail":"Exact quantities, point values and day assignments are not inferred unless established by evidence."
         }
     return None
+
+
+def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None,
+                             player_context: Dict[str, Any] | None = None,
+                             all_claims: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
+    """Public operational builder with a uniform player-context contract."""
+    output=_build_operational_output_base(question, core_evidence, player_context, all_claims)
+    if not output:
+        return output
+    profile=_profile_constraints(player_context)
+    result=dict(output)
+    result["player_context"]={
+        "available":profile["available"],
+        "season":profile["season"],
+        "core_level":profile["core_level"],
+        "flagship_level":profile["flagship_level"],
+        "owned_champion_count":len(profile["owned_champions"]),
+        "fleet_styles":profile["fleet_styles"],
+        "resource_fields_present":sorted(profile["resources"].keys()),
+        "preferences_present":sorted(profile["preferences"].keys()),
+    }
+    result["personalization_guardrail"]=_profile_guardrail(profile)
+    return result

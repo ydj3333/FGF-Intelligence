@@ -45,6 +45,7 @@ ENTITY_ALIASES={
  "resources":["resource","resources","materials","metals","water"],
  "kaboom robot":["kaboom robot","kaboom robots","kaboom, robots","kaboom"],
  "shadowfront":["shadowfront","shadowfront event","outer rim outpost shadowfront"],
+ "anti-plunder operation":["anti-plunder operation","anti plunder operation","anti-plunder","anti plunder"],
 }
 PROPERTY_ALIASES={
  "unlock_level":["level","unlock","unlocks","unlocking","appear","appears","available","availability","access","opens","introduced"],
@@ -460,8 +461,16 @@ class KnowledgeQueryEngine:
    if update_hits:
     rel=update_hits[:limit]
   # Unknown-domain questions require genuine connection; authority alone cannot answer nonsense.
+  # A Tier-1/Tier-2 keyword is not automatically a meaningful entity: broad terms
+  # such as "operation", "event", "guild", or "level" occur across many claims.
+  # If a single canonical token is highly reused, require a second query-to-claim
+  # lexical anchor unless the token is a manually defined semantic entity alias.
   if p.entity=="unknown":
    rel=[(c,s) for c,s in rel if len(_norm_tokens(p.raw)&_norm_tokens(_blob(c)))>=2 or _similarity(p.raw,_blob(c))>=0.28]
+  elif p.entity in self.parser.canonical_keywords and p.entity not in self.parser.canonical_phrases:
+   doc_freq=self.parser._canonical_doc_freq.get(p.entity,0)
+   if doc_freq >= 5:
+    rel=[(c,s) for c,s in rel if len(_norm_tokens(p.raw)&_norm_tokens(_blob(c)))>=2 or _similarity(p.raw,_blob(c))>=0.42]
   if not rel and p.question_type in ("comparison","counter","effect","definition","source","requirement"):
    fallback=[]
    for c,score in ranked[:20]:

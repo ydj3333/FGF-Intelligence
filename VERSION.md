@@ -8,9 +8,9 @@
 # FGF Intelligence Version Contract
 
 ## Current release
-- Version: 6.6.2
-- Name: Canonical Query Coverage Benchmark — Relation-Gated Hardening
-- Baseline: v6.6.1 canonical query coverage benchmark plus Evidence Graph v2
+- Version: 6.6.3
+- Name: Requested-Option Verification & Roster-Aware Kaboom Output
+- Baseline: v6.6.2 canonical query coverage benchmark plus v6.6.3 operational verification
 - Branch: main
 
 ## v6.3 — Live + Experiential Intelligence

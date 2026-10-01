@@ -89676,7 +89676,38 @@
         }
       }
     }
-  ],
+,
+    {
+      "Claim": "Community report associates Anti-Plunder Operation with Xarnas star capture, Solar Swords spawning, and a Prismatic Core usage unlock.",
+      "Notes": "User-provided Discord screenshot shown on 2026-10-01. Raw wording: Xarnas star capture - Solar swords spawn + prismatic core usage unlock + event. Community report; requires validation.",
+      "Source": "User-provided Discord screenshot",
+      "Status": "Under Review",
+      "Category": "Events",
+      "Timestamp": "",
+      "Claim Type": "FACT",
+      "Confidence": "Low",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Evidence Type": "Community Report",
+      "Season/Version": "S2 / 2026-10-01",
+      "Verification Status": "Needs Testing",
+      "claim_key": "anti_plunder_xarnas_solar_swords_prismatic_core",
+      "supabase_id": "445830f2-4e57-4eaa-9bfd-ad1b8b21cd03",
+      "metadata": {
+        "source_type": "user_provided_discord_screenshot",
+        "source_context": "Discord discussion shown by user on 2026-10-01",
+        "raw_text": "Xarnas star capture - Solar swords spawn + prismatic core usage unlock + event",
+        "evidence_scope": "Anti-Plunder Operation",
+        "validation_required": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "Under Review",
+          "tier": 3
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-01"
+        }
+      }
+    }  ],
   "conflicts": [
     {
       "Conflict ID": "FGF-C001",
