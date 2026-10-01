@@ -58,6 +58,16 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertIn("personalization constraint",out["personalization_guardrail"])
 
 
+    def test_anti_plunder_exposes_tier3_enrichment_separately(self):
+        out=build_operational_output("what is anti plunder event", [])
+        self.assertIsNotNone(out)
+        self.assertEqual(out.get("event"), "Anti-Plunder Operation")
+        enrichment=out.get("community_enrichment", [])
+        self.assertEqual(len(enrichment), 1)
+        self.assertIn("Xarnas star capture", enrichment[0]["claim"])
+        self.assertEqual(enrichment[0]["evidence_state"], "Tier 3 — Creator/Community / Under Review")
+        self.assertEqual(enrichment[0]["validation"], "Needs Testing")
+
     def test_anti_plunder_operation_is_recognized_as_event(self):
         out=build_operational_output("Anti-Plunder Operation event", [])
         self.assertIsNotNone(out)
