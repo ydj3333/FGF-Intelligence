@@ -441,6 +441,16 @@ def _build_operational_output_base(question: str, core_evidence: List[Dict[str, 
                 {"phase":"During event","action":p["global"]["during"]},
                 {"phase":"After event","action":p["global"]["after"]},
             ],
+            "community_enrichment":[
+                {
+                    "claim":"A community report associates Anti-Plunder Operation with Xarnas star capture, Solar Swords spawning, and a Prismatic Core usage unlock.",
+                    "evidence_state":"Tier 3 — Creator/Community / Under Review",
+                    "confidence":"Low",
+                    "source":"User-provided Discord screenshot",
+                    "raw_text":"Xarnas star capture - Solar swords spawn + prismatic core usage unlock + event",
+                    "validation":"Needs Testing"
+                }
+            ],
             "columns":["Day","Objective","DO","SAVE","AVOID","Evidence state"],
             "rows":[[d["day"],d["objective"],d["do"],d["save"],d["avoid"],d["state"]] for d in p["days"]],
             "guardrail":"Any exact day mapping not established by authoritative current evidence is explicitly marked Not established; use the live in-game event/calendar for the server-specific objective."
