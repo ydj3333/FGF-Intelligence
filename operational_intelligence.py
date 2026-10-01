@@ -80,6 +80,17 @@ KABOOM_LINEUP_OPTIONS = [
     ["Lineup 5","[control/stun] + [AoE] + [damage/weapon-effect]","Fallback when the named trio is unavailable: prioritize control/grouping, wave-clearing AoE, and a third damage/weapon-effect role.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
 ]
 
+    "path_to_dominance": {
+        "name": "Paths to Dominance",
+        "kind": "event",
+        "global": {
+            "before": "Check the live Trader Prince competition state, your Energy Core level, and Counselor application availability before committing to a position attempt.",
+            "during": "Prioritize the event objective established by the live UI: control of the highest-level star system's Star Space Station, Trader Prince appointment, Counselor positions, Unity Point-driven Prince Abilities, and leaderboard/participation thresholds.",
+            "after": "Record the outcome, appointment/ability state, points, and rewards. All appointments and Prince Ability effects reset when the next competition begins."
+        },
+        "source": "Path to Dominance.docx — 11 pages of user-provided in-game UI evidence. No event dates were supplied."
+    },
+
 SHOP_ROWS = [
     {"shop":"Intel Shop","priority":"Weapon Prisms; then Deep Space Beacons","buy_when":"When the item advances a current progression need and the exchange is supported by the shop's current inventory/value.","save":"Currency for higher-value progression items if not immediately needed.","avoid":"Unverified items or purchases whose current exchange value is unknown.","state":"COMMUNITY_GUIDE"},
     {"shop":"Black Market","priority":"Discounted Speedups and rare materials","buy_when":"When the discount materially supports a current event/progression objective.","save":"Currency for unusually strong discounts and scarce materials.","avoid":"Routine purchases without a current need.","state":"COMMUNITY_GUIDE"},
@@ -96,6 +107,7 @@ def _event_key(q: str) -> str | None:
     if any(x in ql for x in ("guild vs guild","gvg","guild versus guild")): return "gvg"
     if any(x in ql for x in ("top 100 galactic traders","galactic traders","top 100 traders")): return "top100"
     if "shadowfront" in ql: return "shadowfront"
+    if any(x in ql for x in ("paths to dominance","path to dominance","trader prince","prince ability","prince tributes")): return "path_to_dominance"
     return None
 
 def _requested_option_count(question: str) -> int | None:
@@ -198,6 +210,51 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
             "columns":["Aspect","Current answer","Why","Evidence state"],
             "rows":KABOOM_COMBO_ROWS,
             "guardrail":"Do not treat the community lineup as a canonical game rule. Re-check current Season 2/in-game behavior and your available Champion levels before committing resources."
+        }
+    if key == "path_to_dominance":
+        return {
+            "mode":"event_operational_overview",
+            "title":"Paths to Dominance — Trader Prince operational intelligence",
+            "basis":"Primary in-game UI evidence from the supplied Path to Dominance document. Exact event dates were not supplied and are intentionally not inferred.",
+            "core_evidence_count":len(evidence),
+            "source_state":"PRIMARY_IN_GAME_UI",
+            "global_rules":[
+                {"phase":"Cadence","action":"Competition occurs every two weeks."},
+                {"phase":"Postponement","action":"If Dominion Warzone occurs that week, the competition on that server is postponed by one week."},
+                {"phase":"Competition","action":"Control of the highest-level star system's Star Space Station determines the Trader Prince competition; competition lasts up to 24 hours."},
+                {"phase":"Appointment","action":"Winning Commerce Guild chairman has 24 hours to appoint a Commerce Guild member as Trader Prince; otherwise the chairman assumes the title."},
+                {"phase":"Reset","action":"Appointments and Prince Ability effects reset when the next competition begins."},
+            ],
+            "position_rules":[
+                ["Eligibility","Energy Core level 16+ required to apply","Tier 1 — in-game UI"],
+                ["Applications","Only one Counselor position may be applied for or held at a time","Tier 1 — in-game UI"],
+                ["Capacity","Up to 50 applications per position; full positions lock submissions","Tier 1 — in-game UI"],
+                ["Cooldown","30 minutes between position applications","Tier 1 — in-game UI"],
+                ["Rejection","Cannot reapply for that position for the remainder of the day","Tier 1 — in-game UI"],
+                ["Appointment","Minimum appointment duration is 5 minutes; can continue indefinitely if no replacement is approved","Tier 1 — in-game UI"],
+                ["Control","Trader Prince/Acting Prince can appoint; Trader Prince can remove a player","Tier 1 — in-game UI"],
+            ],
+            "positions":["Strategic Counselor","Acting Prince","Military Counselor","Construction Counselor","Research Counselor","Counselor of Internal Affairs"],
+            "abilities":[
+                ["Commission","Issues a quest to all Korell traders to submit Unity Points","10/10 shown","Tier 1 — in-game UI"],
+                ["Treasure","Places a Prince's Treasure near the Ascendancy Fortress","4/4 shown","Tier 1 — in-game UI"],
+                ["Dividend","Spends Unity Points to gain 2,000 Credits","10/10 shown","Tier 1 — in-game UI"],
+                ["Prosperity","Basic trade resource earnings +15% for all Korell traders for 24 hours","4/4 shown","Tier 1 — in-game UI"],
+                ["Safeguard","Major Damage Points -10% for all Korell traders for 24 hours","4/4 shown","Tier 1 — in-game UI"],
+                ["Advance","Fleet Attack +15% for all Korell traders for 24 hours","4/4 shown","Tier 1 — in-game UI"],
+                ["Assistance","Building Speed +10% for all Korell traders for 24 hours","4/4 shown","Tier 1 — in-game UI"],
+                ["Knowledge","Research Speed +10% for all Korell traders for 24 hours","4/4 shown","Tier 1 — in-game UI"],
+                ["Mobilization","Combat Craft Manufacturing Speed +10% for all Korell traders for 24 hours","4/4 shown","Tier 1 — in-game UI"],
+                ["Traderhunt","Wanted notice; marks and slows a trader and prevents Interstellar Shelter triggering","50/50 shown; duration not stated","Tier 1 — in-game UI"],
+            ],
+            "scoring":[
+                ["Leaderboard threshold","1,000 points minimum to claim leaderboard rewards","Tier 1 — in-game UI"],
+                ["Rank bands","1, 2, 3, 4-10, 11-30, 31-50","Tier 1 — in-game UI"],
+                ["Unranked","No ranking rewards","Tier 1 — in-game UI"],
+                ["Participation bands","50K-150K; 150K-300K; 300K-480K; 480K-700K; 700K-1M; >1M","Tier 1 — in-game UI"],
+                ["Reward delivery","Participation rewards sent by mail after battle ends","Tier 1 — in-game UI"],
+            ],
+            "guardrail":"Do not invent event start/end dates, exact reward names from unidentified icons, Traderhunt duration, or Unity Point costs that are not explicitly legible in the supplied evidence."
         }
     if key == "shadowfront":
         p=PLAYBOOKS[key]
