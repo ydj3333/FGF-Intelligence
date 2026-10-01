@@ -89711,6 +89711,822 @@
           "season_scope": "S2 / 2026-10-01"
         }
       }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 2,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Each trader, including the Trader Prince, can receive one commendation per event cycle.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.commendation_limit",
+      "supabase_id": "035d4200-7de5-419b-8531-8ccc2158fd79",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 2,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 9,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Prince Ability Mobilization increases Combat Craft Manufacturing Speed for all Korell traders by 10% for 24 hours.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.mobilization",
+      "supabase_id": "1b8dc054-e631-4a23-afbf-f6d47d9c620e",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 9,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 8,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Prince Ability Advance increases Fleet Attack for all Korell traders by 15% for 24 hours.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.advance",
+      "supabase_id": "1dd3e207-5076-4f2a-8359-0c6f88cc3f56",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 8,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 8,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Prince Ability Safeguard reduces Major Damage Points for all Korell traders by 10% for 24 hours.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.safeguard",
+      "supabase_id": "1fb6928a-c6a1-4121-a34f-aebc747b4acd",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 8,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 1,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "The Trader Prince competition lasts up to 24 hours.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.duration",
+      "supabase_id": "2684f867-8b61-4f59-a425-82de4edba5a7",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 1,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 11,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Participation rewards are sent via mail after the battle ends.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.mail_delivery",
+      "supabase_id": "27f1746f-0ba8-4fe1-8b6e-bd3f10d89f29",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 11,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 2,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "The winning Commerce Guild chairman has 24 hours to appoint a Commerce Guild member as Trader Prince; otherwise the chairman automatically assumes the title.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.appointment",
+      "supabase_id": "2c3c0118-02d8-4d5a-b046-3f991128f5ed",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 2,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 1,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Paths to Dominance competition occurs every two weeks.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.cadence",
+      "supabase_id": "326c6699-70e5-434e-813c-c177e8fc7dd6",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 1,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 5,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Each Counselor appointment must last at least 5 minutes; if no replacement is approved, the position can be held indefinitely.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.appointment_minimum",
+      "supabase_id": "39b60bf6-15c7-4003-89f8-fa05077f580f",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 5,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 4,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Trade Consortium Rewards include Prince's Commendation I (20/20), II (10/10), and III (5/5) on the Prince Tributes screen.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.prince_tribute_tiers",
+      "supabase_id": "4f0ce6d6-3349-46d2-9085-e21677ac883e",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 4,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 10,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Players who are not ranked receive no ranking rewards.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.unranked",
+      "supabase_id": "56a85d4e-59ad-42e9-ac4d-dc2f49a03ddf",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 10,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 8,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Prince Ability Knowledge increases Research Speed for all Korell traders by 10% for 24 hours.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.knowledge",
+      "supabase_id": "5e5e56ae-00e1-41f3-bf54-11f92b897957",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 8,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 10,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "A minimum of 1,000 points is required to claim leaderboard rewards.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.leaderboard_threshold",
+      "supabase_id": "677be874-097e-4bbe-b14a-01665f4362a8",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 10,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 7,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Prince Ability Prosperity increases basic trade resource earnings for all Korell traders by 15% for 24 hours.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.prosperity",
+      "supabase_id": "6f7315c1-d483-4f22-84fb-4ab7a22a91b7",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 7,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 11,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Participation reward point bands shown are 50K-150K, 150K-300K, 300K-480K, 480K-700K, 700K-1M, and above 1M.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.participation_bands",
+      "supabase_id": "6f7d7e0c-8eb7-433a-ab14-22f1777d6153",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 11,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 5,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Each Counselor position accepts up to 50 applications; once full, submissions are locked.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.application_cap",
+      "supabase_id": "802e6b48-52da-4261-9f90-84024c2b32de",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 5,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 9,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Prince Ability Traderhunt issues a wanted notice for a trader, marks the trader for a period, slows the wanted trader, and prevents them from triggering Interstellar Shelter.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.traderhunt",
+      "supabase_id": "9031c086-b2c6-4b13-a5e5-98ffd531d14a",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 9,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 5,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "A player can apply for or hold only one Counselor position at a time.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.one_position",
+      "supabase_id": "97939b06-a66c-4478-ab04-95aa37587476",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 5,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 8,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Prince Ability Assistance increases Building Speed for all Korell traders by 10% for 24 hours.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.assistance",
+      "supabase_id": "9b593397-9a0d-4a49-b6be-c5cdb328413a",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 8,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 2,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "All appointments and Prince Ability effects reset when the next competition for control of the highest-level star system's Star Space Station begins.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.reset",
+      "supabase_id": "a8febd7f-7e6e-439d-821f-0a70976d6e7e",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 2,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 5,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "Energy Core level 16 or higher is required to apply for a Counselor position.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.core_requirement",
+      "supabase_id": "b51d50fc-f63a-4355-a227-8a5cb0fbb7f3",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 5,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 5,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "If a player is rejected for a Counselor position, they cannot reapply for that position for the remainder of the day.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.rejection_lockout",
+      "supabase_id": "d4dcdc45-1f68-4308-998f-3e4fdbd46377",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 5,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 5,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "The cooldown between position applications is 30 minutes.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.application_cooldown",
+      "supabase_id": "dc710cb9-a37d-4f63-8ae4-1854f22baa2d",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 5,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
+    },
+    {
+      "event_key": "path_to_dominance",
+      "provenance": "user-provided in-game UI",
+      "source_page": 1,
+      "source_document": "Path to Dominance.docx",
+      "Claim": "If Dominion Warzone takes place in the same week, Paths to Dominance competition on that server is postponed by one week.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "event.path_to_dominance.dominion_postponement",
+      "supabase_id": "e6acc5c8-6fba-4ec7-a97f-c65fd8bc9c80",
+      "metadata": {
+        "event_key": "path_to_dominance",
+        "provenance": "user-provided in-game UI",
+        "source_page": 1,
+        "source_document": "Path to Dominance.docx",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2"
+        }
+      }
     }
   ],
   "conflicts": [
@@ -89774,9 +90590,9 @@
     "claims": 1083,
     "sources": 48,
     "change_log_entries": 45,
-    "tier1_claims": 451,
+    "tier1_claims": 475,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1539
+    "total_claims": 1563
   }
 }
