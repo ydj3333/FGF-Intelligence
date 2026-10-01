@@ -1,6 +1,6 @@
 {
   "name": "FGF Knowledge Engine — S2 Evidence Pack v2",
-  "generated": "2026-09-30",
+  "generated": "2026-10-01",
   "authority_order": [
     "Tier 1 — Ultimate/Official",
     "Tier 2 — Tested Community",
@@ -89675,6 +89675,42 @@
           "season_scope": "S2 / 2026 / 2026-09-22"
         }
       }
+    },
+    {
+      "raw_text": "Xarnas star capture - Solar swords spawn + prismatic core usage unlock + event",
+      "source_type": "user_provided_discord_screenshot",
+      "evidence_scope": "Anti-Plunder Operation",
+      "source_context": "Discord discussion shown by user on 2026-10-01",
+      "validation_required": true,
+      "Claim": "Community report associates Anti-Plunder Operation with Xarnas star capture, Solar Swords spawning, and a Prismatic Core usage unlock.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-01",
+      "Evidence Type": "FACT",
+      "Evidence Tier": "Tier 3 — Creator/Community",
+      "Confidence": "Low",
+      "Status": "Under Review",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "FACT",
+      "claim_key": "anti_plunder_xarnas_solar_swords_prismatic_core",
+      "supabase_id": "445830f2-4e57-4eaa-9bfd-ad1b8b21cd03",
+      "metadata": {
+        "raw_text": "Xarnas star capture - Solar swords spawn + prismatic core usage unlock + event",
+        "source_type": "user_provided_discord_screenshot",
+        "evidence_scope": "Anti-Plunder Operation",
+        "source_context": "Discord discussion shown by user on 2026-10-01",
+        "validation_required": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "Under Review",
+          "tier": 3
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-01"
+        }
+      }
     }
   ],
   "conflicts": [
@@ -89741,6 +89777,6 @@
     "tier1_claims": 451,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1538
+    "total_claims": 1539
   }
 }
