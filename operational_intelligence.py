@@ -80,17 +80,6 @@ KABOOM_LINEUP_OPTIONS = [
     ["Lineup 5","[control/stun] + [AoE] + [damage/weapon-effect]","Fallback when the named trio is unavailable: prioritize control/grouping, wave-clearing AoE, and a third damage/weapon-effect role.","INFERRED TEMPLATE — Not Kaboom-validated","Roster required"],
 ]
 
-    "path_to_dominance": {
-        "name": "Paths to Dominance",
-        "kind": "event",
-        "global": {
-            "before": "Check the live Trader Prince competition state, your Energy Core level, and Counselor application availability before committing to a position attempt.",
-            "during": "Prioritize the event objective established by the live UI: control of the highest-level star system's Star Space Station, Trader Prince appointment, Counselor positions, Unity Point-driven Prince Abilities, and leaderboard/participation thresholds.",
-            "after": "Record the outcome, appointment/ability state, points, and rewards. All appointments and Prince Ability effects reset when the next competition begins."
-        },
-        "source": "Path to Dominance.docx — 11 pages of user-provided in-game UI evidence. No event dates were supplied."
-    },
-
 SHOP_ROWS = [
     {"shop":"Intel Shop","priority":"Weapon Prisms; then Deep Space Beacons","buy_when":"When the item advances a current progression need and the exchange is supported by the shop's current inventory/value.","save":"Currency for higher-value progression items if not immediately needed.","avoid":"Unverified items or purchases whose current exchange value is unknown.","state":"COMMUNITY_GUIDE"},
     {"shop":"Black Market","priority":"Discounted Speedups and rare materials","buy_when":"When the discount materially supports a current event/progression objective.","save":"Currency for unusually strong discounts and scarce materials.","avoid":"Routine purchases without a current need.","state":"COMMUNITY_GUIDE"},
