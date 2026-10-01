@@ -2,6 +2,20 @@ import unittest
 from operational_intelligence import build_operational_output
 
 class OperationalIntelligenceTests(unittest.TestCase):
+    def test_paths_to_dominance_is_structured(self):
+        out=build_operational_output("give me the Paths to Dominance event plan", [])
+        self.assertEqual(out["mode"], "event_operational_overview")
+        self.assertEqual(out["title"], "Paths to Dominance — Trader Prince operational intelligence")
+        self.assertTrue(any("Energy Core level 16+" in row[1] for row in out["position_rules"]))
+        self.assertTrue(any(row[0] == "Prosperity" and "15%" in row[1] for row in out["abilities"]))
+        self.assertTrue(any(row[0] == "Leaderboard threshold" and "1,000" in row[1] for row in out["scoring"]))
+
+    def test_paths_to_dominance_does_not_infer_dates(self):
+        out=build_operational_output("when does Paths to Dominance start?", [])
+        self.assertEqual(out["mode"], "event_operational_overview")
+        self.assertIn("dates were not supplied", out["basis"])
+        self.assertIn("Do not invent event start/end dates", out["guardrail"])
+
     def test_gvg_is_day_table(self):
         out=build_operational_output("Give me a GvG day-by-day plan", [])
         self.assertEqual(out["mode"], "event_day_plan")
