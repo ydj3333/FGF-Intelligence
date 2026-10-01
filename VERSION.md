@@ -8,10 +8,16 @@
 # FGF Intelligence Version Contract
 
 ## Current release
-- Version: 6.6.2
-- Name: Canonical Query Coverage Benchmark — Relation-Gated Hardening
-- Baseline: v6.6.1 canonical query coverage benchmark plus Evidence Graph v2
-- Branch: main
+- Version: 6.6.4
+- Name: Paths to Dominance Event Intelligence
+- Baseline: v6.6.3 requested-option verification plus Evidence Graph v2
+- Branch: feature/path-to-dominance-event
+
+## v6.6.4 — Paths to Dominance Event Intelligence
+1. Adds structured operational intelligence for the Paths to Dominance event.
+2. Encodes Trader Prince competition, appointment, Counselor application, Prince Ability, leaderboard and participation rules from primary in-game UI evidence.
+3. Preserves explicit unknowns for event dates, unidentified reward icons, Traderhunt duration and other unreadable values.
+4. Adds regression coverage for event routing and anti-inference guardrails.
 
 ## v6.3 — Live + Experiential Intelligence
 1. Core-first policy gate for authority, intent and lifecycle-aware evidence use.
