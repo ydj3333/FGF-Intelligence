@@ -1,6 +1,6 @@
 {
   "name": "FGF Knowledge Engine — S2 Evidence Pack v2",
-  "generated": "2026-10-01",
+  "generated": "2026-10-02",
   "authority_order": [
     "Tier 1 — Ultimate/Official",
     "Tier 2 — Tested Community",
@@ -90527,6 +90527,498 @@
           "season_scope": "S2"
         }
       }
+    },
+    {
+      "source": "fgfwiki-champions-2026-10-02",
+      "capture_incomplete": true,
+      "Claim": "Current FGF Wiki Champions page describes Ajita as an Ion champion focused on healing and team-wide INT support.",
+      "Category": "Champions",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-02",
+      "Evidence Type": "role_enrichment",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "Medium",
+      "Status": "candidate",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "role_enrichment",
+      "claim_key": "web.champions.ajita",
+      "supabase_id": "1cdd3685-1d44-4eeb-a205-949abba81f98",
+      "metadata": {
+        "source": "fgfwiki-champions-2026-10-02",
+        "capture_incomplete": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "candidate",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-02"
+        }
+      }
+    },
+    {
+      "source": "official-mastering-fleet-power-2025-12-03",
+      "Claim": "Official Fleet Power guide states 2 matching Champions give +10% ATK/DEF/INT and 3 matching Champions give +20%.",
+      "Category": "Combat",
+      "Source": "",
+      "Season/Version": "S2 / 2025-12-03",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "web.combat.champion_synergy",
+      "supabase_id": "1f8d9c28-c560-4dd1-82a7-2cdfecbdf905",
+      "metadata": {
+        "source": "official-mastering-fleet-power-2025-12-03",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 2025-12-03"
+        }
+      }
+    },
+    {
+      "source": "fgfwiki-champions-2026-10-02",
+      "capture_incomplete": true,
+      "Claim": "Current FGF Wiki Champions page describes Lily as an Ion champion with AoE and ability slowdown utility.",
+      "Category": "Champions",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-02",
+      "Evidence Type": "role_enrichment",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "Medium",
+      "Status": "candidate",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "role_enrichment",
+      "claim_key": "web.champions.lily",
+      "supabase_id": "401ba2f7-2ef3-491a-8d2b-a40407354805",
+      "metadata": {
+        "source": "fgfwiki-champions-2026-10-02",
+        "capture_incomplete": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "candidate",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-02"
+        }
+      }
+    },
+    {
+      "source": "fgf-hot-update-2026-09-22",
+      "supersedes": "web.progression.epoch_prerequisite_historical",
+      "Claim": "The Sep 22 hot update reduced the Epoch of Fusion Seed Combat Craft Modification prerequisite from 60% to 40%.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "S2 / 2026-09-22",
+      "Evidence Type": "current_update",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "current_update",
+      "claim_key": "web.progression.epoch_prerequisite_current",
+      "supabase_id": "42a3b336-ad2a-493d-a799-78e26d69c323",
+      "metadata": {
+        "source": "fgf-hot-update-2026-09-22",
+        "supersedes": "web.progression.epoch_prerequisite_historical",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-09-22"
+        }
+      }
+    },
+    {
+      "source": "fgfwiki-champions-2026-10-02",
+      "capture_incomplete": true,
+      "Claim": "Current FGF Wiki Champions page describes Evan Rogers as a Beam damage-focused champion.",
+      "Category": "Champions",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-02",
+      "Evidence Type": "role_enrichment",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "Medium",
+      "Status": "candidate",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "role_enrichment",
+      "claim_key": "web.champions.evan_rogers",
+      "supabase_id": "56ccc3a4-e512-4c63-9363-e71f54dbcd93",
+      "metadata": {
+        "source": "fgfwiki-champions-2026-10-02",
+        "capture_incomplete": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "candidate",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-02"
+        }
+      }
+    },
+    {
+      "source": "fgfwiki-events-2026-10-02",
+      "Claim": "Current FGF Wiki event index lists Paths to Dominance as a 24-hour Major Event / Fortress Conquest.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-02",
+      "Evidence Type": "current_web_corrob",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "current_web_corrob",
+      "claim_key": "web.event.path_to_dominance.current_duration",
+      "supabase_id": "68f1950a-bc4e-4356-8aa8-6983b8b7c70a",
+      "metadata": {
+        "source": "fgfwiki-events-2026-10-02",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-02"
+        }
+      }
+    },
+    {
+      "source": "fgfwiki-champions-2026-10-02",
+      "capture_incomplete": true,
+      "Claim": "Current FGF Wiki Champions page describes Zora Dominii as a Kinetic finisher with high burst damage.",
+      "Category": "Champions",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-02",
+      "Evidence Type": "role_enrichment",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "Medium",
+      "Status": "candidate",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "role_enrichment",
+      "claim_key": "web.champions.zora_dominii",
+      "supabase_id": "6ac0feb5-0ff8-4d2f-ac52-662d3949f329",
+      "metadata": {
+        "source": "fgfwiki-champions-2026-10-02",
+        "capture_incomplete": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "candidate",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-02"
+        }
+      }
+    },
+    {
+      "source": "official-mastering-fleet-power-2025-12-03",
+      "Claim": "Official Fleet Power guide states Champion skills activate left-to-right in formation order.",
+      "Category": "Combat",
+      "Source": "",
+      "Season/Version": "S2 / 2025-12-03",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "web.combat.skill_order",
+      "supabase_id": "6ded2408-7471-4e34-9904-b1ededaec66d",
+      "metadata": {
+        "source": "official-mastering-fleet-power-2025-12-03",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 2025-12-03"
+        }
+      }
+    },
+    {
+      "source": "official-epoch-fusion-seed-2026-09-09",
+      "superseded_by": "web.progression.epoch_prerequisite_current",
+      "Claim": "The Sep 9 official guide recorded a 60% Combat Craft Modification prerequisite for Epoch of Fusion Seed.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "S2 / 2026-09-09",
+      "Evidence Type": "historical",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "superseded",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "historical",
+      "claim_key": "web.progression.epoch_prerequisite_historical",
+      "supabase_id": "80e8002d-d4af-495a-87c2-046b326ee21a",
+      "metadata": {
+        "source": "official-epoch-fusion-seed-2026-09-09",
+        "superseded_by": "web.progression.epoch_prerequisite_current",
+        "lifecycle": {
+          "state": "superseded",
+          "legacy_status": "superseded",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-09-09"
+        }
+      }
+    },
+    {
+      "source": "official-mastering-fleet-power-2025-12-03",
+      "Claim": "Official Fleet Power guide states Beam, Kinetic and Ionic form a counter cycle and Energy Type advantage grants +5% damage.",
+      "Category": "Combat",
+      "Source": "",
+      "Season/Version": "S2 / 2025-12-03",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "web.combat.energy_type_advantage",
+      "supabase_id": "8895bdc1-cdad-479f-94f3-ab625a6bae14",
+      "metadata": {
+        "source": "official-mastering-fleet-power-2025-12-03",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 2025-12-03"
+        }
+      }
+    },
+    {
+      "source": "fgf-s2-calendar-2026-09-29",
+      "Claim": "Official Season 2 calendar guidance says event schedules vary by server and players should use the in-game calendar for server-specific timing.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2 / 2026-09-29",
+      "Evidence Type": "schedule_authority",
+      "Evidence Tier": "Tier 1 via official-account mirror",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "schedule_authority",
+      "claim_key": "web.s2.schedule_server_specific",
+      "supabase_id": "8a837778-55d2-445d-9844-b3a2fcfd64aa",
+      "metadata": {
+        "source": "fgf-s2-calendar-2026-09-29",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-09-29"
+        }
+      }
+    },
+    {
+      "source": "fgfwiki-champions-2026-10-02",
+      "capture_incomplete": true,
+      "Claim": "Current FGF Wiki Champions page describes Eva von Trier as a Kinetic champion whose role includes lowering enemy DEF.",
+      "Category": "Champions",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-02",
+      "Evidence Type": "role_enrichment",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "Medium",
+      "Status": "candidate",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "role_enrichment",
+      "claim_key": "web.champions.eva_von_trier",
+      "supabase_id": "8b1e46b8-aede-409b-b2d6-50a4a50387d7",
+      "metadata": {
+        "source": "fgfwiki-champions-2026-10-02",
+        "capture_incomplete": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "candidate",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-02"
+        }
+      }
+    },
+    {
+      "source": "official-epoch-fusion-seed-2026-09-09",
+      "Claim": "Energy Core 33 unlocks the fourth Battle Queue according to the Sep 9 official guide.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "S2 / 2026-09-09",
+      "Evidence Type": "unlock",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "unlock",
+      "claim_key": "web.progression.fourth_battle_queue",
+      "supabase_id": "9981dea4-9164-46d2-b81d-bf907da41d2c",
+      "metadata": {
+        "source": "official-epoch-fusion-seed-2026-09-09",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-09-09"
+        }
+      }
+    },
+    {
+      "source": "fgf-release-notes-1.1.44-1.1.36",
+      "Claim": "v1.1.44 release notes state that PvP battles in Level 9 star systems grant Paths to Dominance event points.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2 / 1.1.44",
+      "Evidence Type": "patch_update",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "patch_update",
+      "claim_key": "web.event.path_to_dominance.level9_pvp_points",
+      "supabase_id": "9c432498-5249-4bd7-a1bb-7e8b618b9db7",
+      "metadata": {
+        "source": "fgf-release-notes-1.1.44-1.1.36",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 1.1.44"
+        }
+      }
+    },
+    {
+      "source": "fgfwiki-s2-siwenna-2026-08-24",
+      "Claim": "Current Season 2 guidance states Paths to Dominance persists on the Siwenna map.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2 / 2026-08-24",
+      "Evidence Type": "season_context",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "season_context",
+      "claim_key": "web.event.path_to_dominance.s2_persistence",
+      "supabase_id": "c2e7a906-8d52-4b30-b861-d744dc54fcbf",
+      "metadata": {
+        "source": "fgfwiki-s2-siwenna-2026-08-24",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-08-24"
+        }
+      }
+    },
+    {
+      "source": "fgfwiki-champions-2026-10-02",
+      "capture_incomplete": true,
+      "Claim": "Current FGF Wiki Champions page describes Jodie Beart as an Ion champion whose role ramps team damage through repeated skill use.",
+      "Category": "Champions",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-02",
+      "Evidence Type": "role_enrichment",
+      "Evidence Tier": "Tier 2",
+      "Confidence": "Medium",
+      "Status": "candidate",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "role_enrichment",
+      "claim_key": "web.champions.jodie_beart",
+      "supabase_id": "d4c9432b-cfdc-4815-b751-14df125d27a1",
+      "metadata": {
+        "source": "fgfwiki-champions-2026-10-02",
+        "capture_incomplete": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "candidate",
+          "tier": 2
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-02"
+        }
+      }
+    },
+    {
+      "source": "fgf-release-notes-1.1.44-1.1.36",
+      "Claim": "v1.1.36 release notes state Prince Decree use counts increased and Prince buff effects/cooldowns no longer reset when Paths to Dominance begins; bounty effects still clear.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "S2 / 1.1.36",
+      "Evidence Type": "patch_update",
+      "Evidence Tier": "Tier 1",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "patch_update",
+      "claim_key": "web.event.path_to_dominance.prince_decree_lifecycle",
+      "supabase_id": "dbd00c6b-c550-4f61-a973-925bfbf4a5e4",
+      "metadata": {
+        "source": "fgf-release-notes-1.1.44-1.1.36",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "S2 / 1.1.36"
+        }
+      }
     }
   ],
   "conflicts": [
@@ -90590,9 +91082,9 @@
     "claims": 1083,
     "sources": 48,
     "change_log_entries": 45,
-    "tier1_claims": 475,
+    "tier1_claims": 483,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1563
+    "total_claims": 1580
   }
 }
