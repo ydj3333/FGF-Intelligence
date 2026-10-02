@@ -1,0 +1,143 @@
+{
+  "snapshot_date": "2026-10-02",
+  "purpose": "Current web intelligence enrichment for FGF Intelligence. These records are enrichment and source-aware context; they do not overwrite primary in-game UI evidence without explicit conflict resolution.",
+  "source_policy": {
+    "tier_1": "Official developer/game documentation and direct in-game evidence.",
+    "tier_2": "Strong tested community/wiki or official-announcement mirrors when the direct official page is not machine-readable.",
+    "tier_3": "Community guides/videos; useful for strategy enrichment but not canonical facts.",
+    "schedule_rule": "For Season 2, server-specific event timing must come from the in-game calendar; general cadence must not be converted into a date."
+  },
+  "sources": [
+    {
+      "id": "web.fgfwiki.events.2026-10-02",
+      "url": "https://fgfwiki.com/en/events",
+      "tier": "Tier 2",
+      "type": "Community Wiki current page",
+      "claims": [
+        "Paths to Dominance is listed as a Major Event / Fortress Conquest.",
+        "The current event index lists its duration as 24 hours."
+      ]
+    },
+    {
+      "id": "web.fgfwiki.champions.2026-10-02",
+      "url": "https://fgfwiki.com/en/champions",
+      "tier": "Tier 2",
+      "type": "Community Wiki current page",
+      "claims": [
+        "The current Champions page presents Energy Type alignment and synergy as core mechanics.",
+        "The current page visibly lists Kinetic, Beam and Ion champion groups and role/stat notes for the displayed champions.",
+        "The page advertises a 51-champion corpus, but the machine-readable page capture does not expose all 51 entries; do not invent the missing roster."
+      ]
+    },
+    {
+      "id": "web.fgfwiki.s2.2026-08-24",
+      "url": "https://fgfwiki.com/zh-tw/guides/season2-siwenna-guide",
+      "tier": "Tier 2",
+      "type": "Community Wiki Season 2 guide",
+      "date": "2026-08-24",
+      "claims": [
+        "Siwenna has Border Region systems at levels 8-9 and Core Region systems at levels 10-12.",
+        "Paths to Dominance, Dominion Warzone and Commerce Guild Duel persist on the Siwenna map.",
+        "Magnetic Storm Resistance affects combat in Siwenna.",
+        "In rally combat, the rally leader's Resistance is used for all fleet members in the rally, according to the guide."
+      ]
+    },
+    {
+      "id": "official.fgf.mastering-fleet-power",
+      "url": "https://www.foundation.game/en/news/official-guide-mastering-fleet-power",
+      "tier": "Tier 1",
+      "type": "Official developer guide",
+      "date": "2025-12-03",
+      "claims": [
+        "Energy Types are Beam, Kinetic and Ionic.",
+        "Beam is strong against Kinetic and weak against Ionic; Kinetic is strong against Ionic and weak against Beam; Ionic is strong against Beam and weak against Kinetic.",
+        "Having the Energy Type advantage grants a 5% damage boost.",
+        "Matching 2 Champions to the Flagship Energy Type gives +10% ATK/DEF/INT; matching 3 gives +20% ATK/DEF/INT.",
+        "Champion skills activate left-to-right in formation order."
+      ]
+    },
+    {
+      "id": "official.fgf.epoch-fusion-seed.2026-09-09",
+      "url": "https://www.foundation.game/en/news/epoch-of-fusion-seed-lv35-buildings-4th-battle-queue",
+      "tier": "Tier 1",
+      "type": "Official developer guide",
+      "date": "2026-09-09",
+      "claims": [
+        "The September 9 guide documented the then-current Epoch of Fusion Seed prerequisite as 60% Combat Craft Modification progress.",
+        "Energy Core 33 unlocks the fourth Battle Queue.",
+        "The guide documents specialization trees for Kinetic, Beam and Ion."
+      ],
+      "lifecycle": "The 60% Epoch prerequisite is historical/superseded by the September 22 hot update below."
+    },
+    {
+      "id": "official.fgf.hot-update.2026-09-22",
+      "url": "https://murpo.com/news/klara-game-news-da5d638bc6a072319b59",
+      "tier": "Tier 2",
+      "type": "Developer-announcement mirror",
+      "date": "2026-09-22",
+      "claims": [
+        "Shadowfront Commerce Guild rewards were increased.",
+        "Weapon Prism was added to the Discount Shop.",
+        "Epoch of Fusion Seed Combat Craft Modification prerequisite was reduced from 60% to 40%.",
+        "The announcement says the listed changes were subject to change."
+      ],
+      "lifecycle": "Current unless superseded by a later developer announcement."
+    },
+    {
+      "id": "official.fgf.season2.calendar.2026-09-29",
+      "url": "https://www.sotwe.com/FoundationGF_EN?lang=en",
+      "tier": "Tier 1 via official-account mirror",
+      "type": "Official developer social announcement mirror",
+      "date": "2026-09-29",
+      "claims": [
+        "With Season 2, event schedules vary more between servers.",
+        "The developer stopped publishing a universal social-media event calendar and directs players to the in-game calendar for server-specific timing.",
+        "For Servers 1001-1016, the published S2 notes say Top 100 is in Weeks 1, 2 and 4, Guild Duel starts Week 3, Dominion Warzone starts Week 6, and later event schedules can differ by server."
+      ]
+    },
+    {
+      "id": "release-notes.fgf.v1.1.44",
+      "url": "https://apps.apple.com/us/app/foundation-galactic-frontier/id6737595599",
+      "tier": "Tier 1",
+      "type": "Platform release notes",
+      "date": "2026-05-15",
+      "claims": [
+        "Paths to Dominance point rules were optimized so PvP battles in Level 9 star systems grant event points."
+      ]
+    },
+    {
+      "id": "release-notes.fgf.v1.1.36",
+      "url": "https://apps.apple.com/us/app/foundation-galactic-frontier/id6737595599",
+      "tier": "Tier 1",
+      "type": "Platform release notes",
+      "date": "2026-04-29",
+      "claims": [
+        "Prince's Decrees received increased use counts.",
+        "Prince buff effects and cooldowns no longer reset when Paths to Dominance begins; bounty effects still clear on reset."
+      ]
+    }
+  ],
+  "conflict_rules": [
+    {
+      "topic": "paths_to_dominance_duration",
+      "current_in_game_ui": "up to 24 hours",
+      "current_wiki_index": "24 hours",
+      "older_community_sources": "some older community pages describe a 7-day political/buff cycle",
+      "resolution": "Use the primary supplied in-game UI and current wiki 24-hour event duration for the competition itself. Treat the 7-day wording as an older/community cycle model unless current in-game evidence shows otherwise."
+    },
+    {
+      "topic": "epoch_fusion_seed_prerequisite",
+      "historical": "60% Combat Craft Modification progress in the Sep 9 official guide",
+      "current": "40% after the Sep 22 hot update",
+      "resolution": "40% is current; preserve 60% as superseded historical evidence."
+    }
+  ],
+  "planner_implications": [
+    "Paths to Dominance planning must distinguish the 24-hour competition window from any post-competition Trader Prince/appointment effects shown by the live server UI.",
+    "For S2, never calculate a calendar date from the bi-weekly cadence alone; require the player's in-game calendar/server state.",
+    "For S2 combat planning, collect player Resistance and rally-leader Resistance context before making a rally recommendation.",
+    "For fleet planning, use Energy Type countering, 2/3-Champion synergy and left-to-right skill order as deterministic mechanics from the official Fleet Power guide.",
+    "When an exact Champion roster/level is missing, return roster-required alternatives rather than inventing a combination.",
+    "Keep official, current wiki, community strategy and observed in-game evidence as separate provenance layers."
+  ]
+}

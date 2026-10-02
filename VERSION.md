@@ -1,3 +1,11 @@
+## v6.7.0 — Current Web + Season 2 Intelligence Enrichment
+
+1. Adds a dated current-web source registry covering current FGF Wiki event/champion data, Season 2/Siwenna, official Fleet Power mechanics, official release-note changes, and the September 2026 hot update.
+2. Adds source-aware lifecycle and conflict rules so current values can supersede historical values without deleting the historical evidence.
+3. Adds Season 2 schedule safety: server-specific timing must come from the in-game calendar; no dates are inferred from generic event cadence.
+4. Enriches Paths to Dominance output with current 24-hour event-index corroboration, Level 9 PvP scoring, Prince Decree lifecycle changes, Siwenna context, and deterministic fleet mechanics.
+5. Adds regression coverage for current-web ingestion and supersession guardrails.
+
 ## v6.6.3 — Requested-Option Verification & Roster-Aware Kaboom Output
 
 - Explicit alternative counts (for example, 5 lineups) are detected and structurally verified against returned options.
@@ -8,10 +16,16 @@
 # FGF Intelligence Version Contract
 
 ## Current release
-- Version: 6.6.2
-- Name: Canonical Query Coverage Benchmark — Relation-Gated Hardening
-- Baseline: v6.6.1 canonical query coverage benchmark plus Evidence Graph v2
-- Branch: main
+- Version: 6.6.4
+- Name: Paths to Dominance Event Intelligence
+- Baseline: v6.6.3 requested-option verification plus Evidence Graph v2
+- Branch: feature/path-to-dominance-event
+
+## v6.6.4 — Paths to Dominance Event Intelligence
+1. Adds structured operational intelligence for the Paths to Dominance event.
+2. Encodes Trader Prince competition, appointment, Counselor application, Prince Ability, leaderboard and participation rules from primary in-game UI evidence.
+3. Preserves explicit unknowns for event dates, unidentified reward icons, Traderhunt duration and other unreadable values.
+4. Adds regression coverage for event routing and anti-inference guardrails.
 
 ## v6.3 — Live + Experiential Intelligence
 1. Core-first policy gate for authority, intent and lifecycle-aware evidence use.
