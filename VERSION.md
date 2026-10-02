@@ -1,3 +1,11 @@
+## v6.7.0 — Current Web + Season 2 Intelligence Enrichment
+
+1. Adds a dated current-web source registry covering current FGF Wiki event/champion data, Season 2/Siwenna, official Fleet Power mechanics, official release-note changes, and the September 2026 hot update.
+2. Adds source-aware lifecycle and conflict rules so current values can supersede historical values without deleting the historical evidence.
+3. Adds Season 2 schedule safety: server-specific timing must come from the in-game calendar; no dates are inferred from generic event cadence.
+4. Enriches Paths to Dominance output with current 24-hour event-index corroboration, Level 9 PvP scoring, Prince Decree lifecycle changes, Siwenna context, and deterministic fleet mechanics.
+5. Adds regression coverage for current-web ingestion and supersession guardrails.
+
 ## v6.6.3 — Requested-Option Verification & Roster-Aware Kaboom Output
 
 - Explicit alternative counts (for example, 5 lineups) are detected and structurally verified against returned options.
