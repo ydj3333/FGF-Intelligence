@@ -12,6 +12,22 @@ import re
 
 NOT_ESTABLISHED = "Not established in current evidence"
 
+CURRENT_WEB_CONTEXT = {
+    "season2_schedule": "Season 2 event timing varies by server; use the in-game calendar for the server-specific schedule. Do not infer a date from general cadence.",
+    "paths_duration": "Current FGF Wiki event index lists Paths to Dominance as a 24-hour Major Event / Fortress Conquest.",
+    "paths_scoring_update": "Release notes for v1.1.44 state that PvP battles in Level 9 star systems grant Paths to Dominance event points.",
+    "prince_decree_update": "Release notes for v1.1.36 state that Prince's Decree use counts increased and Prince buff effects/cooldowns no longer reset when Paths to Dominance begins; bounty effects still clear on reset.",
+    "season2_map": "Current Season 2 guidance states Paths to Dominance persists on the Siwenna map.",
+    "fleet_mechanics": {
+        "energy_types": "Beam > Kinetic > Ionic > Beam counter cycle.",
+        "energy_advantage": "+5% damage when the Energy Type has the matchup advantage.",
+        "champion_synergy": "2 matching Champions: +10% ATK/DEF/INT; 3 matching Champions: +20% ATK/DEF/INT.",
+        "skill_order": "Champion skills activate left-to-right in formation order."
+    },
+    "lifecycle_warning": "The Sep 9 official Epoch of Fusion Seed guide recorded a 60% Combat Craft Modification prerequisite; the Sep 22 hot update reduced it to 40%. Treat 40% as current and 60% as superseded."
+}
+
+
 PLAYBOOKS = {
     "shadowfront": {
         "name": "Shadowfront",
@@ -207,6 +223,7 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
             "basis":"Primary in-game UI evidence from the supplied Path to Dominance document. Exact event dates were not supplied and are intentionally not inferred.",
             "core_evidence_count":len(evidence),
             "source_state":"PRIMARY_IN_GAME_UI",
+            "current_web_context": CURRENT_WEB_CONTEXT,
             "global_rules":[
                 {"phase":"Cadence","action":"Competition occurs every two weeks."},
                 {"phase":"Postponement","action":"If Dominion Warzone occurs that week, the competition on that server is postponed by one week."},
