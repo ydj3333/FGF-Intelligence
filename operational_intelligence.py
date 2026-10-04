@@ -193,23 +193,8 @@ KABOOM_CHAMPION_ALIASES = {
 }
 
 def _extract_player_roster(question: str) -> List[str]:
-    """Extract explicitly named player-owned Champions from an operational query.
-
-    This is intentionally conservative: only known Champion aliases are resolved.
-    A roster constraint must override generic 'best combo' retrieval.
-    """
-    ql = question.lower()
-    found = []
-    aliases = sorted(
-        ((alias, canonical) for canonical, names in KABOOM_CHAMPION_ALIASES.items() for alias in names),
-        key=lambda x: len(x[0]),
-        reverse=True,
-    )
-    for alias, canonical in aliases:
-        if re.search(r"(?<![a-z0-9])" + re.escape(alias) + r"(?![a-z0-9])", ql):
-            if canonical not in found:
-                found.append(canonical)
-    return found
+    """Compatibility wrapper around the universal constraint extractor."""
+    return list(extract_constraints(question).owned_entities)
 
 def _kaboom_roster_answer(question: str, roster: List[str], evidence_count: int) -> Dict[str, Any]:
     """Use the generic v7 strategy engine for a roster-constrained event decision."""
