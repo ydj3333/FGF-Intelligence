@@ -1,3 +1,12 @@
+## v7.0.0 — Event Strategy Intelligence / Stage 5 Answer Validation
+
+1. Adds a deterministic final quality gate between tactical optimization and player-facing output.
+2. Verifies requested option counts and distinguishes exact, partial, and excessive results.
+3. Verifies roster ownership, exclusions, team size, duplicate options, and event-priority isolation.
+4. Preserves evidence/confidence labels and blocks unsupported position/order invention.
+5. Surfaces timing/contradiction review needs without inventing missing mechanics.
+6. Routes solve_question through Stage 5 validation and returns ranked candidates, comparison, and validation state.
+
 ## v7.0.0 — Event Strategy Intelligence / Stage 4 Tactical Optimization
 
 1. Adds combination-level tactical optimization after constraint extraction and feasible candidate generation.
