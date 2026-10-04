@@ -10,6 +10,8 @@ from __future__ import annotations
 from typing import Any, Dict, List
 import re
 
+from constraint_extractor import extract_constraints
+
 NOT_ESTABLISHED = "Not established in current evidence"
 
 CURRENT_WEB_CONTEXT = {
