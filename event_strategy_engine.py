@@ -141,11 +141,7 @@ def decide(
     candidates: Sequence[CandidateAction],
     limit: int = 3,
 ) -> StrategyDecision:
-    """Filter first, then score, then rank.
-
-    This ordering is intentional: an optimal action that violates the player's
-    explicit constraints is never allowed to outrank a feasible action.
-    """
+    """Filter first, then score, then rank."""
     viable: List[Tuple[float, CandidateAction]] = []
     rejected: List[Tuple[str, str]] = []
 
@@ -182,7 +178,6 @@ def decide(
     )
 
 
-
 def build_player_state_from_question(question: str) -> Tuple[PlayerState, ExtractedConstraints]:
     """Convert only explicit user constraints into PlayerState."""
     constraints = extract_constraints(question)
@@ -193,6 +188,7 @@ def build_player_state_from_question(question: str) -> Tuple[PlayerState, Extrac
         ),
         constraints,
     )
+
 
 def build_event_model(
     event_key: str,
@@ -230,13 +226,12 @@ def solve_question(
     role_tags: Mapping[str, Sequence[str]] | None = None,
     limit: int = 5,
 ) -> Dict[str, Any]:
-    """End-to-end Stage 2+3+4 path: extract, generate, optimize, explain."""
+    """End-to-end Stage 2+3+4+5 path: extract, generate, optimize, validate."""
     from candidate_generator import annotate_event_coverage, generate_combinations
     from tactical_optimizer import rank_candidates, why_first_beats_second
+    from answer_validator import validate_answer
 
     player, constraints = build_player_state_from_question(question)
-    # Generate a broad feasible set before ranking so the first N combinations
-    # in roster order cannot hide a better event-specific strategy.
     generated = generate_combinations(
         player, team_size=team_size, limit=10000, role_tags=role_tags
     )
@@ -247,11 +242,35 @@ def solve_question(
     if len(ranked) >= 2:
         comparison = why_first_beats_second(ranked[0], ranked[1])
 
+    validation = validate_answer(
+        question=question,
+        event=event,
+        player=player,
+        constraints=constraints,
+        ranked=ranked,
+        generated_count=len(generated),
+        requested_count=constraints.requested_count,
+        team_size=team_size,
+    )
+
+    decision = decide(event, player, tuple(
+        CandidateAction(
+            name=item.candidate.name,
+            entities=item.candidate.entities,
+            tags=item.candidate.tags,
+            evidence_state=item.evidence_state,
+            rationale=item.explanation,
+        )
+        for item in ranked
+    ), limit=limit)
+
     return {
         "constraints": constraints,
         "player_state": player,
         "generated_count": len(generated),
         "requested_count": constraints.requested_count,
         "decision": decision,
-        "candidates": annotated,
+        "ranked_candidates": ranked,
+        "comparison": comparison,
+        "validation": validation,
     }
