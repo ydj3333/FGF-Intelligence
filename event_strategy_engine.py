@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 import re
 
+from constraint_extractor import ExtractedConstraints, extract_constraints
+
 
 @dataclass(frozen=True)
 class EventStrategyModel:
@@ -179,6 +181,18 @@ def decide(
         confidence=confidence,
     )
 
+
+
+def build_player_state_from_question(question: str) -> Tuple[PlayerState, ExtractedConstraints]:
+    """Convert only explicit user constraints into PlayerState."""
+    constraints = extract_constraints(question)
+    return (
+        PlayerState(
+            owned_entities=constraints.owned_entities,
+            unavailable_entities=constraints.unavailable_entities,
+        ),
+        constraints,
+    )
 
 def build_event_model(
     event_key: str,
