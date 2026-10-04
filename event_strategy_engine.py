@@ -230,15 +230,22 @@ def solve_question(
     role_tags: Mapping[str, Sequence[str]] | None = None,
     limit: int = 5,
 ) -> Dict[str, Any]:
-    """End-to-end Stage 2+3 path: extract constraints, generate, then rank."""
-    from candidate_generator import annotate_event_coverage, generate_combinations, to_actions
+    """End-to-end Stage 2+3+4 path: extract, generate, optimize, explain."""
+    from candidate_generator import annotate_event_coverage, generate_combinations
+    from tactical_optimizer import rank_candidates, why_first_beats_second
 
     player, constraints = build_player_state_from_question(question)
+    # Generate a broad feasible set before ranking so the first N combinations
+    # in roster order cannot hide a better event-specific strategy.
     generated = generate_combinations(
-        player, team_size=team_size, limit=max(limit, 20), role_tags=role_tags
+        player, team_size=team_size, limit=10000, role_tags=role_tags
     )
     annotated = annotate_event_coverage(generated, event)
-    decision = decide(event, player, to_actions(annotated), limit=limit)
+    ranked = rank_candidates(event, player, annotated, limit=limit)
+
+    comparison = None
+    if len(ranked) >= 2:
+        comparison = why_first_beats_second(ranked[0], ranked[1])
 
     return {
         "constraints": constraints,
