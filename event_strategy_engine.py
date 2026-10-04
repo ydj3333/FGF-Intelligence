@@ -220,3 +220,31 @@ def build_event_model(
         duration=duration,
         evidence_state=evidence_state,
     )
+
+
+def solve_question(
+    question: str,
+    event: EventStrategyModel,
+    *,
+    team_size: int = 3,
+    role_tags: Mapping[str, Sequence[str]] | None = None,
+    limit: int = 5,
+) -> Dict[str, Any]:
+    """End-to-end Stage 2+3 path: extract constraints, generate, then rank."""
+    from candidate_generator import annotate_event_coverage, generate_combinations, to_actions
+
+    player, constraints = build_player_state_from_question(question)
+    generated = generate_combinations(
+        player, team_size=team_size, limit=max(limit, 20), role_tags=role_tags
+    )
+    annotated = annotate_event_coverage(generated, event)
+    decision = decide(event, player, to_actions(annotated), limit=limit)
+
+    return {
+        "constraints": constraints,
+        "player_state": player,
+        "generated_count": len(generated),
+        "requested_count": constraints.requested_count,
+        "decision": decision,
+        "candidates": annotated,
+    }
