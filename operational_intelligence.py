@@ -183,6 +183,90 @@ def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> 
     return output
 
 
+
+KABOOM_CHAMPION_ALIASES = {
+    "Zora Dominii": ("zora dominii", "zora"),
+    "Lily": ("lily",),
+    "Jodie Beart": ("jodie beart", "jodie"),
+    "Kama Moai": ("kama moai", "kama", "kameni"),
+    "Evan Rogers": ("evan rogers", "evan"),
+}
+
+def _extract_player_roster(question: str) -> List[str]:
+    """Extract explicitly named player-owned Champions from an operational query.
+
+    This is intentionally conservative: only known Champion aliases are resolved.
+    A roster constraint must override generic 'best combo' retrieval.
+    """
+    ql = question.lower()
+    found = []
+    aliases = sorted(
+        ((alias, canonical) for canonical, names in KABOOM_CHAMPION_ALIASES.items() for alias in names),
+        key=lambda x: len(x[0]),
+        reverse=True,
+    )
+    for alias, canonical in aliases:
+        if re.search(r"(?<![a-z0-9])" + re.escape(alias) + r"(?![a-z0-9])", ql):
+            if canonical not in found:
+                found.append(canonical)
+    return found
+
+def _kaboom_roster_answer(question: str, roster: List[str], evidence_count: int) -> Dict[str, Any]:
+    """Return a roster-specific Kaboom formation instead of the generic top combo."""
+    # The stored Kaboom evidence establishes the roles, but not an official
+    # slot-by-slot ground formation order. Therefore the position sequence is
+    # explicitly marked as tactical inference, never as a canonical mechanic.
+    role = {
+        "Zora Dominii": ("Group / cluster", "Use Zora to pull/group robot waves so the AOE package hits clustered targets."),
+        "Lily": ("AOE burst", "Use Lily as the primary wave-clearing AOE damage source."),
+        "Jodie Beart": ("Cluster damage", "Jodie's weapon effects are reported to add damage against grouped enemies."),
+        "Kama Moai": ("Control / stun", "Kama is reported as an Ion attacker that can stun enemies."),
+        "Evan Rogers": ("DPS", "Evan is a high-damage Champion, but the current Kaboom evidence does not establish a slot-specific role for him."),
+    }
+
+    if set(roster) >= {"Zora Dominii", "Lily", "Kama Moai"} and len(roster) == 3:
+        ordered = ["Zora Dominii", "Lily", "Kama Moai"]
+        selection_basis = "Your stated roster exactly matches Zora + Lily + Kama; no Jodie or Evan has been substituted."
+    else:
+        preferred = ["Zora Dominii", "Lily", "Jodie Beart", "Kama Moai", "Evan Rogers"]
+        ordered = [x for x in preferred if x in roster][:3]
+        selection_basis = "Selected only from the Champions you explicitly named; no unowned Champion was added."
+
+    rows = []
+    for i, champion in enumerate(ordered, 1):
+        r, why = role[champion]
+        rows.append([f"Position {i}", champion, r, why, "Tactical inference — slot order not explicitly established"])
+
+    missing = [x for x in ("Zora Dominii", "Lily", "Kama Moai") if x not in roster]
+    answer = {
+        "mode": "event_combo_roster_aware",
+        "title": "Kaboom, Robots! — your available Champions",
+        "basis": "Player-roster-aware answer. The engine must respect the Champions supplied in the question before considering generic community combinations.",
+        "core_evidence_count": evidence_count,
+        "source_state": "COMMUNITY_ENRICHMENT + CURRENT_CHAMPION_CONTEXT",
+        "player_roster": roster,
+        "selection": ordered,
+        "columns": ["Position", "Champion", "Role", "Why", "Position confidence"],
+        "rows": rows,
+        "recommendation": (
+            "For the roster you gave, use Position 1 Zora → Position 2 Lily → Position 3 Kama Moai. "
+            "The tactical sequence is grouping/control → AOE burst → stun/control. "
+            "This is a tactical recommendation, not an established official slot-order mechanic."
+            if len(ordered) == 3 else
+            "The named roster does not contain a fully established Kaboom trio in the current evidence. "
+            "I selected only from your named Champions and will not silently add Jodie/Evan."
+        ),
+        "guardrail": (
+            "The current Kaboom evidence establishes AOE as the priority and supports Zora grouping, "
+            "Lily AOE, Jodie grouped-target damage, and Kama stun. It does not establish an official "
+            "slot-by-slot ground-position rule, so the exact position order is labelled as inference."
+        ),
+    }
+    if missing:
+        answer["missing_from_known_core"] = missing
+    return answer
+
+
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
@@ -190,8 +274,12 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
     wants_event = key is not None or any(x in ql for x in ("day by day","day-by-day","daily plan","event schedule","event plan","what should i do each day"))
     wants_shop = any(x in ql for x in ("shop","shops","store","stores","buy in different shops","what to buy"))
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
-    wants_combo = any(x in ql for x in ("combo","team","lineup","champion")) and "kaboom" in ql
+    wants_combo = any(x in ql for x in ("combo","team","lineup","champion","position","order")) and "kaboom" in ql
     if wants_combo:
+        roster = _extract_player_roster(question)
+        asks_for_position = bool(re.search(r"\b(position|order|slot|where|keep)\b", ql))
+        if roster and asks_for_position:
+            return _kaboom_roster_answer(question, roster, len(evidence))
         wants_five_lineups = bool(re.search(r"\b5\b|five", ql)) and any(
             x in ql for x in ("line up", "lineup", "team", "combo")
         )
