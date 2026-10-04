@@ -79,3 +79,23 @@ def test_hard_constraint_beats_generic_optimal_candidate():
     )
     result = decide(event, player, candidates, limit=1)
     assert result.selected[0].name == "feasible"
+
+
+def test_end_to_end_five_combinations_respects_owned_roster():
+    from event_strategy_engine import solve_question
+    event = build_event_model(
+        "kaboom",
+        objective="clear robot waves",
+        scoring_factors=("kills",),
+        tactical_priorities=("AOE", "grouping"),
+    )
+    result = solve_question(
+        "I have A, B, C, D and E. Give me 5 combinations.",
+        event,
+        team_size=3,
+        limit=5,
+    )
+    assert result["generated_count"] == 10
+    assert len(result["decision"].selected) == 5
+    for selected in result["decision"].selected:
+        assert set(selected.entities).issubset({"A", "B", "C", "D", "E"})
