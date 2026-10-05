@@ -388,8 +388,9 @@ class KnowledgeQueryEngine:
   hits=[]
   for c,blob,_,_ in self._index:
    low=blob
-   if "shared moonlight" not in low or "f2p" not in low or _is_noisy_claim(c): continue
-   if any(x in low for x in ("f2p priority sequence","prioritize daily rewards","paid-entry feature","normal event participation")):
+   claim_low=_text(c).lower()
+   if "shared moonlight" not in claim_low or "f2p" not in claim_low or _is_noisy_claim(c): continue
+   if any(x in claim_low for x in ("f2p priority sequence","prioritize daily rewards","paid-entry feature","normal event participation")):
     hits.append((c,_similarity(p.raw,low)))
   if not hits:return None
   hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
