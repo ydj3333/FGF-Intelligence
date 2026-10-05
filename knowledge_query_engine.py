@@ -376,6 +376,32 @@ class KnowledgeQueryEngine:
   text+=" This is community/meta evidence (Tier 2), not an official developer ranking."
   return self._answer(p,text,[x[0] for x in top],"strategy_champion_dps")
 
+ def _strategy_ranked_champions_by_style(self,p):
+  ql=p.raw.lower()
+  style="kinetic" if "kinetic" in ql else "beam" if "beam" in ql else "ion" if re.search(r"\bion\b|ionic",ql) else ""
+  if not style: return None
+  rank_value={"sss":7,"ss+":6.5,"ss":6,"s+":5.5,"s":5,"a+":4.5,"a":4,"b+":3.5,"b":3}
+  found=[]
+  for c,blob,_,_ in self._index:
+   low=blob
+   if "ranked" not in low or style not in low or "champion" not in low: continue
+   m=re.search(r"ranked\s+(sss|ss\+|ss|s\+|s|a\+|a|b\+|b)\b",low)
+   if not m: continue
+   if not re.search(rf"\b{style}\b[^.]*champion|champion[^.]*\b{style}\b",low): continue
+   name=_text(c).split(" is ranked",1)[0].strip()
+   found.append((rank_value[m.group(1)],name,c))
+  if not found: return None
+  best=max(x[0] for x in found)
+  top=[]; seen=set()
+  for rv,name,c in sorted(found,key=lambda x:(-x[0],-_authority(x[2]))):
+   if rv!=best or name.lower() in seen: continue
+   seen.add(name.lower()); top.append((name,c))
+   if len(top)>=3: break
+  if not top: return None
+  names=", ".join(name for name,_ in top)
+  text=f"Based on the stored S2 community meta evidence, the highest-ranked {style.title()} Champions identified for this style are {names}. This is community/meta evidence and some entries are under review, not an official developer ranking."
+  return self._answer(p,text,[c for _,c in top],"strategy_ranked_style")
+
  def _strategy_f2p(self,p,rel):
   ql=p.raw.lower()
   topic_terms=[]
