@@ -10,6 +10,8 @@ from __future__ import annotations
 from typing import Any, Dict, List
 import re
 
+from constraint_extractor import extract_constraints
+
 NOT_ESTABLISHED = "Not established in current evidence"
 
 CURRENT_WEB_CONTEXT = {
@@ -183,6 +185,103 @@ def _verify_operational_output(question: str, output: Dict[str, Any] | None) -> 
     return output
 
 
+
+KABOOM_CHAMPION_ALIASES = {
+    "Zora Dominii": ("zora dominii", "zora"),
+    "Lily": ("lily",),
+    "Jodie Beart": ("jodie beart", "jodie"),
+    "Kama Moai": ("kama moai", "kama", "kameni"),
+    "Evan Rogers": ("evan rogers", "evan"),
+}
+
+def _extract_player_roster(question: str) -> List[str]:
+    """Compatibility wrapper around the universal constraint extractor."""
+    return list(extract_constraints(question).owned_entities)
+
+def _kaboom_roster_answer(question: str, roster: List[str], evidence_count: int) -> Dict[str, Any]:
+    """Use the generic v7 strategy engine for a roster-constrained event decision."""
+    event = build_event_model(
+        "kaboom_robots",
+        objective="clear robot waves and maximize kills",
+        scoring_factors=("kills",),
+        tactical_priorities=("AOE", "grouping", "stun"),
+        duration="48h",
+        evidence_state="tier 2",
+    )
+    player = PlayerState(owned_entities=tuple(roster))
+
+    # These candidates are evidence-derived roles, not an exhaustive global
+    # roster. The engine filters first, so a generic Jodie recommendation can
+    # never override an explicit player-owned roster.
+    role_map = {
+        "Zora Dominii": ("grouping", "Group robot waves so area damage can hit clustered targets."),
+        "Lily": ("AOE", "Primary burst area damage against grouped robot waves."),
+        "Jodie Beart": ("AOE", "Community evidence reports extra damage against grouped targets."),
+        "Kama Moai": ("stun", "Use control/stun to help keep the wave contained."),
+        "Evan Rogers": ("damage", "Damage-oriented option; current Kaboom evidence does not establish a specific slot role."),
+    }
+    candidates = []
+    for champion in ("Zora Dominii", "Lily", "Jodie Beart", "Kama Moai", "Evan Rogers"):
+        if champion in role_map:
+            tag, rationale = role_map[champion]
+            candidates.append(
+                CandidateAction(
+                    name=champion,
+                    entities=(champion,),
+                    tags=(tag,),
+                    evidence_state="tier 2",
+                    rationale=rationale,
+                )
+            )
+
+    decision = decide(event, player, candidates, limit=3)
+    selected = [x.name for x in decision.selected]
+
+    # Preserve the user's requested positional answer while making the
+    # positional ordering an explicit tactical inference, not an invented
+    # official slot mechanic.
+    preferred_order = ["Zora Dominii", "Lily", "Kama Moai"]
+    ordered = [x for x in preferred_order if x in selected]
+    ordered += [x for x in selected if x not in ordered]
+
+    role_text = {
+        "Zora Dominii": ("Position 1", "Group / cluster", "Start by grouping the wave."),
+        "Lily": ("Position 2", "AOE burst", "Follow the grouping with burst AOE."),
+        "Kama Moai": ("Position 3", "Control / stun", "Use control to contain the remaining wave."),
+        "Jodie Beart": ("Position", "Cluster damage", "Community evidence supports grouped-target damage."),
+        "Evan Rogers": ("Position", "Damage", "Current Kaboom evidence does not establish an exact slot role."),
+    }
+    rows = []
+    for champion in ordered:
+        pos, role, why = role_text[champion]
+        rows.append([pos, champion, role, why, "Tactical inference — exact slot order not established"])
+
+    return {
+        "mode": "event_strategy_engine",
+        "title": "Kaboom, Robots! — roster-constrained strategy",
+        "basis": "v7 Event Strategy Engine: event mechanics are evaluated against the player's explicit roster before ranking recommendations.",
+        "core_evidence_count": evidence_count,
+        "event_model": {
+            "event": event.event_key,
+            "objective": event.objective,
+            "scoring_factors": list(event.scoring_factors),
+            "tactical_priorities": list(event.tactical_priorities),
+            "duration": event.duration,
+        },
+        "player_roster": roster,
+        "selection": ordered,
+        "columns": ["Position", "Champion", "Role", "Why", "Position confidence"],
+        "rows": rows,
+        "rejected_candidates": list(decision.rejected),
+        "confidence": decision.confidence,
+        "recommendation": (
+            "For the supplied roster, the recommended sequence is Zora → Lily → Kama: "
+            "group → burst AOE → control. The exact positional order is a tactical inference, "
+            "not an official slot-order mechanic in the current evidence."
+        ),
+        "guardrail": "Do not silently substitute a Champion outside the player's explicit roster.",
+    }
+
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
@@ -190,8 +289,12 @@ def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] 
     wants_event = key is not None or any(x in ql for x in ("day by day","day-by-day","daily plan","event schedule","event plan","what should i do each day"))
     wants_shop = any(x in ql for x in ("shop","shops","store","stores","buy in different shops","what to buy"))
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
-    wants_combo = any(x in ql for x in ("combo","team","lineup","champion")) and "kaboom" in ql
+    wants_combo = any(x in ql for x in ("combo","team","lineup","champion","position","order")) and "kaboom" in ql
     if wants_combo:
+        roster = _extract_player_roster(question)
+        asks_for_position = bool(re.search(r"\b(position|order|slot|where|keep)\b", ql))
+        if roster and asks_for_position:
+            return _kaboom_roster_answer(question, roster, len(evidence))
         wants_five_lineups = bool(re.search(r"\b5\b|five", ql)) and any(
             x in ql for x in ("line up", "lineup", "team", "combo")
         )
