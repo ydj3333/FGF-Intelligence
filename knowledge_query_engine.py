@@ -551,6 +551,26 @@ class KnowledgeQueryEngine:
   text=f"Based on the stored S2 community meta evidence, the highest-ranked {style.title()} Champions identified for this style are {names}. This is community/meta evidence and some entries are under review, not an official developer ranking."
   return self._answer(p,text,[c for _,c in top],"strategy_ranked_style")
 
+ def _strategy_credit_farming(self,p,rel):
+  candidates=[]
+  source_terms=("earn","gain","obtain","reward","farm","trade","expedition","quest","source","route")
+  for c,s in rel:
+   low=_text(c).lower()
+   if _is_noisy_claim(c) or "credit" not in low: continue
+   if any(x in low for x in source_terms): candidates.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_text(c).lower()
+   if _is_noisy_claim(c) or "credit" not in low: continue
+   if any(x in low for x in source_terms): candidates.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in candidates: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:8]
+  if not top:return None
+  lines=["Available documented Credit-farming/value options:"]
+  for c,_ in top: lines.append(f"- {_text(c)}")
+  lines.append("The corpus does not establish one universal best Credit source; the strongest currently evidenced options should be compared by yield, time, access, and current event context.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_credit_farming")
+
  def _strategy_options(self,p,rel):
   """Enumerate relevant evidenced options, then rank only when evidence supports it.
   This is intentionally additive: specialized handlers still run first.
@@ -862,6 +882,9 @@ class KnowledgeQueryEngine:
       seen.add(item[2]); top.append(item)
       if len(top)>=4: break
      return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"strategy_considerations")
+   if ("credit" in p.raw.lower() and ("best way" in p.raw.lower() or "farm" in p.raw.lower() or "earn" in p.raw.lower())):
+    r=self._strategy_credit_farming(p,rel)
+    if r:return r
    if (
     any(x in p.raw.lower() for x in (
      "best way","ways to","how do i get","how can i get","how to farm",
