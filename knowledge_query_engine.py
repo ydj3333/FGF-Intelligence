@@ -617,17 +617,19 @@ class KnowledgeQueryEngine:
     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"numeric")
    return self._empty(p,"The current knowledge base does not establish the requested numeric value.")
   if p.question_type=="strategy":
-   if "f2p" in p.raw.lower() or "free to play" in p.raw.lower() or "without spending" in p.raw.lower():
-    r=self._strategy_f2p(p,rel)
-    if r:return r
-   if p.entity=="champion" and p.property=="dps":
-    r=self._strategy_champion_dps(p,rel)
+   # Specialized event handlers must run before generic F2P strategy so an
+   # event-specific question cannot be hijacked by unrelated global F2P facts.
+   if p.entity=="shared moonlight" and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
+    r=self._strategy_shared_moonlight_f2p(p)
     if r:return r
    if p.entity=="shared moonlight" and p.property=="reward":
     r=self._strategy_shared_moonlight_rewards(p,rel)
     if r:return r
-   if p.entity=="shared moonlight" and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
-    r=self._strategy_shared_moonlight_f2p(p)
+   if p.entity=="champion" and p.property=="dps":
+    r=self._strategy_champion_dps(p,rel)
+    if r:return r
+   if "f2p" in p.raw.lower() or "free to play" in p.raw.lower() or "without spending" in p.raw.lower():
+    r=self._strategy_f2p(p,rel)
     if r:return r
    if any(x in p.raw.lower() for x in ("kinetic","beam","ion")) and any(x in p.raw.lower() for x in ("best","heroes","which champions","which heroes")):
     r=self._strategy_ranked_champions_by_style(p)
