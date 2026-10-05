@@ -406,7 +406,7 @@ class KnowledgeQueryEngine:
    claim=_text(c).strip()
    nums=re.findall(r"\b\d+(?:\.\d+)?%?\b",claim)
    if nums and claim.lower() not in evidence_claims:
-    claim=re.split(r"\b\d+(?:\.\d+)?%?\b",claim,maxsplit=1)[0].strip(" ,;:.")
+    continue
    lines.append(f"- {claim}")
   lines.append("The corpus does not establish a single F2P-best Flagship; these are the documented options/considerations rather than an invented winner.")
   return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_flagship_f2p")
@@ -425,7 +425,13 @@ class KnowledgeQueryEngine:
     cand.append((c,_similarity(p.raw,low)))
   unique={}
   for c,s in cand: unique.setdefault(_text(c).strip().lower(),(c,s))
-  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:4]
+  values=list(unique.values())
+  core=[x for x in values if "energy core" in _blob(x[0])]
+  flagship=[x for x in values if "flagship" in _blob(x[0]) and "energy core" not in _blob(x[0])]
+  top=(sorted(core,key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:2]+
+       sorted(flagship,key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:2])
+  if not top:
+   top=sorted(values,key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:4]
   if not top:return None
   text="Current evidence supports different roles rather than a universal winner: "+" ".join(_text(c) for c,_ in top)
   text+=" The corpus does not establish that Energy Core should always precede Flagship, or vice versa, for every player; the decision depends on the documented unlock/progression effects and the player's objective."
