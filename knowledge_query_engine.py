@@ -480,7 +480,7 @@ class KnowledgeQueryEngine:
    claim=_text(c).strip()
    nums=re.findall(r"\b\d+(?:\.\d+)?%?\b",claim)
    if nums and claim.lower() not in evidence_claims:
-    claim=re.split(r"\b\d+(?:\.\d+)?%?\b",claim,maxsplit=1)[0].strip(" ,;:.")
+    continue
    lines.append(f"- {claim}")
   lines.append("No universal single best Crystal use is established by the current evidence.")
   return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_crystals_f2p")
