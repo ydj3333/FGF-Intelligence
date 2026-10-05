@@ -21,3 +21,13 @@ Supported profile fields are spending profile, Core level, fleet type, guild rol
 
 ## Test contract
 Stage 6 tests cover temporal resolution, unresolved same-authority interpretation conflicts, explicit topic grouping, missing player profile fields, and end-to-end wiring through solve_question().
+
+## Compatibility with the existing Core objectives
+
+Stage 6 is an additive layer. It inherits the permanent FGF Core-first contract documented in `docs/CORE_OBJECTIVES_COMPATIBILITY.md`.
+
+Stage 6 must never replace an established v6 Core answer with generic retrieval, policy text, community material, or a newly invented synthesis. It may add provenance, currentness, conflict state, player adaptation and validated enrichment.
+
+The original Core result is captured before Stage 6/policy processing. When Core is established, the final answer must retain that exact Core answer. When Core is not established, Stage 6 may enrich or abstain, but may not manufacture a missing fact.
+
+This distinction is a release requirement, not an optional quality improvement.
