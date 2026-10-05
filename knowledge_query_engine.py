@@ -721,13 +721,18 @@ class KnowledgeQueryEngine:
     # the existing retrieval evidence instead of abstaining just because the
     # sentence-level heuristic missed it.
     if not cand:
-     for rc,rs in rel:
-      blob=_blob(rc)
-      if ("minor damage" in ql and "major damage" in blob) or (
+     # Broaden within the canonical corpus, not to external/community
+     # material, when the retrieved top set split the two subjects across
+     # separate claims.
+     corpus_cand=[]
+     for rc,blob,_,_ in self._index:
+      if ("minor damage" in ql and "minor damage" in blob and "major damage" in blob) or (
        "flagship" in ql and "flagship" in blob and
-       ("combat craft" in blob or "ship" in blob or "bonus" in blob)
+       ("combat craft" in blob or "fleet style" in blob or "flagship style" in blob)
       ):
-       cand.append((rc,rs,_text(rc)))
+       corpus_cand.append((rc,_similarity(p.raw,blob),_text(rc)))
+     corpus_cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+     cand.extend(corpus_cand[:3])
     if cand:
      cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
      top=[]; seen=set()
