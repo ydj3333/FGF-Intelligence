@@ -384,6 +384,89 @@ class KnowledgeQueryEngine:
   text+=" This is community/meta evidence (Tier 2), not an official developer ranking."
   return self._answer(p,text,[x[0] for x in top],"strategy_champion_dps")
 
+ def _strategy_flagship_f2p(self,p,rel):
+  candidates=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "flagship" not in low: continue
+   if any(x in low for x in ("obtain","obtained","upgrade","component","blueprint","trade route","attribute","shop","event","tribute")):
+    candidates.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "flagship" not in low: continue
+   if any(x in low for x in ("obtain","obtained","upgrade","component","blueprint","trade route","attribute","shop","event","tribute")):
+    candidates.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in candidates: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:6]
+  if not top:return None
+  lines=["F2P-relevant Flagship options documented by the current corpus:"]
+  for c,_ in top: lines.append(f"- {_text(c)}")
+  lines.append("The corpus does not establish a single F2P-best Flagship; these are the documented options/considerations rather than an invented winner.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_flagship_f2p")
+
+ def _strategy_core_vs_flagship(self,p,rel):
+  cand=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c) or not ("energy core" in low or "flagship" in low): continue
+   if any(x in low for x in ("upgrade","level","cap","attribute","trade route","progression","component")):
+    cand.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or not ("energy core" in low or "flagship" in low): continue
+   if any(x in low for x in ("upgrade","level","cap","attribute","trade route","progression","component")):
+    cand.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in cand: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:4]
+  if not top:return None
+  text="Current evidence supports different roles rather than a universal winner: "+" ".join(_text(c) for c,_ in top)
+  text+=" The corpus does not establish that Energy Core should always precede Flagship, or vice versa, for every player; the decision depends on the documented unlock/progression effects and the player's objective."
+  return self._answer(p,text,[c for c,_ in top],"strategy_core_vs_flagship")
+
+ def _strategy_building_f2p(self,p,rel):
+  cand=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c): continue
+   if "energy core" in low and any(x in low for x in ("priority","upgrade","progression","building")):
+    cand.append((c,s))
+  if not cand:
+   for c,blob,_,_ in self._index:
+    low=_blob(c)
+    if _is_noisy_claim(c): continue
+    if "energy core" in low and any(x in low for x in ("priority","upgrade","progression","building")):
+     cand.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in cand: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:4]
+  if not top:return None
+  text="For F2P base development, the strongest documented priority evidence is: "+" ".join(_text(c) for c,_ in top)
+  text+=" The corpus does not establish a universal first-building rule beyond these documented progression priorities."
+  return self._answer(p,text,[c for c,_ in top],"strategy_building_f2p")
+
+ def _strategy_crystals_f2p(self,p,rel):
+  cand=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "crystal" not in low: continue
+   if any(x in low for x in ("spend","spending","use","recommend","priority","shop","purchase","save")):
+    cand.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "crystal" not in low: continue
+   if any(x in low for x in ("spend","spending","use","recommend","priority","shop","purchase","save")):
+    cand.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in cand: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:6]
+  if not top:return None
+  lines=["F2P Crystal-use options documented by the current corpus:"]
+  for c,_ in top: lines.append(f"- {_text(c)}")
+  lines.append("No universal single best Crystal use is established by the current evidence.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_crystals_f2p")
+
  def _strategy_shared_moonlight_speedups(self,p,rel):
   candidates=[]
   for c,s in rel:
@@ -716,6 +799,18 @@ class KnowledgeQueryEngine:
   if p.question_type=="strategy":
    # Specialized event handlers must run before generic F2P strategy so an
    # event-specific question cannot be hijacked by unrelated global F2P facts.
+   if "best flagship" in p.raw.lower() and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
+    r=self._strategy_flagship_f2p(p,rel)
+    if r:return r
+   if ("should i upgrade" in p.raw.lower() or "core 35 or" in p.raw.lower() or "energy core or flagship" in p.raw.lower()):
+    r=self._strategy_core_vs_flagship(p,rel)
+    if r:return r
+   if "which building" in p.raw.lower() and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
+    r=self._strategy_building_f2p(p,rel)
+    if r:return r
+   if "crystals" in p.raw.lower() and ("best use" in p.raw.lower() or "f2p" in p.raw.lower()):
+    r=self._strategy_crystals_f2p(p,rel)
+    if r:return r
    if p.entity=="shared moonlight" and any(x in p.raw.lower() for x in ("speedup","speedups")):
     r=self._strategy_shared_moonlight_speedups(p,rel)
     if r:return r
