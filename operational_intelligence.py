@@ -112,7 +112,11 @@ def _blob(evidence: List[Dict[str, Any]]) -> str:
 def _event_key(q: str) -> str | None:
     ql=q.lower()
     if any(x in ql for x in ("guild vs guild","gvg","guild versus guild")): return "gvg"
-    # T100 is the established player shorthand for Top 100 Galactic Traders.\n    # Keep the alias at the operational-intelligence boundary so short player\n    # queries such as "best way to do T100" still reach the existing six-day\n    # event playbook instead of falling through to generic strategy retrieval.\n    if any(x in ql for x in ("top 100 galactic traders","galactic traders","top 100 traders","t100","t 100")) or re.search(r"\\bt[\\s-]?100\\b", ql): return "top100"
+    # T100 is the established player shorthand for Top 100 Galactic Traders.
+    # Keep the alias at the operational-intelligence boundary so short player
+    # queries such as "best way to do T100" still reach the existing six-day
+    # event playbook instead of falling through to generic strategy retrieval.
+    if any(x in ql for x in ("top 100 galactic traders","galactic traders","top 100 traders","t100","t 100")) or re.search(r"\bt[\s-]?100\b", ql): return "top100"
     if "shadowfront" in ql: return "shadowfront"
     if any(x in ql for x in ("paths to dominance","path to dominance","trader prince","prince ability","prince tributes")): return "path_to_dominance"
     return None
