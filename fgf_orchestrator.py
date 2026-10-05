@@ -94,14 +94,21 @@ class FGFOrchestrator:
 
         # Established factual answers stop at Core.
         if intent == "factual" and not core_abstains:
+            policy_review = core.get("policy_review")
             result = OrchestrationResult(
                 answer=core.get("answer", ""),
                 baseline_answer=core_baseline.get("answer", ""),
-                branch="core",
-                evidence_state="CONFIRMED",
+                branch="core+policy_review" if policy_review else "core",
+                evidence_state=(
+                    "CORE_ESTABLISHED_BUT_POLICY_REVIEW"
+                    if policy_review else "CONFIRMED"
+                ),
                 abstained=False,
                 core_answerable=True,
-                warnings=[],
+                warnings=(
+                    list(core.get("orchestration_warnings", []))
+                    if policy_review else []
+                ),
                 core=core, experience=[], youtube=[],
                 provenance={"branches_used": ["core"]},
             ).as_dict()
