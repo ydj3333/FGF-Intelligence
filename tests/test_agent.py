@@ -92,3 +92,11 @@ finally:
         Path(log_path).unlink(missing_ok=True)
     except Exception:
         pass
+
+
+def test_t100_best_way_cannot_surface_generic_strategy_options():
+    result = agent.answer("best way to do T100")
+    assert result["answer_type"] == "event_best_strategy"
+    assert "Top 100 Galactic Traders" in result["answer"]
+    assert "Available evidenced options/methods" not in result["answer"]
+    assert result["operational"]["mode"] == "event_best_strategy"
