@@ -286,10 +286,46 @@ def _kaboom_roster_answer(question: str, roster: List[str], evidence_count: int)
         "guardrail": "Do not silently substitute a Champion outside the player's explicit roster.",
     }
 
+def _wants_best_event_strategy(question: str) -> bool:
+    """Detect an explicit request for the best/efficient strategy for a known event."""
+    ql = question.lower()
+    return bool(re.search(
+        r"\b(best way|best strategy|optimal strategy|most efficient|maximize|maximum rewards|how do i (?:do|play|approach)|strategy for|efficient way)\b",
+        ql,
+    ))
+
+
+def _top100_best_strategy() -> Dict[str, Any]:
+    """Convert the stored T100 guide into an actionable execution strategy."""
+    return {
+        "mode": "event_best_strategy",
+        "title": "Top 100 Galactic Traders — best execution strategy",
+        "basis": "Best-effort strategy synthesis from the stored Top 100 Galactic Traders community guide. The corpus does not establish a mathematically optimal resource-spend threshold.",
+        "source_state": "COMMUNITY_GUIDE",
+        "columns": ["Phase / Day", "Best action", "Resource discipline", "Why / objective", "Evidence state"],
+        "rows": [
+            ["Before Day 1", "Inspect the live milestone ladder and prepare event-relevant resources.", "Keep Speedups, Crystals, Beacons/Beacon materials and other event resources available; do not pre-spend blindly.", "Start with resources positioned for the active objective and avoid wasting resources before the reward ladder is understood.", "COMMUNITY_GUIDE"],
+            ["Day 1", "Complete Ordinary Tribute activities and use moderate Speedups.", "Spend only enough to advance the objective; preserve surplus for later days.", "Matches the stored Day 1 objective while protecting the reserve.", "COMMUNITY_GUIDE"],
+            ["Day 2", "Prioritize Commissions.", "Use Crystals cautiously and only when they directly advance the objective.", "Commission progression is the documented Day 2 focus; unnecessary Crystal spending reduces flexibility.", "COMMUNITY_GUIDE"],
+            ["Day 3", "Use Beacons / Beacon materials when required.", "Protect Computational Components and other scarce progression resources unless the live objective specifically calls for them.", "Advances the documented Beacon objective without consuming scarce resources prematurely.", "COMMUNITY_GUIDE"],
+            ["Day 4", "Return to high-value Commissions.", "Prioritize commissions that advance the active objective; keep rare resources for stronger opportunities.", "The stored guide identifies commissions as the main Day 4 activity.", "COMMUNITY_GUIDE"],
+            ["Day 5", "Take the third milestone when it is resource-efficient; reassess before pushing further.", "Do not force the fourth milestone when its resource cost is disproportionate to the reward.", "The stored guide explicitly identifies Day 5 as a weaker reward ladder and recommends stopping when value drops.", "COMMUNITY_GUIDE"],
+            ["Day 6", "Use PvP only within the current server/event rules and overlap it with other PvP events where useful.", "Keep a normal progression reserve after the event; do not assume PvP requirements without checking live rules.", "Maximizes potential overlap without inventing unsupported PvP requirements.", "COMMUNITY_GUIDE"],
+            ["Every day", "Spend against the current objective, then stop when marginal reward value drops.", "Preserve resources for later/higher-value objectives rather than chasing points for their own sake.", "This is the core resource-efficiency rule in the stored T100 guide.", "COMMUNITY_GUIDE"],
+        ],
+        "recommendation": "The strongest evidence-backed approach is objective-first spending: prepare before Day 1, match resources to each day's objective, use Crystals cautiously, protect scarce resources, take efficient milestones, and stop when the next reward no longer justifies the resource cost. Exact spend thresholds are not established.",
+        "guardrail": "Do not present an invented numeric spend target or claim a mathematically proven optimal route. Check the live in-game milestone ladder and server-specific rules before committing resources.",
+    }
+
+
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
     key=_event_key(question)
+    # Event-specific strategy must win over the generic "best way" option
+    # enumerator. For T100, return an actionable execution strategy.
+    if key == "top100" and _wants_best_event_strategy(question):
+        return _top100_best_strategy()
     wants_event = key is not None or any(x in ql for x in ("day by day","day-by-day","daily plan","event schedule","event plan","what should i do each day"))
     wants_shop = any(x in ql for x in ("shop","shops","store","stores","buy in different shops","what to buy"))
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))
