@@ -430,7 +430,7 @@ class KnowledgeQueryEngine:
   """
   ql=p.raw.lower()
   topic_terms=[]
-  for term in ("credit","credits","resource","resources","trade","merchant","expedition","farm","farming","building","research","champion","flagship","crystal","crystals","event"):
+  for term in ("credit","credits","resource","resources","trade","merchant","expedition","farm","farming","building","research","champion","flagship","crystal","crystals","event","moonlight","speedup","speedups","energy core","core"):
    if term in ql: topic_terms.append(term)
   action_terms=("earn","gain","reward","obtain","farm","trade","expedition","merchant","quest","source","method","route","save","saving","spend","spending","discount","priority","upgrade","acquire","available","shop")
   candidates=[]
@@ -481,9 +481,13 @@ class KnowledgeQueryEngine:
    nums=re.findall(r"\b\d+(?:\.\d+)?\b",claim)
    qnums=set(re.findall(r"\b\d+(?:\.\d+)?\b",ql))
    if nums and claim.lower() not in evidence_claims and not any(n in qnums for n in nums):
-    # Use the source's non-numeric opening clause as the option label.
-    label=re.split(r"[,;:.]",claim,maxsplit=1)[0].strip()
-    claim=label if label else "Documented option (see evidence set)"
+    # Supplemental options remain visible, but unsupported numeric detail is
+    # suppressed rather than leaking an unproven number into the answer.
+    prefix=re.split(r"\b\d+(?:\.\d+)?%?\b",claim,maxsplit=1)[0].strip(" ,;:.")
+    words=prefix.split()
+    claim=" ".join(words[:10]).strip()
+    if not claim:
+     claim="Additional documented option (numeric detail retained only in the evidence set)"
    label="official/strong evidence" if _authority(c)>=3 else "community evidence"
    lines.append(f"- {claim} ({label})")
   text="Available evidenced options/methods:\n"+"\n".join(lines)
