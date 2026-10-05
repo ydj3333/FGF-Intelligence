@@ -401,7 +401,13 @@ class KnowledgeQueryEngine:
   top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:6]
   if not top:return None
   lines=["F2P-relevant Flagship options documented by the current corpus:"]
-  for c,_ in top: lines.append(f"- {_text(c)}")
+  evidence_claims={_text(c).strip().lower() for c,_ in top[:4]}
+  for c,_ in top:
+   claim=_text(c).strip()
+   nums=re.findall(r"\b\d+(?:\.\d+)?%?\b",claim)
+   if nums and claim.lower() not in evidence_claims:
+    claim=re.split(r"\b\d+(?:\.\d+)?%?\b",claim,maxsplit=1)[0].strip(" ,;:.")
+   lines.append(f"- {claim}")
   lines.append("The corpus does not establish a single F2P-best Flagship; these are the documented options/considerations rather than an invented winner.")
   return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_flagship_f2p")
 
@@ -463,7 +469,13 @@ class KnowledgeQueryEngine:
   top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:6]
   if not top:return None
   lines=["F2P Crystal-use options documented by the current corpus:"]
-  for c,_ in top: lines.append(f"- {_text(c)}")
+  evidence_claims={_text(c).strip().lower() for c,_ in top[:4]}
+  for c,_ in top:
+   claim=_text(c).strip()
+   nums=re.findall(r"\b\d+(?:\.\d+)?%?\b",claim)
+   if nums and claim.lower() not in evidence_claims:
+    claim=re.split(r"\b\d+(?:\.\d+)?%?\b",claim,maxsplit=1)[0].strip(" ,;:.")
+   lines.append(f"- {claim}")
   lines.append("No universal single best Crystal use is established by the current evidence.")
   return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_crystals_f2p")
 
