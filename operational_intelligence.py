@@ -318,14 +318,88 @@ def _top100_best_strategy() -> Dict[str, Any]:
     }
 
 
+def _event_best_strategy(key: str, question: str, evidence_count: int) -> Dict[str, Any] | None:
+    """Mandatory event-first strategy router.
+
+    A known event + explicit strategy intent must never fall through to the
+    generic knowledge strategy enumerator. Event-specific playbooks may provide
+    richer handling; otherwise the stored event playbook is transformed into an
+    evidence-labelled execution plan.
+    """
+    if key == "top100":
+        return _top100_best_strategy()
+
+    playbook = PLAYBOOKS.get(key)
+    if not playbook:
+        return None
+
+    name = playbook.get("name", key)
+    days = playbook.get("days") or []
+    global_rules = playbook.get("global") or {}
+    source = playbook.get("source", "Stored event playbook")
+
+    rows = []
+    for day in days:
+        rows.append([
+            day.get("day", ""),
+            day.get("do", ""),
+            day.get("save", ""),
+            day.get("avoid", ""),
+            day.get("state", "NOT ESTABLISHED"),
+        ])
+
+    # For events without day-specific evidence, still answer the user's
+    # strategic question with the event's established operating principles
+    # instead of exposing unrelated generic evidence.
+    if not rows:
+        for phase, action in global_rules.items():
+            rows.append([
+                phase.title(),
+                action,
+                "Use only resources justified by the current objective.",
+                "Re-check live event state before committing scarce resources.",
+                "CURRENT PLAYBOOK",
+            ])
+
+    recommendation = (
+        f"The best evidence-backed approach for {name} is to follow the "
+        "event's established operating principles, match spending/actions to "
+        "the active objective, preserve scarce resources when the next payoff "
+        "is not established, and verify live event conditions before committing."
+    )
+
+    return {
+        "mode": "event_best_strategy",
+        "title": f"{name} — best execution strategy",
+        "basis": (
+            f"Event-specific strategy synthesized from the stored {name} "
+            f"playbook. {source}"
+        ),
+        "core_evidence_count": evidence_count,
+        "source_state": "EVENT_PLAYBOOK",
+        "columns": ["Phase / Day", "Best action", "Resource discipline", "Guard against", "Evidence state"],
+        "rows": rows,
+        "recommendation": recommendation,
+        "guardrail": (
+            "Event-specific evidence takes precedence over generic strategy "
+            "retrieval. Do not invent day objectives, spend thresholds, dates, "
+            "or rewards that the playbook does not establish."
+        ),
+    }
+
+
 def build_operational_output(question: str, core_evidence: List[Dict[str, Any]] | None = None) -> Dict[str, Any] | None:
     ql=question.lower()
     evidence=core_evidence or []
     key=_event_key(question)
-    # Event-specific strategy must win over the generic "best way" option
-    # enumerator. For T100, return an actionable execution strategy.
-    if key == "top100" and _wants_best_event_strategy(question):
-        return _top100_best_strategy()
+    # HARD ROUTING CONTRACT: a recognized event + explicit strategy intent
+    # must be answered by the event strategy layer before generic evidence
+    # enumeration. This protects event-specific knowledge from later generic
+    # strategy hardening/regressions.
+    if key is not None and _wants_best_event_strategy(question):
+        event_strategy = _event_best_strategy(key, question, len(evidence))
+        if event_strategy is not None:
+            return event_strategy
     wants_event = key is not None or any(x in ql for x in ("day by day","day-by-day","daily plan","event schedule","event plan","what should i do each day"))
     wants_shop = any(x in ql for x in ("shop","shops","store","stores","buy in different shops","what to buy"))
     wants_resource = any(x in ql for x in ("save","spend","resources","resource plan","resource allocation","what not to use"))

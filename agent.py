@@ -1492,6 +1492,29 @@ try:
                 question,
                 core.get('evidence', []) if isinstance(core.get('evidence'), list) else []
             )
+            # Event strategy is an answer-layer decision, not decorative
+            # enrichment. If a recognized event + strategy intent produced an
+            # event_best_strategy operational result, never expose the generic
+            # core strategy_options answer as the player's primary answer.
+            operational = merged.get('operational') or {}
+            if operational.get('mode') == 'event_best_strategy':
+                rows = operational.get('rows') or []
+                summary = str(operational.get('recommendation') or '').strip()
+                actions = []
+                for row in rows[:8]:
+                    if isinstance(row, list) and len(row) >= 2:
+                        actions.append(f"{row[0]}: {row[1]}")
+                if actions:
+                    merged['answer'] = summary + "\n\n" + "\n".join(actions)
+                elif summary:
+                    merged['answer'] = summary
+                merged['answer_type'] = 'event_best_strategy'
+                merged['reasoning'] = {
+                    'mode': 'event_best_strategy',
+                    'event': operational.get('title'),
+                    'answer_source': 'event_operational_layer',
+                }
+                merged['evidence_state'] = operational.get('source_state', merged.get('evidence_state'))
         except Exception as exc:
             merged['operational'] = None
             merged['operational_warning'] = 'Operational renderer unavailable: ' + type(exc).__name__
