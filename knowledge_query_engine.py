@@ -384,6 +384,19 @@ class KnowledgeQueryEngine:
   text+=" This is community/meta evidence (Tier 2), not an official developer ranking."
   return self._answer(p,text,[x[0] for x in top],"strategy_champion_dps")
 
+ def _strategy_shared_moonlight_f2p(self,p):
+  hits=[]
+  for c,blob,_,_ in self._index:
+   low=blob
+   if "shared moonlight" not in low or "f2p" not in low or _is_noisy_claim(c): continue
+   if any(x in low for x in ("f2p priority sequence","prioritize daily rewards","paid-entry feature","normal event participation")):
+    hits.append((c,_similarity(p.raw,low)))
+  if not hits:return None
+  hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+  top=[c for c,_ in hits[:2]]
+  text="For F2P Shared Moonlight play, the stored guide recommends claiming daily rewards, collecting free event resources, delaying spending until the shop is understood, prioritizing limited rewards, managing Moonsoil Diggers carefully, targeting the best realistic Grand Prize, and treating paid features as optional. Exact use of a specific Speedup stock is not established."
+  return self._answer(p,text,top,"strategy_shared_moonlight_f2p")
+
  def _strategy_ranked_champions_by_style(self,p):
   ql=p.raw.lower()
   style="kinetic" if "kinetic" in ql else "beam" if "beam" in ql else "ion" if re.search(r"\bion\b|ionic",ql) else ""
@@ -612,7 +625,10 @@ class KnowledgeQueryEngine:
    if p.entity=="shared moonlight" and p.property=="reward":
     r=self._strategy_shared_moonlight_rewards(p,rel)
     if r:return r
-   if any(x in p.raw.lower() for x in ("kinetic","beam","ion")) and any(x in p.raw.lower() for x in ("best","heroes","champions")):
+   if p.entity=="shared moonlight" and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
+    r=self._strategy_shared_moonlight_f2p(p)
+    if r:return r
+   if any(x in p.raw.lower() for x in ("kinetic","beam","ion")) and any(x in p.raw.lower() for x in ("best","heroes","which champions","which heroes")):
     r=self._strategy_ranked_champions_by_style(p)
     if r:return r
    if any(x in p.raw.lower() for x in ("best","efficiently","most efficient","optimal","should i","what should i","recommended","priority","save resources")):
