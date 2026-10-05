@@ -415,6 +415,12 @@ class KnowledgeQueryEngine:
    if topic_terms and not any(x in low for x in topic_terms):
     continue
    cand.append((c,score))
+  if not cand:
+   for c,blob,_,_ in self._index:
+    low=_blob(c)
+    if not any(x in low for x in ("f2p","free to play","free-to-play")): continue
+    if topic_terms and not any(x in low for x in topic_terms): continue
+    cand.append((c,_similarity(p.raw,low)))
   if not cand:return None
   cand.sort(key=lambda x:(0 if _authority(x[0])>=3 else 1,-x[1]))
   top=cand[:3]
@@ -589,6 +595,16 @@ class KnowledgeQueryEngine:
    if p.entity=="shared moonlight" and p.property=="reward":
     r=self._strategy_shared_moonlight_rewards(p,rel)
     if r:return r
+   if any(x in p.raw.lower() for x in ("kinetic","beam","ion")) and any(x in p.raw.lower() for x in ("best","heroes","champions")):
+    r=self._strategy_ranked_champions_by_style(p)
+    if r:return r
+   if any(x in p.raw.lower() for x in ("best","most efficient","optimal","should i","what should i","recommended","priority")):
+    return self._empty(
+     p,
+     "The current knowledge base does not establish a reliable recommendation for this decision. I will not substitute generic facts for a 'best' or 'should' answer.",
+     claims=[c for c,_ in rel[:2]],
+     mode="strategy_no_recommendation_evidence",
+    )
   if p.question_type=="multi_hop" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    wants_availability=bool(re.search(r"\\b(?:where|available|shop|location)\\b", p.raw.lower()))
