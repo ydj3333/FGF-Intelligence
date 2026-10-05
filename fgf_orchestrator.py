@@ -15,6 +15,7 @@ from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Optional
 
 from policy_engine import classify_intent, enforce
+from core_objectives import preserve_core_answer, validate_core_preservation
 
 
 @dataclass
@@ -62,6 +63,8 @@ class FGFOrchestrator:
 
     def answer(self, question: str, player_context: Optional[Dict[str, Any]] = None):
         core = self.core_answer(question, player_context)
+        # Protected baseline: all later layers must build on the original Core result.
+        core_baseline = dict(core)
         intent = _policy_intent(question, core)
         core_claims = core.get("evidence", []) if isinstance(core.get("evidence"), list) else []
         policy = enforce(
@@ -91,9 +94,9 @@ class FGFOrchestrator:
 
         # Established factual answers stop at Core.
         if intent == "factual" and not core_abstains:
-            return OrchestrationResult(
+            result = OrchestrationResult(
                 answer=core.get("answer", ""),
-                baseline_answer=core.get("answer", ""),
+                baseline_answer=core_baseline.get("answer", ""),
                 branch="core",
                 evidence_state="CONFIRMED",
                 abstained=False,
@@ -102,6 +105,8 @@ class FGFOrchestrator:
                 core=core, experience=[], youtube=[],
                 provenance={"branches_used": ["core"]},
             ).as_dict()
+            validate_core_preservation(core_baseline, result)
+            return result
 
         experience = []
         if self.experience_store is not None:
@@ -141,9 +146,10 @@ class FGFOrchestrator:
                 branches.append("experience")
             if youtube:
                 branches.append("youtube")
-            return OrchestrationResult(
+            answer = preserve_core_answer(core_baseline, answer)
+            result = OrchestrationResult(
                 answer=answer,
-                baseline_answer=core.get("answer", ""),
+                baseline_answer=core_baseline.get("answer", ""),
                 branch="+".join(branches),
                 evidence_state="SUPPORTED" if experience else "COMMUNITY_INTERPRETATION",
                 abstained=False,
@@ -159,6 +165,8 @@ class FGFOrchestrator:
                 core=core, experience=experience, youtube=youtube,
                 provenance={"branches_used": branches},
             ).as_dict()
+            validate_core_preservation(core_baseline, result)
+            return result
 
         if core_abstains and youtube_allowed and youtube:
             answer = (
