@@ -20,6 +20,10 @@ from policy_engine import classify_intent, enforce
 @dataclass
 class OrchestrationResult:
     answer: str
+    # Immutable baseline produced by the original v6 Knowledge Query Engine.
+    # Later intelligence layers may enrich it, but must never replace a correct
+    # specialized core answer with generic retrieval.
+    baseline_answer: str
     branch: str
     evidence_state: str
     abstained: bool
@@ -31,7 +35,13 @@ class OrchestrationResult:
     provenance: Dict[str, Any]
 
     def as_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        payload = asdict(self)
+        payload["answer_layering"] = {
+            "baseline": "v6_core_knowledge_query_engine",
+            "baseline_preserved": payload.get("baseline_answer", "") != "" and payload.get("baseline_answer", "") in payload.get("answer", ""),
+            "policy": "new intelligence layers are additive; a correct specialized core answer is never discarded",
+        }
+        return payload
 
 
 def _is_abstention(result: Dict[str, Any]) -> bool:
@@ -81,6 +91,7 @@ class FGFOrchestrator:
         if intent == "factual" and not core_abstains:
             return OrchestrationResult(
                 answer=core.get("answer", ""),
+                baseline_answer=core.get("answer", ""),
                 branch="core",
                 evidence_state="CONFIRMED",
                 abstained=False,
@@ -130,6 +141,7 @@ class FGFOrchestrator:
                 branches.append("youtube")
             return OrchestrationResult(
                 answer=answer,
+                baseline_answer=core.get("answer", ""),
                 branch="+".join(branches),
                 evidence_state="SUPPORTED" if experience else "COMMUNITY_INTERPRETATION",
                 abstained=False,
@@ -156,7 +168,7 @@ class FGFOrchestrator:
                 )
             )
             return OrchestrationResult(
-                answer=answer, branch="youtube_fallback",
+                answer=answer, baseline_answer=core.get("answer", ""), branch="youtube_fallback",
                 evidence_state="COMMUNITY_INTERPRETATION",
                 abstained=False, core_answerable=False,
                 warnings=[
@@ -169,6 +181,7 @@ class FGFOrchestrator:
 
         return OrchestrationResult(
             answer=core.get("answer", "The current evidence is insufficient."),
+            baseline_answer=core.get("answer", ""),
             branch="core_abstention",
             evidence_state="INSUFFICIENT_EVIDENCE",
             abstained=True,
