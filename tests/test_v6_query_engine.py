@@ -227,3 +227,34 @@ def test_v7_comparison_layer_preserves_existing_core_comparison_subtypes():
     assert flagship["reasoning"]["mode"] == "descriptive_comparison"
     assert "flagship" in flagship["answer"].lower()
     assert "better recommendation" not in flagship["answer"].lower()
+
+
+def test_v7_numeric_cap_does_not_substitute_unrelated_level_facts():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Energy core level 15 unlocks epic.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Energy core level 20 unlocks legendary.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the maximum Energy Core level?")
+    assert result["answer_type"] == "knowledge_abstention"
+    assert "does not establish" in result["answer"].lower()
+
+
+def test_v7_exact_cost_policy_cannot_be_hijacked_by_unrelated_retrieval():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Players can establish their own Home Port.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What should I do when the evidence does not establish an exact cost?")
+    assert result["reasoning"]["mode"] == "safe_strategy_policy"
+    assert "do not invent a number" in result["answer"].lower()
+
+
+def test_v7_best_strategy_does_not_return_unrelated_facts():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Players can establish their own Home Port.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the best way to farm Credits?")
+    assert result["answer_type"] == "knowledge_abstention"
+    assert "recommendation" in result["answer"].lower()
