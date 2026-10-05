@@ -685,6 +685,46 @@ class KnowledgeQueryEngine:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True); return self._answer(p,cand[0][2],[cand[0][0]],"counter")
   if p.question_type=="comparison":
    ql=p.raw.lower()
+
+   # Authority/conflict questions are governance questions, not value
+   # comparisons. Resolve them before generic retrieval can manufacture a
+   # misleading "better/worse" answer.
+   if any(x in ql for x in ("youtube","official evidence","disagree","disagreement","conflict","conflicts","trust")):
+    text=("When community/YouTube evidence conflicts with stronger official evidence, "
+          "the stronger official/current evidence governs the production answer; the conflicting "
+          "community claim is preserved as additional evidence rather than silently replacing it. "
+          "If the conflict concerns a live game mechanic, check the latest official/in-game evidence.")
+    return self._answer(p,text,[],"evidence_governance")
+
+   # "Difference between A and B" and scope questions such as "A or B?"
+   # are descriptive comparisons. They must use direct evidence rather than
+   # the value-comparison winner logic below.
+   descriptive_comparison = (
+    "difference" in ql or "different" in ql or
+    re.search(r"\b(?:all|only|just)\b.*\bor\b", ql)
+   )
+   if descriptive_comparison:
+    cand=[]
+    for rc,rs in rel:
+     for sent in self._direct_sentences(p,rc):
+      sl=sent.lower()
+      if any(term in sl for term in (
+       "minor damage","major damage","ship loss","repair bay",
+       "flagship","combat craft","same style","fleet style",
+       "bonus","applies","determines","provides","consists of"
+      )):
+       cand.append((rc,rs,sent))
+    if cand:
+     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+     top=[]; seen=set()
+     for item in cand:
+      key=item[2].strip()
+      if key in seen: continue
+      seen.add(key); top.append(item)
+      if len(top)>=3: break
+     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"descriptive_comparison")
+
+   # Comparative questions must answer the comparison itself, not fall back
    # Comparative questions must answer the comparison itself, not fall back
    # to generic event facts. Extract the two sides and verify each side
    # independently against the corpus before making a value judgment.
