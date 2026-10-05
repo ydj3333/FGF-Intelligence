@@ -810,6 +810,12 @@ class KnowledgeQueryEngine:
      corpus_cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
      cand.extend(corpus_cand[:3])
     if cand:
+     if "minor" in ql and "major" in ql:
+      for rc,rs in rel:
+       for sent in self._direct_sentences(p,rc):
+        sl=sent.lower()
+        if ("minor damage" in sl or "major damage" in sl) and sent not in [x[2] for x in cand]:
+         cand.append((rc,rs,sent))
      cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
      top=[]; seen=set()
      for item in cand:
