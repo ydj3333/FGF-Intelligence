@@ -610,7 +610,6 @@ class KnowledgeQueryEngine:
     return self._empty(
      p,
      "The current knowledge base does not establish a reliable recommendation for this decision. I will not substitute generic facts for a 'best' or 'should' answer.",
-     claims=[c for c,_ in rel[:2]],
      mode="strategy_no_recommendation_evidence",
     )
   if p.question_type=="multi_hop" and p.entity!="unknown":
