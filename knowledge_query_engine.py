@@ -64,7 +64,7 @@ QUESTION_TYPES={
  "source":["how do i get","where do i get","how to get","where can i get","source","sources","obtain","farm"],
  "requirement":["what unlocks","what do i need","what is required","requires","requirement","prerequisite","before i can"],
  "comparison":["difference","different","versus"," vs ","compare","better than","worse than","prefer","preferred","worth","value","instead of","rather than"],
- "strategy":["best","optimal","recommended","should i","priority","most efficient"],
+ "strategy":["best","optimal","recommended","should i","priority","most efficient","efficiently","save resources","progression plan","plan"],
  "effect":["what happens","what does","what do","effect","benefit","bonus"],
  "counter":["what counters","which counters","counter","against"],
  "numeric":["how many","how much","how long","percentage","percent","cost","maximum","max","cap"],
@@ -103,7 +103,7 @@ def _is_noisy_claim(c):
  tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
  if "tier 3" not in tier: return False
  if len(text)>180: return True
- return any(x in low for x in ("woo","you know","here we go","completely empty","for this test","kin ything","ge completely"))
+ return any(x in low for x in ("woo","you know","here we go","completely empty","for this test","kin ything","ge completely","or something like that","he new flagship","to unlock it as a free to play p"))
 
 def _authority(c):
  tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
@@ -500,7 +500,7 @@ class KnowledgeQueryEngine:
    update_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
    if update_hits:
     rel=update_hits[:limit]
-  if p.question_type=="strategy" and "exact cost" in p.raw.lower() and (
+  if p.question_type=="strategy" and "exact cost" in p.raw.lower() and not any(x in p.raw.lower() for x in ("f2p","free to play","progression plan")) and (
    "does not establish" in p.raw.lower() or "unknown" in p.raw.lower()
   ):
    text=("When the evidence does not establish an exact cost, do not invent a number. "
