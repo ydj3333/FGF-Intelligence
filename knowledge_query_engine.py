@@ -97,6 +97,14 @@ def _blob(c):
  return " ".join(str(c.get(k,"") or "") for k in ("Claim","claim","Category","category","Notes","notes","Source","source","Claim Type","claim_type","Evidence Tier","tier","Season/Version","season","version")).lower()
 def _tokens(s): return re.findall(r"[a-z0-9]+(?:['-][a-z0-9]+)?",s.lower())
 def _norm_tokens(s): return {x for x in _tokens(s) if x not in STOP and len(x)>1}
+def _is_noisy_claim(c):
+ text=_text(c).strip()
+ low=text.lower()
+ tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
+ if "tier 3" not in tier: return False
+ if len(text)>180: return True
+ return any(x in low for x in ("woo","you know","here we go","completely empty","for this test","kin ything","ge completely"))
+
 def _authority(c):
  tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
  status=str(c.get("Status",c.get("status",""))).lower()
@@ -417,10 +425,11 @@ class KnowledgeQueryEngine:
    cand.append((c,score))
   if not cand:
    for c,blob,_,_ in self._index:
-    low=_blob(c)
+    low=_blob(c); claim_low=_text(c).lower()
+    if _is_noisy_claim(c): continue
     if not any(x in low for x in ("f2p","free to play","free-to-play")): continue
-    if topic_terms and not any(x in low for x in topic_terms): continue
-    cand.append((c,_similarity(p.raw,low)))
+    if topic_terms and not any(x in claim_low for x in topic_terms): continue
+    cand.append((c,_similarity(p.raw,claim_low)))
   if not cand:return None
   cand.sort(key=lambda x:(0 if _authority(x[0])>=3 else 1,-x[1]))
   top=cand[:3]
@@ -606,7 +615,7 @@ class KnowledgeQueryEngine:
    if any(x in p.raw.lower() for x in ("kinetic","beam","ion")) and any(x in p.raw.lower() for x in ("best","heroes","champions")):
     r=self._strategy_ranked_champions_by_style(p)
     if r:return r
-   if any(x in p.raw.lower() for x in ("best","most efficient","optimal","should i","what should i","recommended","priority")):
+   if any(x in p.raw.lower() for x in ("best","efficiently","most efficient","optimal","should i","what should i","recommended","priority","save resources")):
     return self._empty(
      p,
      "The current knowledge base does not establish a reliable recommendation for this decision. I will not substitute generic facts for a 'best' or 'should' answer.",
@@ -777,7 +786,7 @@ class KnowledgeQueryEngine:
      # separate claims.
      corpus_cand=[]
      for rc,blob,_,_ in self._index:
-      if ("minor damage" in ql and "minor damage" in blob and "major damage" in blob) or (
+      if (("minor" in ql and "major" in ql) and "minor damage" in blob and "major damage" in blob) or (
        "flagship" in ql and "flagship" in blob and
        ("combat craft" in blob or "fleet style" in blob or "flagship style" in blob)
       ):
