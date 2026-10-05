@@ -425,51 +425,71 @@ class KnowledgeQueryEngine:
   return self._answer(p,text,[c for _,c in top],"strategy_ranked_style")
 
  def _strategy_options(self,p,rel):
-  """Enumerate evidenced options for a decision question before ranking them.
-  A 'best' question must not collapse into either a random winner or a bare
-  abstention: present the available methods/options, then state whether the
-  corpus actually establishes a winner.
+  """Enumerate relevant evidenced options, then rank only when evidence supports it.
+  This is intentionally additive: specialized handlers still run first.
   """
   ql=p.raw.lower()
   topic_terms=[]
-  for term in ("credit","credits","resource","resources","trade","merchant","expedition","farm","farming","building","research","champion","flagship","event"):
+  for term in ("credit","credits","resource","resources","trade","merchant","expedition","farm","farming","building","research","champion","flagship","crystal","crystals","event"):
    if term in ql: topic_terms.append(term)
+  action_terms=("earn","gain","reward","obtain","farm","trade","expedition","merchant","quest","source","method","route","save","saving","spend","spending","discount","priority","upgrade","acquire","available","shop")
   candidates=[]
   for c,score in rel:
-   low=_blob(c); claim=_text(c).strip()
    if _is_noisy_claim(c): continue
+   low=_blob(c); claim=_text(c).strip().lower()
    if topic_terms and not any(t in low for t in topic_terms): continue
+   if not any(a in low for a in action_terms): continue
+   # A Credit-farming question must describe a Credit source, not merely a
+   # cost that happens to contain the word Credits.
+   if ("credit" in ql or "credits" in ql) and not any(a in low for a in ("earn","gain","reward","obtain","farm","trade","expedition","source","method","route")):
+    continue
    candidates.append((c,score))
-  # Search the full canonical corpus when top retrieval did not expose every
-  # option. This is deliberately broader, but still evidence-bound.
+  # Broaden only within the canonical corpus when retrieval missed a relevant
+  # option. Never broaden to noisy transcript fragments.
   for c,blob,_,_ in self._index:
    if _is_noisy_claim(c): continue
-   low=_blob(c)
+   low=_blob(c); claim=_text(c).strip().lower()
    if topic_terms and not any(t in low for t in topic_terms): continue
-   if not any(x in low for x in ("earn","gain","reward","obtain","farm","trade","expedition","merchant","quest","source","method","route")):
+   if not any(a in low for a in action_terms): continue
+   if ("credit" in ql or "credits" in ql) and not any(a in low for a in ("earn","gain","reward","obtain","farm","trade","expedition","source","method","route")):
     continue
-   if not any(x in low for x in topic_terms): continue
-   candidates.append((c,_similarity(p.raw,low)))
-  # Deduplicate and keep genuinely relevant options.
+   candidates.append((c,_similarity(p.raw,claim)))
   unique={}
   for c,s in candidates:
    key=_text(c).strip().lower()
    if key and key not in unique: unique[key]=(c,s)
   candidates=list(unique.values())
-  candidates.sort(key=lambda x:(_authority(x[0]),x[1]),reverse=True)
-  top=candidates[:8]
-  if not top:return None
+
+  # Prefer claims that actually describe an option/method over background
+  # mechanics. Numeric claims stay in the provenance set; supplemental
+  # options with unsupported numbers are not emitted as detailed text.
+  def option_score(item):
+   c,s=item; low=_blob(c)
+   option_bonus=2 if any(x in low for x in ("method","source","earn","gain","obtain","farm","trade","route","reward","save","spend","discount","shop")) else 0
+   subject_bonus=sum(1 for t in topic_terms if t in low)
+   return (option_bonus+subject_bonus,_authority(c),s)
+  candidates.sort(key=option_score,reverse=True)
+  if not candidates:return None
+
+  evidence_candidates=candidates[:4]
+  evidence_claims={_text(c).strip().lower() for c,_ in evidence_candidates}
   lines=[]
-  for i,(c,_) in enumerate(top,1):
+  for i,(c,_) in enumerate(candidates[:8],1):
+   claim=_text(c).strip()
+   # Do not leak numeric details from supplemental options that are outside
+   # the four-record evidence budget. The option itself remains visible.
+   nums=re.findall(r"\b\d+(?:\.\d+)?\b",claim)
+   qnums=set(re.findall(r"\b\d+(?:\.\d+)?\b",ql))
+   if nums and claim.lower() not in evidence_claims and not any(n in qnums for n in nums):
+    # Use the source's non-numeric opening clause as the option label.
+    label=re.split(r"[,;:.]",claim,maxsplit=1)[0].strip()
+    claim=label if label else "Documented option (see evidence set)"
    label="official/strong evidence" if _authority(c)>=3 else "community evidence"
-   lines.append(f"{i}. {_text(c)} ({label})")
+   lines.append(f"{i}. {claim} ({label})")
   text="Available evidenced options/methods:\n"+"\n".join(lines)
   if any(x in ql for x in ("best","optimal","most efficient","recommended")):
-   text+="\n\nWinner: the current corpus does not establish a defensible single best option from these sources. The options above should be compared by the user's objective, cost, access, and current event state; I will not invent a ranking."
-  # Keep the established answer-surface evidence budget (max 4) even
-  # when we enumerate more than four available options. The full option list
-  # is the synthesis; the four strongest evidence records provide provenance.
-  return self._answer(p,text,[c for c,_ in top[:4]],"strategy_options")
+   text+="\n\nWinner: the current corpus does not establish a defensible single best option from these sources. The options above are the evidenced choices to compare against the player's objective, cost, access, and current event state."
+  return self._answer(p,text,[c for c,_ in evidence_candidates],"strategy_options")
 
  def _strategy_f2p(self,p,rel):
   ql=p.raw.lower()
