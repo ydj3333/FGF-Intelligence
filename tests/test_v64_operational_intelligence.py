@@ -29,12 +29,20 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertIn("Beacons", out["rows"][2][1])
 
     def test_t100_shorthand_routes_to_same_six_day_playbook(self):
-        out=build_operational_output("best way to do T100", [])
+        out=build_operational_output("Top 100 Galactic Traders day by day plan", [])
         self.assertEqual(out["mode"], "event_day_plan")
         self.assertEqual(out["title"], "Top 100 Galactic Traders — operational plan")
         self.assertEqual(len(out["rows"]), 6)
         self.assertIn("Commissions", out["rows"][1][1])
         self.assertIn("Beacons", out["rows"][2][1])
+
+    def test_t100_best_way_returns_strategy_not_generic_options(self):
+        out=build_operational_output("best way to do T100", [])
+        self.assertEqual(out["mode"], "event_best_strategy")
+        self.assertEqual(out["title"], "Top 100 Galactic Traders — best execution strategy")
+        self.assertGreaterEqual(len(out["rows"]), 7)
+        self.assertIn("stop when marginal reward value drops", out["recommendation"])
+        self.assertTrue(any(row[0] == "Day 5" and "third milestone" in row[1] for row in out["rows"]))
 
     def test_shop_matrix(self):
         out=build_operational_output("best resources to buy in different shops", [])
