@@ -159,5 +159,30 @@ class OperationalIntelligenceTests(unittest.TestCase):
     def test_no_operational_trigger_for_plain_mechanic(self):
         self.assertIsNone(build_operational_output("What does Kinetic counter?", []))
 
+    def test_known_event_best_way_is_never_generic_strategy_options(self):
+        # This is the routing invariant that was missing from the previous
+        # regression suite: event-specific strategy must beat generic
+        # "best way" evidence enumeration.
+        cases = [
+            ("best way to do T100", "Top 100 Galactic Traders"),
+            ("best way to approach GvG", "Guild vs Guild"),
+            ("best way to do Shadowfront", "Shadowfront"),
+            ("best way to do Paths to Dominance", "Paths to Dominance"),
+        ]
+        for question, event_name in cases:
+            out = build_operational_output(question, [])
+            self.assertEqual(out["mode"], "event_best_strategy", msg=question)
+            self.assertIn(event_name, out["title"])
+            self.assertNotEqual(out["mode"], "strategy_options")
+            self.assertTrue(out.get("rows"))
+
+    def test_t100_best_way_contains_actionable_resource_discipline(self):
+        out = build_operational_output("best way to do T100", [])
+        text = " ".join(str(x) for row in out["rows"] for x in row)
+        self.assertIn("Crystals", text)
+        self.assertIn("Beacons", text)
+        self.assertIn("milestone", text.lower())
+        self.assertIn("marginal reward", out["recommendation"])
+
 if __name__ == "__main__":
     unittest.main()
