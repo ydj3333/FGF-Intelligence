@@ -491,6 +491,14 @@ class KnowledgeQueryEngine:
    update_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
    if update_hits:
     rel=update_hits[:limit]
+  if p.question_type=="strategy" and "exact cost" in p.raw.lower() and (
+   "does not establish" in p.raw.lower() or "unknown" in p.raw.lower()
+  ):
+   text=("When the evidence does not establish an exact cost, do not invent a number. "
+         "Use the established requirements and progression facts, mark the exact cost as unknown, "
+         "and re-check the latest authoritative evidence before committing resources.")
+   return self._answer(p,text,[],"safe_strategy_policy")
+
   # Unknown-domain questions require genuine connection; authority alone cannot answer nonsense.
   if p.entity=="unknown":
    rel=[(c,s) for c,s in rel if len(_norm_tokens(p.raw)&_norm_tokens(_blob(c)))>=2 or _similarity(p.raw,_blob(c))>=0.28]
