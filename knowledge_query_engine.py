@@ -63,7 +63,7 @@ QUESTION_TYPES={
  "level_threshold":["which level","what level","at what level"],
  "source":["how do i get","where do i get","how to get","where can i get","source","sources","obtain","farm"],
  "requirement":["what unlocks","what do i need","what is required","requires","requirement","prerequisite","before i can"],
- "comparison":["difference","different","versus"," vs ","compare"],
+ "comparison":["difference","different","versus"," vs ","compare","better than","worse than","prefer","preferred","worth","value","instead of","rather than"],
  "strategy":["best","optimal","recommended","should i","priority","most efficient"],
  "effect":["what happens","what does","what do","effect","benefit","bonus"],
  "counter":["what counters","which counters","counter","against"],
@@ -688,9 +688,9 @@ class KnowledgeQueryEngine:
    # Comparative questions must answer the comparison itself, not fall back
    # to generic event facts. Extract the two sides and verify each side
    # independently against the corpus before making a value judgment.
-   m=re.search(r"(.+?)\\s+(?:is\\s+)?(?:better|worse)\\s+than\\s+(.+?)(?:\\?|$)", ql)
+   m=re.search(r"(.+?)\s+(?:is\s+)?(?:better|worse)\s+than\s+(.+?)(?:\?|$)", ql)
    if not m:
-    m=re.search(r"(.+?)\\s+(?:rather than|instead of|vs\\.?|versus)\\s+(.+?)(?:\\?|$)", ql)
+    m=re.search(r"(.+?)\s+(?:rather than|instead of|vs\.?|versus)\s+(.+?)(?:\?|$)", ql)
    if m:
     left=m.group(1).strip(" ,?"); right=m.group(2).strip(" ,?")
     left_hits=[(c,s) for c,s in ranked if left and left in _blob(c)]
