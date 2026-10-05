@@ -28,6 +28,14 @@ class OperationalIntelligenceTests(unittest.TestCase):
         self.assertIn("Commissions", out["rows"][1][1])
         self.assertIn("Beacons", out["rows"][2][1])
 
+    def test_t100_shorthand_routes_to_same_six_day_playbook(self):
+        out=build_operational_output("best way to do T100", [])
+        self.assertEqual(out["mode"], "event_day_plan")
+        self.assertEqual(out["title"], "Top 100 Galactic Traders — operational plan")
+        self.assertEqual(len(out["rows"]), 6)
+        self.assertIn("Commissions", out["rows"][1][1])
+        self.assertIn("Beacons", out["rows"][2][1])
+
     def test_shop_matrix(self):
         out=build_operational_output("best resources to buy in different shops", [])
         self.assertEqual(out["mode"], "shop_matrix")
