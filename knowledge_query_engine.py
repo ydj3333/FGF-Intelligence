@@ -424,6 +424,50 @@ class KnowledgeQueryEngine:
   text=f"Based on the stored S2 community meta evidence, the highest-ranked {style.title()} Champions identified for this style are {names}. This is community/meta evidence and some entries are under review, not an official developer ranking."
   return self._answer(p,text,[c for _,c in top],"strategy_ranked_style")
 
+ def _strategy_options(self,p,rel):
+  """Enumerate evidenced options for a decision question before ranking them.
+  A 'best' question must not collapse into either a random winner or a bare
+  abstention: present the available methods/options, then state whether the
+  corpus actually establishes a winner.
+  """
+  ql=p.raw.lower()
+  topic_terms=[]
+  for term in ("credit","credits","resource","resources","trade","merchant","expedition","farm","farming","building","research","champion","flagship","event"):
+   if term in ql: topic_terms.append(term)
+  candidates=[]
+  for c,score in rel:
+   low=_blob(c); claim=_text(c).strip()
+   if _is_noisy_claim(c): continue
+   if topic_terms and not any(t in low for t in topic_terms): continue
+   candidates.append((c,score))
+  # Search the full canonical corpus when top retrieval did not expose every
+  # option. This is deliberately broader, but still evidence-bound.
+  for c,blob,_,_ in self._index:
+   if _is_noisy_claim(c): continue
+   low=_blob(c)
+   if topic_terms and not any(t in low for t in topic_terms): continue
+   if not any(x in low for x in ("earn","gain","reward","obtain","farm","trade","expedition","merchant","quest","source","method","route")):
+    continue
+   if not any(x in low for x in topic_terms): continue
+   candidates.append((c,_similarity(p.raw,low)))
+  # Deduplicate and keep genuinely relevant options.
+  unique={}
+  for c,s in candidates:
+   key=_text(c).strip().lower()
+   if key and key not in unique: unique[key]=(c,s)
+  candidates=list(unique.values())
+  candidates.sort(key=lambda x:(_authority(x[0]),x[1]),reverse=True)
+  top=candidates[:8]
+  if not top:return None
+  lines=[]
+  for i,(c,_) in enumerate(top,1):
+   label="official/strong evidence" if _authority(c)>=3 else "community evidence"
+   lines.append(f"{i}. {_text(c)} ({label})")
+  text="Available evidenced options/methods:\n"+"\n".join(lines)
+  if any(x in ql for x in ("best","optimal","most efficient","recommended")):
+   text+="\n\nWinner: the current corpus does not establish a defensible single best option from these sources. The options above should be compared by the user's objective, cost, access, and current event state; I will not invent a ranking."
+  return self._answer(p,text,[c for c,_ in top],"strategy_options")
+
  def _strategy_f2p(self,p,rel):
   ql=p.raw.lower()
   topic_terms=[]
@@ -650,9 +694,11 @@ class KnowledgeQueryEngine:
       if len(top)>=4: break
      return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"strategy_considerations")
    if any(x in p.raw.lower() for x in ("best","efficiently","most efficient","optimal","should i","what should i","recommended","priority","save resources")) and "consider" not in p.raw.lower():
+    r=self._strategy_options(p,rel)
+    if r:return r
     return self._empty(
      p,
-     "The current knowledge base does not establish a reliable recommendation for this decision. I will not substitute generic facts for a 'best' or 'should' answer.",
+     "The current knowledge base does not establish a reliable recommendation or enough evidenced options for this decision.",
      mode="strategy_no_recommendation_evidence",
     )
   if p.question_type=="multi_hop" and p.entity!="unknown":
