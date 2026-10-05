@@ -545,6 +545,8 @@ class KnowledgeQueryEngine:
       requested_levels=[m.group(1)] if m else []
      if requested_levels and not any(n in re.findall(r"\b\d+\b",sl) for n in requested_levels):
       continue
+     if re.search(r"\b(?:maximum|max|cap)\b",p.raw.lower()) and not re.search(r"\b(?:maximum|max|cap)\b",sl):
+      continue
      cand.append((c,s,sent))
    if cand:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
