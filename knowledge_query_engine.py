@@ -52,7 +52,7 @@ PROPERTY_ALIASES={
  "requirement":["require","requires","need","needed","prerequisite","before","condition","unlock"],
  "cost":["cost","costs","price","spend","resources","resource"],
  "effect":["effect","does","gives","boost","bonus","increase","changes"],
- "comparison":["difference","different","versus","vs","compare","compared","disagree","disagreement","conflict","conflicts","trust","official evidence","youtube disagree"],
+ "comparison":["difference","different","versus","vs","compare","compared","better than","worse than","better","worse","prefer","preferred","worth","value","instead of","rather than","disagree","disagreement","conflict","conflicts","trust","official evidence","youtube disagree"],
  "counter":["counter","counters","against","beats","advantage"],
  "upgrade":["upgrade","upgrading","level","empowerment","power up"],
  "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
@@ -684,7 +684,54 @@ class KnowledgeQueryEngine:
    if cand:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True); return self._answer(p,cand[0][2],[cand[0][0]],"counter")
   if p.question_type=="comparison":
-   return self._answer(p," ".join(_text(c) for c,_ in rel[:3]),[c for c,_ in rel[:3]],"comparison")
+   ql=p.raw.lower()
+   # Comparative questions must answer the comparison itself, not fall back
+   # to generic event facts. Extract the two sides and verify each side
+   # independently against the corpus before making a value judgment.
+   m=re.search(r"(.+?)\\s+(?:is\\s+)?(?:better|worse)\\s+than\\s+(.+?)(?:\\?|$)", ql)
+   if not m:
+    m=re.search(r"(.+?)\\s+(?:rather than|instead of|vs\\.?|versus)\\s+(.+?)(?:\\?|$)", ql)
+   if m:
+    left=m.group(1).strip(" ,?"); right=m.group(2).strip(" ,?")
+    left_hits=[(c,s) for c,s in ranked if left and left in _blob(c)]
+    right_hits=[(c,s) for c,s in ranked if right and right in _blob(c)]
+    # Prefer evidence that explicitly mentions the compared subject.
+    left_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    right_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    evidence_claims=[]
+    if left_hits: evidence_claims.append(left_hits[0][0])
+    if right_hits and right_hits[0][0] not in evidence_claims: evidence_claims.append(right_hits[0][0])
+    if left_hits and right_hits:
+     direct=[c for c,s in rel if left in _blob(c) and right in _blob(c) and any(w in _blob(c) for w in ("better","worse","prefer","value"))]
+     if direct:
+      return self._answer(p,_text(direct[0]),[direct[0]],"direct_comparison")
+     return self._answer(
+      p,
+      f"The current evidence establishes both sides of the comparison, but it does not establish that {left} is better than {right} (or vice versa). I won't invent a winner; the available evidence is descriptive rather than comparative.",
+      evidence_claims,
+      "comparison_no_direct_winner",
+     )
+    if left_hits or right_hits:
+     known = left if left_hits else right
+     missing = right if left_hits else left
+     return self._answer(
+      p,
+      f"The current evidence establishes information about {known}, but I cannot establish the value of {missing} or a reliable head-to-head comparison from the current knowledge base. So I would not call one better yet.",
+      evidence_claims,
+      "comparison_partial_evidence",
+     )
+    return self._empty(
+     p,
+     f"I could not find current evidence establishing either side of the comparison ({left} vs {right}). I won't manufacture a winner.",
+     claims=[c for c,s in rel[:2]],
+     mode="comparison_no_subject_evidence",
+    )
+   return self._answer(
+    p,
+    "This is a comparison question, but the current evidence does not contain a direct head-to-head result. I will not convert generic event facts into a 'better' recommendation.",
+    [c for c,_ in rel[:3]],
+    "comparison_no_direct_pair",
+   )
   top,_=rel[0]; direct=self._direct_sentences(p,top); text=direct[0] if direct else _text(top)
   if re.search(r"\bwhich\s+(?:type\s+of\s+)?components?\b", p.raw.lower()) and direct:
    return self._answer(p,text,[top],"direct_component")
