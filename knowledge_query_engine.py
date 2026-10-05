@@ -103,7 +103,7 @@ def _is_noisy_claim(c):
  tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
  if "tier 3" not in tier: return False
  if len(text)>180: return True
- return any(x in low for x in ("woo","you know","here we go","completely empty","for this test","kin ything","ge completely","or something like that","he new flagship","to unlock it as a free to play p"))
+ return any(x in low for x in ("woo","you know","here we go","completely empty","for this test","kin ything","ge completely","or something like that","he new flagship","to unlock it as a free to play p","so that's what's up","okay, so i think","right here","bust all your","hot bar","one thing i learned","you can be ready to unlock","i wanted to show you"))
 
 def _authority(c):
  tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
