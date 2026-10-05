@@ -631,7 +631,22 @@ class KnowledgeQueryEngine:
    if any(x in p.raw.lower() for x in ("kinetic","beam","ion")) and any(x in p.raw.lower() for x in ("best","heroes","which champions","which heroes")):
     r=self._strategy_ranked_champions_by_style(p)
     if r:return r
-   if any(x in p.raw.lower() for x in ("best","efficiently","most efficient","optimal","should i","what should i","recommended","priority","save resources")):
+   if "consider" in p.raw.lower():
+    cand=[]
+    for rc,rs in rel:
+     for sent in self._direct_sentences(p,rc):
+      sl=sent.lower()
+      if any(x in sl for x in ("energy type","flagship style","matching champions","champions","flagship","combat craft","weapon style","synergy")):
+       cand.append((rc,rs,sent))
+    if cand:
+     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+     top=[]; seen=set()
+     for item in cand:
+      if item[2] in seen: continue
+      seen.add(item[2]); top.append(item)
+      if len(top)>=4: break
+     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"strategy_considerations")
+   if any(x in p.raw.lower() for x in ("best","efficiently","most efficient","optimal","should i","what should i","recommended","priority","save resources")) and "consider" not in p.raw.lower():
     return self._empty(
      p,
      "The current knowledge base does not establish a reliable recommendation for this decision. I will not substitute generic facts for a 'best' or 'should' answer.",
