@@ -21,6 +21,7 @@ class EvidenceRecord:
     relevance: float = 1.0
     source_id: str = ""
     observed_date: str | None = None
+    topic: str = ""
 
 @dataclass(frozen=True)
 class FusedClaim:
