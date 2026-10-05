@@ -258,3 +258,21 @@ def test_v7_best_strategy_does_not_return_unrelated_facts():
     result=KnowledgeQueryEngine(claims).compose("What is the best way to farm Credits?")
     assert result["answer_type"] == "knowledge_abstention"
     assert "recommendation" in result["answer"].lower()
+
+
+def test_v7_best_strategy_enumerates_options_without_exceeding_evidence_budget():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Merchant expeditions can earn Credits.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Daily quests provide Credits.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Trade routes generate Credits from trading activity.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Events can provide Credits as rewards.","Evidence Tier":"Tier 2 — Community","Status":"Confirmed"},
+        {"Claim":"Guild activities can provide Credits.","Evidence Tier":"Tier 2 — Community","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the best way to farm Credits?")
+    assert result["reasoning"]["mode"] == "strategy_options"
+    assert "Available evidenced options/methods" in result["answer"]
+    assert "Merchant expeditions" in result["answer"]
+    assert "Daily quests" in result["answer"]
+    assert len(result["evidence"]) <= 4
+    assert "does not establish a defensible single best option" in result["answer"]
