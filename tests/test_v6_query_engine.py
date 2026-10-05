@@ -276,3 +276,30 @@ def test_v7_best_strategy_enumerates_options_without_exceeding_evidence_budget()
     assert "Daily quests" in result["answer"]
     assert len(result["evidence"]) <= 4
     assert "does not establish a defensible single best option" in result["answer"]
+
+
+def test_v7_best_flagship_f2p_enumerates_relevant_options_without_inventing_winner():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"The Flagship is the heart of a fleet and provides attribute bonuses and abilities.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Flagship Components can be obtained through the Glory Shop, Ascendancy Shrines, and Tribute Vessels.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"The Core Component determines the Flagship Style and the Style of the entire fleet.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the best flagship for F2P players?")
+    assert result["reasoning"]["mode"] == "strategy_flagship_f2p"
+    assert "does not establish a single F2P-best Flagship" in result["answer"]
+    assert "Flagship Components" in result["answer"]
+    assert len(result["evidence"]) <= 4
+
+
+def test_v7_core_vs_flagship_preserves_both_sides():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Energy Core level determines the maximum level of Flagships, Champions, and other buildings.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Continuously upgrading a Flagship improves its base attributes and is presented as important for trade routes.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("Should I upgrade Energy Core or flagship first?")
+    assert result["reasoning"]["mode"] == "strategy_core_vs_flagship"
+    assert "Energy Core" in result["answer"]
+    assert "Flagship" in result["answer"]
+    assert "universal winner" in result["answer"]
