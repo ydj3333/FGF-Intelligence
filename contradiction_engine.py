@@ -32,7 +32,9 @@ def detect_conflicts(records: Iterable[EvidenceRecord]) -> Tuple[Conflict, ...]:
             if _norm(left.text) == _norm(right.text):
                 continue
             # Explicit claim pairs are supplied by the caller; different text on the same topic is a conflict.
-            if left.claim_id.split(":")[0] != right.claim_id.split(":")[0]:
+            left_topic = getattr(left, "topic", "") or left.claim_id.split(":")[0]
+            right_topic = getattr(right, "topic", "") or right.claim_id.split(":")[0]
+            if left_topic != right_topic:
                 continue
             pair = (left, right)
             winner = max(pair, key=score_evidence)
