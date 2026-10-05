@@ -191,3 +191,39 @@ def test_v6_engine_answers_three_hop_chain_only_when_complete():
     assert "Core progression" in r["answer"]
     assert "available at Research Academy" in r["answer"]
     assert len(r["evidence"])==3
+
+
+def test_v7_comparison_layer_preserves_existing_core_comparison_subtypes():
+    from knowledge_query_engine import KnowledgeQueryEngine
+
+    damage = KnowledgeQueryEngine([
+        {"Claim":"Space combat has three categories of fleet damage: Minor Damage (Light), Major Damage (Heavy), and Ship Loss.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Major Damage (Heavy) sends damaged vessels to the Repair Bay and requires Repair Modules for repair.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]).compose("What is the difference between minor and major damage?")
+    assert damage["reasoning"]["mode"] == "descriptive_comparison"
+    assert "minor damage" in damage["answer"].lower()
+    assert "major damage" in damage["answer"].lower()
+    assert "better recommendation" not in damage["answer"].lower()
+
+    governance = KnowledgeQueryEngine([
+        {"Claim":"Official evidence establishes the mechanic.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"A community YouTube claim reports a different mechanic.",
+         "Evidence Tier":"Tier 3 — Creator/Community","Status":"Confirmed"},
+    ]).compose("Official evidence and YouTube disagree about this FGF mechanic. What should I trust?")
+    assert governance["reasoning"]["mode"] == "evidence_governance"
+    assert "official/current evidence governs" in governance["answer"].lower()
+
+    flagship = KnowledgeQueryEngine([
+        {"Claim":"The Fleet page configures Flagships, Champions, and combat craft.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"A fleet consists of 1 Flagship, 3 Champions, and multiple combat craft.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Additional Flagship Components enhance ships' base ATK, DEF, and INT attributes.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]).compose("What is the difference between flagship and regular ships?")
+    assert flagship["reasoning"]["mode"] == "descriptive_comparison"
+    assert "flagship" in flagship["answer"].lower()
+    assert "better recommendation" not in flagship["answer"].lower()
