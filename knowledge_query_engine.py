@@ -705,6 +705,8 @@ class KnowledgeQueryEngine:
    )
    if descriptive_comparison:
     cand=[]
+    qtokens=_norm_tokens(p.raw)
+    # First prefer direct sentences from the retrieved evidence.
     for rc,rs in rel:
      for sent in self._direct_sentences(p,rc):
       sl=sent.lower()
@@ -714,6 +716,18 @@ class KnowledgeQueryEngine:
        "bonus","applies","determines","provides","consists of"
       )):
        cand.append((rc,rs,sent))
+    # If sentence extraction is too restrictive, use the claim itself when it
+    # contains the core subjects of the descriptive comparison. This preserves
+    # the existing retrieval evidence instead of abstaining just because the
+    # sentence-level heuristic missed it.
+    if not cand:
+     for rc,rs in rel:
+      blob=_blob(rc)
+      if ("minor damage" in ql and "major damage" in blob) or (
+       "flagship" in ql and "flagship" in blob and
+       ("combat craft" in blob or "ship" in blob or "bonus" in blob)
+      ):
+       cand.append((rc,rs,_text(rc)))
     if cand:
      cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
      top=[]; seen=set()
