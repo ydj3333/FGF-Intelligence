@@ -384,6 +384,32 @@ class KnowledgeQueryEngine:
   text+=" This is community/meta evidence (Tier 2), not an official developer ranking."
   return self._answer(p,text,[x[0] for x in top],"strategy_champion_dps")
 
+ def _strategy_shared_moonlight_speedups(self,p,rel):
+  candidates=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c): continue
+   if "speedup" not in low: continue
+   if "moonlight" in low or "save speedups" in low or "black market" in low or "event" in low:
+    candidates.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "speedup" not in low: continue
+   if "moonlight" in low or "save speedups" in low or "black market" in low or "event" in low:
+    candidates.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in candidates:
+   unique.setdefault(_text(c).strip().lower(),(c,s))
+  candidates=list(unique.values())
+  candidates.sort(key=lambda x:(_authority(x[0]),x[1]),reverse=True)
+  top=candidates[:4]
+  if not top:return None
+  lines=["Available evidenced Speedup-use options:"]
+  for c,_ in top:
+   lines.append(f"- {_text(c)}")
+  lines.append("No single Speedup-spending winner is established for the Moonlight stock without the exact event objective and timing.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top],"strategy_shared_moonlight_speedups")
+
  def _strategy_shared_moonlight_f2p(self,p):
   hits=[]
   for c,blob,_,_ in self._index:
@@ -690,6 +716,9 @@ class KnowledgeQueryEngine:
   if p.question_type=="strategy":
    # Specialized event handlers must run before generic F2P strategy so an
    # event-specific question cannot be hijacked by unrelated global F2P facts.
+   if p.entity=="shared moonlight" and any(x in p.raw.lower() for x in ("speedup","speedups")):
+    r=self._strategy_shared_moonlight_speedups(p,rel)
+    if r:return r
    if p.entity=="shared moonlight" and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
     r=self._strategy_shared_moonlight_f2p(p)
     if r:return r
@@ -720,7 +749,14 @@ class KnowledgeQueryEngine:
       seen.add(item[2]); top.append(item)
       if len(top)>=4: break
      return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"strategy_considerations")
-   if any(x in p.raw.lower() for x in ("best","efficiently","most efficient","optimal","should i","what should i","recommended","priority","save resources")) and "consider" not in p.raw.lower():
+   if (
+    any(x in p.raw.lower() for x in (
+     "best way","ways to","how do i get","how can i get","how to farm",
+     "how do i farm","sources of","source of","where can i get",
+     "how do i earn","how can i earn","save resources efficiently"
+    ))
+    and not any(x in p.raw.lower() for x in ("should i","what should i","best flagship","best heroes","best use","which building","which flagship"))
+   ):
     r=self._strategy_options(p,rel)
     if r:return r
     return self._empty(
