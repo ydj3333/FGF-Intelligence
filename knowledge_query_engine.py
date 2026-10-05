@@ -466,7 +466,10 @@ class KnowledgeQueryEngine:
   text="Available evidenced options/methods:\n"+"\n".join(lines)
   if any(x in ql for x in ("best","optimal","most efficient","recommended")):
    text+="\n\nWinner: the current corpus does not establish a defensible single best option from these sources. The options above should be compared by the user's objective, cost, access, and current event state; I will not invent a ranking."
-  return self._answer(p,text,[c for c,_ in top],"strategy_options")
+  # Keep the established answer-surface evidence budget (max 4) even
+  # when we enumerate more than four available options. The full option list
+  # is the synthesis; the four strongest evidence records provide provenance.
+  return self._answer(p,text,[c for c,_ in top[:4]],"strategy_options")
 
  def _strategy_f2p(self,p,rel):
   ql=p.raw.lower()
