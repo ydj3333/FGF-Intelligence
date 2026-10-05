@@ -1,3 +1,11 @@
+## v7.1.0 — Stage 6 Evidence Intelligence
+
+1. Integrates evidence fusion, contradiction detection, player adaptation, and the uncertainty quality gate into the generic event strategy path.
+2. Preserves provenance and distinguishes current, historical, superseded, and unknown evidence.
+3. Supports explicit contradiction topics so temporal, authority, and interpretation conflicts are auditable without guessing topic relationships.
+4. Blocks confident output when a contradiction remains unresolved and never infers missing player-profile fields.
+5. Keeps Stage 6 optional at the API boundary for backward compatibility while enabling full Stage 2–6 execution when evidence/profile context is supplied.
+
 ## v7.0.0 — Event Strategy Intelligence / Stage 5 Answer Validation
 
 1. Adds a deterministic final quality gate between tactical optimization and player-facing output.
