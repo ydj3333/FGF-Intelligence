@@ -36,3 +36,31 @@ def test_player_adaptation_never_infers_missing_fields():
     result = adapt_profile(profile, ("spending_profile", "core_level", "fleet_type"))
     assert "core_level" in result.missing_profile_fields
     assert not result.applicable
+
+
+def test_explicit_topic_drives_contradiction_detection():
+    rows = (
+        EvidenceRecord("a", "Requirement is 40%", "official", "current", 1, "s1", topic="epoch_prerequisite"),
+        EvidenceRecord("b", "Requirement is 60%", "official", "historical", 1, "s2", topic="epoch_prerequisite"),
+    )
+    conflicts = detect_conflicts(rows)
+    assert conflicts and conflicts[0].conflict_type == "temporal"
+
+
+def test_stage6_is_wired_into_solve_question():
+    from event_strategy_engine import build_event_model, solve_question
+    rows = (
+        EvidenceRecord("epoch:current", "Requirement is 40%", "official", "current", 1, "s1", topic="epoch_prerequisite"),
+        EvidenceRecord("epoch:old", "Requirement was 60%", "official", "historical", 1, "s2", topic="epoch_prerequisite"),
+    )
+    event = build_event_model("kaboom", objective="defeat waves", tactical_priorities=("AOE",))
+    result = solve_question(
+        "give 1 combo; I have Zora, Lily, Jodie",
+        event,
+        evidence=rows,
+        player_profile=PlayerProfile(spending_profile="F2P"),
+        required_profile_fields=("core_level",),
+    )
+    assert result["stage6"] is not None
+    assert result["stage6"]["quality_gate"].allowed
+    assert "core_level" in result["stage6"]["player_adaptation"].missing_profile_fields
