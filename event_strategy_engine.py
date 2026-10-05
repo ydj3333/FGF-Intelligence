@@ -21,6 +21,10 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 import re
 
 from constraint_extractor import ExtractedConstraints, extract_constraints
+from contradiction_engine import detect_conflicts
+from evidence_fusion import EvidenceRecord, fuse_evidence
+from player_adaptation import PlayerProfile, adapt_profile
+from stage6_quality_gate import apply_quality_gate
 
 
 @dataclass(frozen=True)
@@ -225,8 +229,11 @@ def solve_question(
     team_size: int = 3,
     role_tags: Mapping[str, Sequence[str]] | None = None,
     limit: int = 5,
+    evidence: Sequence[EvidenceRecord] = (),
+    player_profile: PlayerProfile | None = None,
+    required_profile_fields: Tuple[str, ...] = (),
 ) -> Dict[str, Any]:
-    """End-to-end Stage 2+3+4+5 path: extract, generate, optimize, validate."""
+    """End-to-end Stage 2+3+4+5+6 path with optional evidence/profile context."""
     from candidate_generator import annotate_event_coverage, generate_combinations
     from tactical_optimizer import rank_candidates, why_first_beats_second
     from answer_validator import validate_answer
@@ -264,6 +271,20 @@ def solve_question(
         for item in ranked
     ), limit=limit)
 
+    stage6 = None
+    if evidence or player_profile is not None or required_profile_fields:
+        fused = fuse_evidence(evidence)
+        conflicts = detect_conflicts(evidence)
+        profile_result = adapt_profile(player_profile, required_profile_fields) if player_profile is not None else None
+        gate = apply_quality_gate(conflicts, base_confidence=decision.confidence)
+        stage6 = {
+            "fused_claims": fused,
+            "conflicts": conflicts,
+            "player_adaptation": profile_result,
+            "quality_gate": gate,
+            "allowed": gate.allowed and validation.valid,
+        }
+
     return {
         "constraints": constraints,
         "player_state": player,
@@ -273,4 +294,5 @@ def solve_question(
         "ranked_candidates": ranked,
         "comparison": comparison,
         "validation": validation,
+        "stage6": stage6,
     }

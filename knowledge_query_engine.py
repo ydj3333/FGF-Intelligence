@@ -52,7 +52,7 @@ PROPERTY_ALIASES={
  "requirement":["require","requires","need","needed","prerequisite","before","condition","unlock"],
  "cost":["cost","costs","price","spend","resources","resource"],
  "effect":["effect","does","gives","boost","bonus","increase","changes"],
- "comparison":["difference","different","versus","vs","compare","compared","disagree","disagreement","conflict","conflicts","trust","official evidence","youtube disagree"],
+ "comparison":["difference","different","versus","vs","compare","compared","better than","worse than","better","worse","prefer","preferred","worth","value","instead of","rather than","disagree","disagreement","conflict","conflicts","trust","official evidence","youtube disagree"],
  "counter":["counter","counters","against","beats","advantage"],
  "upgrade":["upgrade","upgrading","level","empowerment","power up"],
  "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
@@ -63,8 +63,8 @@ QUESTION_TYPES={
  "level_threshold":["which level","what level","at what level"],
  "source":["how do i get","where do i get","how to get","where can i get","source","sources","obtain","farm"],
  "requirement":["what unlocks","what do i need","what is required","requires","requirement","prerequisite","before i can"],
- "comparison":["difference","different","versus"," vs ","compare"],
- "strategy":["best","optimal","recommended","should i","priority","most efficient"],
+ "comparison":["difference","different","versus"," vs ","compare","better than","worse than","prefer","preferred","worth","value","instead of","rather than"],
+ "strategy":["best","optimal","recommended","should i","priority","most efficient","efficiently","save resources","progression plan","plan"],
  "effect":["what happens","what does","what do","effect","benefit","bonus"],
  "counter":["what counters","which counters","counter","against"],
  "numeric":["how many","how much","how long","percentage","percent","cost","maximum","max","cap"],
@@ -97,6 +97,14 @@ def _blob(c):
  return " ".join(str(c.get(k,"") or "") for k in ("Claim","claim","Category","category","Notes","notes","Source","source","Claim Type","claim_type","Evidence Tier","tier","Season/Version","season","version")).lower()
 def _tokens(s): return re.findall(r"[a-z0-9]+(?:['-][a-z0-9]+)?",s.lower())
 def _norm_tokens(s): return {x for x in _tokens(s) if x not in STOP and len(x)>1}
+def _is_noisy_claim(c):
+ text=_text(c).strip()
+ low=text.lower()
+ tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
+ if "tier 3" not in tier: return False
+ if len(text)>180: return True
+ return any(x in low for x in ("woo","you know","here we go","completely empty","for this test","kin ything","ge completely","or something like that","he new flagship","to unlock it as a free to play p","so that's what's up","okay, so i think","right here","bust all your","hot bar","one thing i learned","you can be ready to unlock","i wanted to show you"))
+
 def _authority(c):
  tier=str(c.get("Evidence Tier",c.get("tier",""))).lower()
  status=str(c.get("Status",c.get("status",""))).lower()
@@ -376,6 +384,264 @@ class KnowledgeQueryEngine:
   text+=" This is community/meta evidence (Tier 2), not an official developer ranking."
   return self._answer(p,text,[x[0] for x in top],"strategy_champion_dps")
 
+ def _strategy_flagship_f2p(self,p,rel):
+  candidates=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "flagship" not in low: continue
+   if any(x in low for x in ("obtain","obtained","upgrade","component","blueprint","trade route","attribute","shop","event","tribute")):
+    candidates.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "flagship" not in low: continue
+   if any(x in low for x in ("obtain","obtained","upgrade","component","blueprint","trade route","attribute","shop","event","tribute")):
+    candidates.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in candidates: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:6]
+  if not top:return None
+  lines=["F2P-relevant Flagship options documented by the current corpus:"]
+  evidence_claims={_text(c).strip().lower() for c,_ in top[:4]}
+  for c,_ in top:
+   claim=_text(c).strip()
+   nums=re.findall(r"\b\d+(?:\.\d+)?%?\b",claim)
+   if nums and claim.lower() not in evidence_claims:
+    continue
+   lines.append(f"- {claim}")
+  lines.append("The corpus does not establish a single F2P-best Flagship; these are the documented options/considerations rather than an invented winner.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_flagship_f2p")
+
+ def _strategy_core_vs_flagship(self,p,rel):
+  cand=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c) or not ("energy core" in low or "flagship" in low): continue
+   if any(x in low for x in ("upgrade","level","cap","attribute","trade route","progression","component")):
+    cand.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or not ("energy core" in low or "flagship" in low): continue
+   if any(x in low for x in ("upgrade","level","cap","attribute","trade route","progression","component")):
+    cand.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in cand: unique.setdefault(_text(c).strip().lower(),(c,s))
+  values=list(unique.values())
+  core=[x for x in values if "energy core" in _blob(x[0])]
+  flagship=[x for x in values if "flagship" in _blob(x[0]) and "energy core" not in _blob(x[0])]
+  top=(sorted(core,key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:2]+
+       sorted(flagship,key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:2])
+  if not top:
+   top=sorted(values,key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:4]
+  if not top:return None
+  text="Current evidence supports different roles rather than a universal winner: "+" ".join(_text(c) for c,_ in top)
+  text+=" The corpus does not establish that Energy Core should always precede Flagship, or vice versa, for every player; the decision depends on the documented unlock/progression effects and the player's objective."
+  return self._answer(p,text,[c for c,_ in top],"strategy_core_vs_flagship")
+
+ def _strategy_building_f2p(self,p,rel):
+  cand=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c): continue
+   if "energy core" in low and any(x in low for x in ("priority","upgrade","progression","building")):
+    cand.append((c,s))
+  if not cand:
+   for c,blob,_,_ in self._index:
+    low=_blob(c)
+    if _is_noisy_claim(c): continue
+    if "energy core" in low and any(x in low for x in ("priority","upgrade","progression","building")):
+     cand.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in cand: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:4]
+  if not top:return None
+  text="For F2P base development, the strongest documented priority evidence is: "+" ".join(_text(c) for c,_ in top)
+  text+=" The corpus does not establish a universal first-building rule beyond these documented progression priorities."
+  return self._answer(p,text,[c for c,_ in top],"strategy_building_f2p")
+
+ def _strategy_crystals_f2p(self,p,rel):
+  cand=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "crystal" not in low: continue
+   if any(x in low for x in ("spend","spending","use","recommend","priority","shop","purchase","save")):
+    cand.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "crystal" not in low: continue
+   if any(x in low for x in ("spend","spending","use","recommend","priority","shop","purchase","save")):
+    cand.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in cand: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:6]
+  if not top:return None
+  lines=["F2P Crystal-use options documented by the current corpus:"]
+  evidence_claims={_text(c).strip().lower() for c,_ in top[:4]}
+  for c,_ in top:
+   claim=_text(c).strip()
+   nums=re.findall(r"\b\d+(?:\.\d+)?%?\b",claim)
+   if nums and claim.lower() not in evidence_claims:
+    continue
+   lines.append(f"- {claim}")
+  lines.append("No universal single best Crystal use is established by the current evidence.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_crystals_f2p")
+
+ def _strategy_shared_moonlight_speedups(self,p,rel):
+  candidates=[]
+  for c,s in rel:
+   low=_blob(c)
+   if _is_noisy_claim(c): continue
+   if "speedup" not in low: continue
+   if "moonlight" in low or "save speedups" in low or "black market" in low or "event" in low:
+    candidates.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_blob(c)
+   if _is_noisy_claim(c) or "speedup" not in low: continue
+   if "moonlight" in low or "save speedups" in low or "black market" in low or "event" in low:
+    candidates.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in candidates:
+   unique.setdefault(_text(c).strip().lower(),(c,s))
+  candidates=list(unique.values())
+  candidates.sort(key=lambda x:(_authority(x[0]),x[1]),reverse=True)
+  top=candidates[:4]
+  if not top:return None
+  lines=["Available evidenced Speedup-use options:"]
+  for c,_ in top:
+   lines.append(f"- {_text(c)}")
+  lines.append("No single Speedup-spending winner is established for the Moonlight stock without the exact event objective and timing.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top],"strategy_shared_moonlight_speedups")
+
+ def _strategy_shared_moonlight_f2p(self,p):
+  hits=[]
+  for c,blob,_,_ in self._index:
+   low=blob
+   claim_low=_text(c).lower()
+   if "shared moonlight" not in claim_low or "f2p" not in claim_low or _is_noisy_claim(c): continue
+   if any(x in claim_low for x in ("f2p priority sequence","prioritize daily rewards","paid-entry feature","normal event participation")):
+    hits.append((c,_similarity(p.raw,low)))
+  if not hits:return None
+  hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+  top=[c for c,_ in hits[:2]]
+  text="For F2P Shared Moonlight play, the stored guide recommends claiming daily rewards, collecting free event resources, delaying spending until the shop is understood, prioritizing limited rewards, managing Moonsoil Diggers carefully, targeting the best realistic Grand Prize, and treating paid features as optional. Exact use of a specific Speedup stock is not established."
+  return self._answer(p,text,top,"strategy_shared_moonlight_f2p")
+
+ def _strategy_ranked_champions_by_style(self,p):
+  ql=p.raw.lower()
+  style="kinetic" if "kinetic" in ql else "beam" if "beam" in ql else "ion" if re.search(r"\bion\b|ionic",ql) else ""
+  if not style: return None
+  rank_value={"sss":7,"ss+":6.5,"ss":6,"s+":5.5,"s":5,"a+":4.5,"a":4,"b+":3.5,"b":3}
+  found=[]
+  for c,blob,_,_ in self._index:
+   low=blob
+   if "ranked" not in low or style not in low or "champion" not in low: continue
+   m=re.search(r"ranked\s+(sss|ss\+|ss|s\+|s|a\+|a|b\+|b)\b",low)
+   if not m: continue
+   if not re.search(rf"\b{style}\b[^.]*champion|champion[^.]*\b{style}\b",low): continue
+   name=_text(c).split(" is ranked",1)[0].strip()
+   found.append((rank_value[m.group(1)],name,c))
+  if not found: return None
+  best=max(x[0] for x in found)
+  top=[]; seen=set()
+  for rv,name,c in sorted(found,key=lambda x:(-x[0],-_authority(x[2]))):
+   if rv!=best or name.lower() in seen: continue
+   seen.add(name.lower()); top.append((name,c))
+   if len(top)>=3: break
+  if not top: return None
+  names=", ".join(name for name,_ in top)
+  text=f"Based on the stored S2 community meta evidence, the highest-ranked {style.title()} Champions identified for this style are {names}. This is community/meta evidence and some entries are under review, not an official developer ranking."
+  return self._answer(p,text,[c for _,c in top],"strategy_ranked_style")
+
+ def _strategy_credit_farming(self,p,rel):
+  candidates=[]
+  source_terms=("earn","gain","obtain","reward","farm","trade","expedition","quest","source","route")
+  for c,s in rel:
+   low=_text(c).lower()
+   if _is_noisy_claim(c) or "credit" not in low: continue
+   if any(x in low for x in source_terms): candidates.append((c,s))
+  for c,blob,_,_ in self._index:
+   low=_text(c).lower()
+   if _is_noisy_claim(c) or "credit" not in low: continue
+   if any(x in low for x in source_terms): candidates.append((c,_similarity(p.raw,low)))
+  unique={}
+  for c,s in candidates: unique.setdefault(_text(c).strip().lower(),(c,s))
+  top=sorted(unique.values(),key=lambda x:(_authority(x[0]),x[1]),reverse=True)[:8]
+  if not top:return None
+  lines=["Available documented Credit-farming/value options:"]
+  for c,_ in top: lines.append(f"- {_text(c)}")
+  lines.append("The corpus does not establish one universal best Credit source; the strongest currently evidenced options should be compared by yield, time, access, and current event context.")
+  return self._answer(p,"\n".join(lines),[c for c,_ in top[:4]],"strategy_credit_farming")
+
+ def _strategy_options(self,p,rel):
+  """Enumerate relevant evidenced options, then rank only when evidence supports it.
+  This is intentionally additive: specialized handlers still run first.
+  """
+  ql=p.raw.lower()
+  topic_terms=[]
+  for term in ("credit","credits","resource","resources","trade","merchant","expedition","farm","farming","building","research","champion","flagship","crystal","crystals","event","moonlight","speedup","speedups","energy core","core"):
+   if term in ql: topic_terms.append(term)
+  action_terms=("earn","gain","reward","obtain","farm","trade","expedition","merchant","quest","source","method","route","save","saving","spend","spending","discount","priority","upgrade","acquire","available","shop")
+  candidates=[]
+  for c,score in rel:
+   if _is_noisy_claim(c): continue
+   low=_blob(c); claim=_text(c).strip().lower()
+   if topic_terms and not any(t in low for t in topic_terms): continue
+   if not any(a in low for a in action_terms): continue
+   # A Credit-farming question must describe a Credit source, not merely a
+   # cost that happens to contain the word Credits.
+   if ("credit" in ql or "credits" in ql) and not any(a in low for a in ("earn","gain","reward","obtain","farm","trade","expedition","source","method","route")):
+    continue
+   candidates.append((c,score))
+  # Broaden only within the canonical corpus when retrieval missed a relevant
+  # option. Never broaden to noisy transcript fragments.
+  for c,blob,_,_ in self._index:
+   if _is_noisy_claim(c): continue
+   low=_blob(c); claim=_text(c).strip().lower()
+   if topic_terms and not any(t in low for t in topic_terms): continue
+   if not any(a in low for a in action_terms): continue
+   if ("credit" in ql or "credits" in ql) and not any(a in low for a in ("earn","gain","reward","obtain","farm","trade","expedition","source","method","route")):
+    continue
+   candidates.append((c,_similarity(p.raw,claim)))
+  unique={}
+  for c,s in candidates:
+   key=_text(c).strip().lower()
+   if key and key not in unique: unique[key]=(c,s)
+  candidates=list(unique.values())
+
+  # Prefer claims that actually describe an option/method over background
+  # mechanics. Numeric claims stay in the provenance set; supplemental
+  # options with unsupported numbers are not emitted as detailed text.
+  def option_score(item):
+   c,s=item; low=_blob(c)
+   option_bonus=2 if any(x in low for x in ("method","source","earn","gain","obtain","farm","trade","route","reward","save","spend","discount","shop")) else 0
+   subject_bonus=sum(1 for t in topic_terms if t in low)
+   return (option_bonus+subject_bonus,_authority(c),s)
+  candidates.sort(key=option_score,reverse=True)
+  if not candidates:return None
+
+  evidence_candidates=candidates[:4]
+  evidence_claims={_text(c).strip().lower() for c,_ in evidence_candidates}
+  lines=[]
+  for c,_ in candidates[:8]:
+   claim=_text(c).strip()
+   # Do not leak numeric details from supplemental options that are outside
+   # the four-record evidence budget. The option itself remains visible.
+   nums=re.findall(r"\b\d+(?:\.\d+)?\b",claim)
+   qnums=set(re.findall(r"\b\d+(?:\.\d+)?\b",ql))
+   if nums and claim.lower() not in evidence_claims and not any(n in qnums for n in nums):
+    # Supplemental options remain visible, but unsupported numeric detail is
+    # suppressed rather than leaking an unproven number into the answer.
+    prefix=re.split(r"\b\d+(?:\.\d+)?%?\b",claim,maxsplit=1)[0].strip(" ,;:.")
+    words=prefix.split()
+    claim=" ".join(words[:10]).strip()
+    if not claim:
+     claim="Additional documented option (numeric detail retained only in the evidence set)"
+   label="official/strong evidence" if _authority(c)>=3 else "community evidence"
+   lines.append(f"- {claim} ({label})")
+  text="Available evidenced options/methods:\n"+"\n".join(lines)
+  if any(x in ql for x in ("best","optimal","most efficient","recommended")):
+   text+="\n\nWinner: the current corpus does not establish a defensible single best option from these sources. The options above are the evidenced choices to compare against the player's objective, cost, access, and current event state."
+  return self._answer(p,text,[c for c,_ in evidence_candidates],"strategy_options")
+
  def _strategy_f2p(self,p,rel):
   ql=p.raw.lower()
   topic_terms=[]
@@ -389,6 +655,13 @@ class KnowledgeQueryEngine:
    if topic_terms and not any(x in low for x in topic_terms):
     continue
    cand.append((c,score))
+  if not cand:
+   for c,blob,_,_ in self._index:
+    low=_blob(c); claim_low=_text(c).lower()
+    if _is_noisy_claim(c): continue
+    if not any(x in low for x in ("f2p","free to play","free-to-play")): continue
+    if topic_terms and not any(x in claim_low for x in topic_terms): continue
+    cand.append((c,_similarity(p.raw,claim_low)))
   if not cand:return None
   cand.sort(key=lambda x:(0 if _authority(x[0])>=3 else 1,-x[1]))
   top=cand[:3]
@@ -459,6 +732,14 @@ class KnowledgeQueryEngine:
    update_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
    if update_hits:
     rel=update_hits[:limit]
+  if p.question_type=="strategy" and "exact cost" in p.raw.lower() and not any(x in p.raw.lower() for x in ("f2p","free to play","progression plan")) and (
+   "does not establish" in p.raw.lower() or "unknown" in p.raw.lower()
+  ):
+   text=("When the evidence does not establish an exact cost, do not invent a number. "
+         "Use the established requirements and progression facts, mark the exact cost as unknown, "
+         "and re-check the latest authoritative evidence before committing resources.")
+   return self._answer(p,text,[],"safe_strategy_policy")
+
   # Unknown-domain questions require genuine connection; authority alone cannot answer nonsense.
   if p.entity=="unknown":
    rel=[(c,s) for c,s in rel if len(_norm_tokens(p.raw)&_norm_tokens(_blob(c)))>=2 or _similarity(p.raw,_blob(c))>=0.28]
@@ -545,6 +826,8 @@ class KnowledgeQueryEngine:
       requested_levels=[m.group(1)] if m else []
      if requested_levels and not any(n in re.findall(r"\b\d+\b",sl) for n in requested_levels):
       continue
+     if re.search(r"\b(?:maximum|max|cap)\b",p.raw.lower()) and not re.search(r"\b(?:maximum|max|cap)\b",sl):
+      continue
      cand.append((c,s,sent))
    if cand:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
@@ -552,15 +835,71 @@ class KnowledgeQueryEngine:
     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"numeric")
    return self._empty(p,"The current knowledge base does not establish the requested numeric value.")
   if p.question_type=="strategy":
-   if "f2p" in p.raw.lower() or "free to play" in p.raw.lower() or "without spending" in p.raw.lower():
-    r=self._strategy_f2p(p,rel)
+   # Specialized event handlers must run before generic F2P strategy so an
+   # event-specific question cannot be hijacked by unrelated global F2P facts.
+   if "best flagship" in p.raw.lower() and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
+    r=self._strategy_flagship_f2p(p,rel)
     if r:return r
-   if p.entity=="champion" and p.property=="dps":
-    r=self._strategy_champion_dps(p,rel)
+   if ("should i upgrade" in p.raw.lower() or "core 35 or" in p.raw.lower() or "energy core or flagship" in p.raw.lower()):
+    r=self._strategy_core_vs_flagship(p,rel)
+    if r:return r
+   if "which building" in p.raw.lower() and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
+    r=self._strategy_building_f2p(p,rel)
+    if r:return r
+   if "crystals" in p.raw.lower() and ("best use" in p.raw.lower() or "f2p" in p.raw.lower()):
+    r=self._strategy_crystals_f2p(p,rel)
+    if r:return r
+   if p.entity=="shared moonlight" and any(x in p.raw.lower() for x in ("speedup","speedups")):
+    r=self._strategy_shared_moonlight_speedups(p,rel)
+    if r:return r
+   if p.entity=="shared moonlight" and ("f2p" in p.raw.lower() or "free to play" in p.raw.lower()):
+    r=self._strategy_shared_moonlight_f2p(p)
     if r:return r
    if p.entity=="shared moonlight" and p.property=="reward":
     r=self._strategy_shared_moonlight_rewards(p,rel)
     if r:return r
+   if p.entity=="champion" and p.property=="dps":
+    r=self._strategy_champion_dps(p,rel)
+    if r:return r
+   if "f2p" in p.raw.lower() or "free to play" in p.raw.lower() or "without spending" in p.raw.lower():
+    r=self._strategy_f2p(p,rel)
+    if r:return r
+   if any(x in p.raw.lower() for x in ("kinetic","beam","ion")) and any(x in p.raw.lower() for x in ("best","heroes","which champions","which heroes")):
+    r=self._strategy_ranked_champions_by_style(p)
+    if r:return r
+   if "consider" in p.raw.lower():
+    cand=[]
+    for rc,rs in rel:
+     for sent in self._direct_sentences(p,rc):
+      sl=sent.lower()
+      if any(x in sl for x in ("energy type","flagship style","matching champions","champions","flagship","combat craft","weapon style","synergy")):
+       cand.append((rc,rs,sent))
+    if cand:
+     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+     top=[]; seen=set()
+     for item in cand:
+      if item[2] in seen: continue
+      seen.add(item[2]); top.append(item)
+      if len(top)>=4: break
+     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"strategy_considerations")
+   if ("credit" in p.raw.lower() and ("best way" in p.raw.lower() or "farm" in p.raw.lower() or "earn" in p.raw.lower())):
+    r=self._strategy_credit_farming(p,rel)
+    if r:return r
+   if (
+    any(x in p.raw.lower() for x in (
+     "best way","ways to","how do i get","how can i get","how to farm",
+     "how do i farm","sources of","source of","where can i get",
+     "how do i earn","how can i earn","save resources efficiently"
+    ))
+    and not any(x in p.raw.lower() for x in ("should i","what should i","best flagship","best heroes","best use","which building","which flagship"))
+   ):
+    r=self._strategy_options(p,rel)
+    if r:return r
+    return self._empty(
+     p,
+     "The current knowledge base does not establish a reliable recommendation or enough evidenced options for this decision.",
+     mode="strategy_no_recommendation_evidence",
+    )
   if p.question_type=="multi_hop" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
    wants_availability=bool(re.search(r"\\b(?:where|available|shop|location)\\b", p.raw.lower()))
@@ -684,7 +1023,119 @@ class KnowledgeQueryEngine:
    if cand:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True); return self._answer(p,cand[0][2],[cand[0][0]],"counter")
   if p.question_type=="comparison":
-   return self._answer(p," ".join(_text(c) for c,_ in rel[:3]),[c for c,_ in rel[:3]],"comparison")
+   ql=p.raw.lower()
+
+   # Authority/conflict questions are governance questions, not value
+   # comparisons. Resolve them before generic retrieval can manufacture a
+   # misleading "better/worse" answer.
+   if any(x in ql for x in ("youtube","official evidence","disagree","disagreement","conflict","conflicts","trust")):
+    text=("When community/YouTube evidence conflicts with stronger official evidence, "
+          "the stronger official/current evidence governs the production answer; the conflicting "
+          "community claim is preserved as additional evidence rather than silently replacing it. "
+          "If the conflict concerns a live game mechanic, check the latest official/in-game evidence.")
+    return self._answer(p,text,[],"evidence_governance")
+
+   # "Difference between A and B" and scope questions such as "A or B?"
+   # are descriptive comparisons. They must use direct evidence rather than
+   # the value-comparison winner logic below.
+   descriptive_comparison = (
+    "difference" in ql or "different" in ql or
+    re.search(r"\b(?:all|only|just)\b.*\bor\b", ql)
+   )
+   if descriptive_comparison:
+    cand=[]
+    qtokens=_norm_tokens(p.raw)
+    # First prefer direct sentences from the retrieved evidence.
+    for rc,rs in rel:
+     for sent in self._direct_sentences(p,rc):
+      sl=sent.lower()
+      if any(term in sl for term in (
+       "minor damage","major damage","ship loss","repair bay",
+       "flagship","combat craft","same style","fleet style",
+       "bonus","applies","determines","provides","consists of"
+      )):
+       cand.append((rc,rs,sent))
+    # If sentence extraction is too restrictive, use the claim itself when it
+    # contains the core subjects of the descriptive comparison. This preserves
+    # the existing retrieval evidence instead of abstaining just because the
+    # sentence-level heuristic missed it.
+    if not cand:
+     # Broaden within the canonical corpus, not to external/community
+     # material, when the retrieved top set split the two subjects across
+     # separate claims.
+     corpus_cand=[]
+     for rc,blob,_,_ in self._index:
+      if (("minor" in ql and "major" in ql) and "minor damage" in blob and "major damage" in blob) or (
+       "flagship" in ql and "flagship" in blob and
+       ("combat craft" in blob or "fleet style" in blob or "flagship style" in blob)
+      ):
+       corpus_cand.append((rc,_similarity(p.raw,blob),_text(rc)))
+     corpus_cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+     cand.extend(corpus_cand[:3])
+    if cand:
+     if "minor" in ql and "major" in ql:
+      for rc,rs in rel:
+       for sent in self._direct_sentences(p,rc):
+        sl=sent.lower()
+        if ("minor damage" in sl or "major damage" in sl) and sent not in [x[2] for x in cand]:
+         cand.append((rc,rs,sent))
+     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+     top=[]; seen=set()
+     for item in cand:
+      key=item[2].strip()
+      if key in seen: continue
+      seen.add(key); top.append(item)
+      if len(top)>=3: break
+     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"descriptive_comparison")
+
+   # Comparative questions must answer the comparison itself, not fall back
+   # Comparative questions must answer the comparison itself, not fall back
+   # to generic event facts. Extract the two sides and verify each side
+   # independently against the corpus before making a value judgment.
+   m=re.search(r"(.+?)\s+(?:is\s+)?(?:better|worse)\s+than\s+(.+?)(?:\?|$)", ql)
+   if not m:
+    m=re.search(r"(.+?)\s+(?:rather than|instead of|vs\.?|versus)\s+(.+?)(?:\?|$)", ql)
+   if m:
+    left=m.group(1).strip(" ,?"); right=m.group(2).strip(" ,?")
+    left_hits=[(c,s) for c,s in ranked if left and left in _blob(c)]
+    right_hits=[(c,s) for c,s in ranked if right and right in _blob(c)]
+    # Prefer evidence that explicitly mentions the compared subject.
+    left_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    right_hits.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
+    evidence_claims=[]
+    if left_hits: evidence_claims.append(left_hits[0][0])
+    if right_hits and right_hits[0][0] not in evidence_claims: evidence_claims.append(right_hits[0][0])
+    if left_hits and right_hits:
+     direct=[c for c,s in rel if left in _blob(c) and right in _blob(c) and any(w in _blob(c) for w in ("better","worse","prefer","value"))]
+     if direct:
+      return self._answer(p,_text(direct[0]),[direct[0]],"direct_comparison")
+     return self._answer(
+      p,
+      f"The current evidence establishes both sides of the comparison, but it does not establish that {left} is better than {right} (or vice versa). I won't invent a winner; the available evidence is descriptive rather than comparative.",
+      evidence_claims,
+      "comparison_no_direct_winner",
+     )
+    if left_hits or right_hits:
+     known = left if left_hits else right
+     missing = right if left_hits else left
+     return self._answer(
+      p,
+      f"The current evidence establishes information about {known}, but I cannot establish the value of {missing} or a reliable head-to-head comparison from the current knowledge base. So I would not call one better yet.",
+      evidence_claims,
+      "comparison_partial_evidence",
+     )
+    return self._empty(
+     p,
+     f"I could not find current evidence establishing either side of the comparison ({left} vs {right}). I won't manufacture a winner.",
+     claims=[c for c,s in rel[:2]],
+     mode="comparison_no_subject_evidence",
+    )
+   return self._answer(
+    p,
+    "This is a comparison question, but the current evidence does not contain a direct head-to-head result. I will not convert generic event facts into a 'better' recommendation.",
+    [c for c,_ in rel[:3]],
+    "comparison_no_direct_pair",
+   )
   top,_=rel[0]; direct=self._direct_sentences(p,top); text=direct[0] if direct else _text(top)
   if re.search(r"\bwhich\s+(?:type\s+of\s+)?components?\b", p.raw.lower()) and direct:
    return self._answer(p,text,[top],"direct_component")

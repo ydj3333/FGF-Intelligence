@@ -191,3 +191,115 @@ def test_v6_engine_answers_three_hop_chain_only_when_complete():
     assert "Core progression" in r["answer"]
     assert "available at Research Academy" in r["answer"]
     assert len(r["evidence"])==3
+
+
+def test_v7_comparison_layer_preserves_existing_core_comparison_subtypes():
+    from knowledge_query_engine import KnowledgeQueryEngine
+
+    damage = KnowledgeQueryEngine([
+        {"Claim":"Space combat has three categories of fleet damage: Minor Damage (Light), Major Damage (Heavy), and Ship Loss.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Major Damage (Heavy) sends damaged vessels to the Repair Bay and requires Repair Modules for repair.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]).compose("What is the difference between minor and major damage?")
+    assert damage["reasoning"]["mode"] == "descriptive_comparison"
+    assert "minor damage" in damage["answer"].lower()
+    assert "major damage" in damage["answer"].lower()
+    assert "better recommendation" not in damage["answer"].lower()
+
+    governance = KnowledgeQueryEngine([
+        {"Claim":"Official evidence establishes the mechanic.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"A community YouTube claim reports a different mechanic.",
+         "Evidence Tier":"Tier 3 — Creator/Community","Status":"Confirmed"},
+    ]).compose("Official evidence and YouTube disagree about this FGF mechanic. What should I trust?")
+    assert governance["reasoning"]["mode"] == "evidence_governance"
+    assert "official/current evidence governs" in governance["answer"].lower()
+
+    flagship = KnowledgeQueryEngine([
+        {"Claim":"The Fleet page configures Flagships, Champions, and combat craft.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"A fleet consists of 1 Flagship, 3 Champions, and multiple combat craft.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Additional Flagship Components enhance ships' base ATK, DEF, and INT attributes.",
+         "Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]).compose("What is the difference between flagship and regular ships?")
+    assert flagship["reasoning"]["mode"] == "descriptive_comparison"
+    assert "flagship" in flagship["answer"].lower()
+    assert "better recommendation" not in flagship["answer"].lower()
+
+
+def test_v7_numeric_cap_does_not_substitute_unrelated_level_facts():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Energy core level 15 unlocks epic.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Energy core level 20 unlocks legendary.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the maximum Energy Core level?")
+    assert result["answer_type"] == "knowledge_abstention"
+    assert "does not establish" in result["answer"].lower()
+
+
+def test_v7_exact_cost_policy_cannot_be_hijacked_by_unrelated_retrieval():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Players can establish their own Home Port.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What should I do when the evidence does not establish an exact cost?")
+    assert result["reasoning"]["mode"] == "safe_strategy_policy"
+    assert "do not invent a number" in result["answer"].lower()
+
+
+def test_v7_best_strategy_does_not_return_unrelated_facts():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Players can establish their own Home Port.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the best way to farm Credits?")
+    assert result["answer_type"] == "knowledge_abstention"
+    assert "recommendation" in result["answer"].lower()
+
+
+def test_v7_best_strategy_enumerates_options_without_exceeding_evidence_budget():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Merchant expeditions can earn Credits.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Daily quests provide Credits.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Trade routes generate Credits from trading activity.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Events can provide Credits as rewards.","Evidence Tier":"Tier 2 — Community","Status":"Confirmed"},
+        {"Claim":"Guild activities can provide Credits.","Evidence Tier":"Tier 2 — Community","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the best way to farm Credits?")
+    assert result["reasoning"]["mode"] == "strategy_options"
+    assert "Available evidenced options/methods" in result["answer"]
+    assert "Merchant expeditions" in result["answer"]
+    assert "Daily quests" in result["answer"]
+    assert len(result["evidence"]) <= 4
+    assert "does not establish a defensible single best option" in result["answer"]
+
+
+def test_v7_best_flagship_f2p_enumerates_relevant_options_without_inventing_winner():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"The Flagship is the heart of a fleet and provides attribute bonuses and abilities.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Flagship Components can be obtained through the Glory Shop, Ascendancy Shrines, and Tribute Vessels.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"The Core Component determines the Flagship Style and the Style of the entire fleet.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("What is the best flagship for F2P players?")
+    assert result["reasoning"]["mode"] == "strategy_flagship_f2p"
+    assert "does not establish a single F2P-best Flagship" in result["answer"]
+    assert "Flagship Components" in result["answer"]
+    assert len(result["evidence"]) <= 4
+
+
+def test_v7_core_vs_flagship_preserves_both_sides():
+    from knowledge_query_engine import KnowledgeQueryEngine
+    claims=[
+        {"Claim":"Energy Core level determines the maximum level of Flagships, Champions, and other buildings.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+        {"Claim":"Continuously upgrading a Flagship improves its base attributes and is presented as important for trade routes.","Evidence Tier":"Tier 1 — Ultimate/Official","Status":"Confirmed"},
+    ]
+    result=KnowledgeQueryEngine(claims).compose("Should I upgrade Energy Core or flagship first?")
+    assert result["reasoning"]["mode"] == "strategy_core_vs_flagship"
+    assert "Energy Core" in result["answer"]
+    assert "Flagship" in result["answer"]
+    assert "universal winner" in result["answer"]

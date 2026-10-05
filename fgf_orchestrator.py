@@ -15,11 +15,16 @@ from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Optional
 
 from policy_engine import classify_intent, enforce
+from core_objectives import preserve_core_answer, validate_core_preservation
 
 
 @dataclass
 class OrchestrationResult:
     answer: str
+    # Immutable baseline produced by the original v6 Knowledge Query Engine.
+    # Later intelligence layers may enrich it, but must never replace a correct
+    # specialized core answer with generic retrieval.
+    baseline_answer: str
     branch: str
     evidence_state: str
     abstained: bool
@@ -31,7 +36,13 @@ class OrchestrationResult:
     provenance: Dict[str, Any]
 
     def as_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        payload = asdict(self)
+        payload["answer_layering"] = {
+            "baseline": "v6_core_knowledge_query_engine",
+            "baseline_preserved": payload.get("baseline_answer", "") != "" and payload.get("baseline_answer", "") in payload.get("answer", ""),
+            "policy": "new intelligence layers are additive; a correct specialized core answer is never discarded",
+        }
+        return payload
 
 
 def _is_abstention(result: Dict[str, Any]) -> bool:
@@ -52,6 +63,8 @@ class FGFOrchestrator:
 
     def answer(self, question: str, player_context: Optional[Dict[str, Any]] = None):
         core = self.core_answer(question, player_context)
+        # Protected baseline: all later layers must build on the original Core result.
+        core_baseline = dict(core)
         intent = _policy_intent(question, core)
         core_claims = core.get("evidence", []) if isinstance(core.get("evidence"), list) else []
         policy = enforce(
@@ -65,30 +78,42 @@ class FGFOrchestrator:
             and intent == "factual"
             and core.get("answer_type") not in {"knowledge_abstention", "knowledge_policy"}
         ):
+            # Preserve the established core answer. Policy/governance is an
+            # additional layer and must not erase a correct specialized answer.
+            # If a policy warning exists, surface it alongside the baseline.
             core = dict(core)
-            core["answer"] = policy["answer"]
-            core["answer_type"] = "knowledge_policy"
-            core["evidence"] = []
-            core["evidence_used"] = []
-            core["uncertainty"] = (
-                policy["warnings"][0]
-                if policy.get("warnings")
-                else "Official evidence is insufficient."
-            )
+            warnings = list(core.get("orchestration_warnings", []))
+            warnings.extend(policy.get("warnings", []))
+            core["orchestration_warnings"] = warnings
+            core["policy_review"] = {
+                "abstained": True,
+                "reason": policy.get("warnings", ["Policy review requested."])[0],
+                "baseline_preserved": True,
+            }
         core_abstains = _is_abstention(core)
 
         # Established factual answers stop at Core.
         if intent == "factual" and not core_abstains:
-            return OrchestrationResult(
+            policy_review = core.get("policy_review")
+            result = OrchestrationResult(
                 answer=core.get("answer", ""),
-                branch="core",
-                evidence_state="CONFIRMED",
+                baseline_answer=core_baseline.get("answer", ""),
+                branch="core+policy_review" if policy_review else "core",
+                evidence_state=(
+                    "CORE_ESTABLISHED_BUT_POLICY_REVIEW"
+                    if policy_review else "CONFIRMED"
+                ),
                 abstained=False,
                 core_answerable=True,
-                warnings=[],
+                warnings=(
+                    list(core.get("orchestration_warnings", []))
+                    if policy_review else []
+                ),
                 core=core, experience=[], youtube=[],
                 provenance={"branches_used": ["core"]},
             ).as_dict()
+            validate_core_preservation(core_baseline, result)
+            return result
 
         experience = []
         if self.experience_store is not None:
@@ -128,8 +153,10 @@ class FGFOrchestrator:
                 branches.append("experience")
             if youtube:
                 branches.append("youtube")
-            return OrchestrationResult(
+            answer = preserve_core_answer(core_baseline, answer)
+            result = OrchestrationResult(
                 answer=answer,
+                baseline_answer=core_baseline.get("answer", ""),
                 branch="+".join(branches),
                 evidence_state="SUPPORTED" if experience else "COMMUNITY_INTERPRETATION",
                 abstained=False,
@@ -145,6 +172,8 @@ class FGFOrchestrator:
                 core=core, experience=experience, youtube=youtube,
                 provenance={"branches_used": branches},
             ).as_dict()
+            validate_core_preservation(core_baseline, result)
+            return result
 
         if core_abstains and youtube_allowed and youtube:
             answer = (
@@ -156,7 +185,7 @@ class FGFOrchestrator:
                 )
             )
             return OrchestrationResult(
-                answer=answer, branch="youtube_fallback",
+                answer=answer, baseline_answer=core.get("answer", ""), branch="youtube_fallback",
                 evidence_state="COMMUNITY_INTERPRETATION",
                 abstained=False, core_answerable=False,
                 warnings=[
@@ -169,6 +198,7 @@ class FGFOrchestrator:
 
         return OrchestrationResult(
             answer=core.get("answer", "The current evidence is insufficient."),
+            baseline_answer=core.get("answer", ""),
             branch="core_abstention",
             evidence_state="INSUFFICIENT_EVIDENCE",
             abstained=True,
