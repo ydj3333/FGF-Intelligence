@@ -474,7 +474,7 @@ class KnowledgeQueryEngine:
   evidence_candidates=candidates[:4]
   evidence_claims={_text(c).strip().lower() for c,_ in evidence_candidates}
   lines=[]
-  for i,(c,_) in enumerate(candidates[:8],1):
+  for c,_ in candidates[:8]:
    claim=_text(c).strip()
    # Do not leak numeric details from supplemental options that are outside
    # the four-record evidence budget. The option itself remains visible.
@@ -485,7 +485,7 @@ class KnowledgeQueryEngine:
     label=re.split(r"[,;:.]",claim,maxsplit=1)[0].strip()
     claim=label if label else "Documented option (see evidence set)"
    label="official/strong evidence" if _authority(c)>=3 else "community evidence"
-   lines.append(f"{i}. {claim} ({label})")
+   lines.append(f"- {claim} ({label})")
   text="Available evidenced options/methods:\n"+"\n".join(lines)
   if any(x in ql for x in ("best","optimal","most efficient","recommended")):
    text+="\n\nWinner: the current corpus does not establish a defensible single best option from these sources. The options above are the evidenced choices to compare against the player's objective, cost, access, and current event state."
