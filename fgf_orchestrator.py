@@ -75,16 +75,18 @@ class FGFOrchestrator:
             and intent == "factual"
             and core.get("answer_type") not in {"knowledge_abstention", "knowledge_policy"}
         ):
+            # Preserve the established core answer. Policy/governance is an
+            # additional layer and must not erase a correct specialized answer.
+            # If a policy warning exists, surface it alongside the baseline.
             core = dict(core)
-            core["answer"] = policy["answer"]
-            core["answer_type"] = "knowledge_policy"
-            core["evidence"] = []
-            core["evidence_used"] = []
-            core["uncertainty"] = (
-                policy["warnings"][0]
-                if policy.get("warnings")
-                else "Official evidence is insufficient."
-            )
+            warnings = list(core.get("orchestration_warnings", []))
+            warnings.extend(policy.get("warnings", []))
+            core["orchestration_warnings"] = warnings
+            core["policy_review"] = {
+                "abstained": True,
+                "reason": policy.get("warnings", ["Policy review requested."])[0],
+                "baseline_preserved": True,
+            }
         core_abstains = _is_abstention(core)
 
         # Established factual answers stop at Core.
