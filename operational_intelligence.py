@@ -30,6 +30,50 @@ CURRENT_WEB_CONTEXT = {
 }
 
 
+# Cross-event resource allocation policy.
+# When T100 and GvG compete for the same scarce resource pool, GvG is
+# deliberately preferred because it has higher reward priority and is harder
+# to complete. This is an allocation rule, not a claim about exact rewards.
+EVENT_RESOURCE_PRIORITY = {
+    "Guild vs Guild": {
+        "rank": 1,
+        "policy": "RESERVE_FIRST",
+        "reason": "Higher reward priority and higher completion difficulty.",
+    },
+    "Top 100 Galactic Traders": {
+        "rank": 2,
+        "policy": "SPEND_AFTER_GVG_RESERVE",
+        "reason": "Use efficient T100 spending only after the GvG reserve is protected.",
+    },
+}
+
+CONTESTED_EVENT_RESOURCES = [
+    "Speedups",
+    "Champion XP",
+    "Beacons",
+    "Computational Components",
+    "rare upgrade materials",
+    "PvP-related energy",
+]
+
+def event_resource_policy(current_event: str, future_event: str, resource: str) -> Dict[str, Any]:
+    """Explain whether a shared resource should be spent or reserved."""
+    current = EVENT_RESOURCE_PRIORITY.get(current_event, {"rank": 99})
+    future = EVENT_RESOURCE_PRIORITY.get(future_event, {"rank": 99})
+    if resource in CONTESTED_EVENT_RESOURCES and future["rank"] < current["rank"]:
+        return {
+            "decision": "RESERVE",
+            "resource": resource,
+            "for_event": future_event,
+            "reason": "A higher-priority future event gets first claim on contested scarce resources.",
+        }
+    return {
+        "decision": "CURRENT_EVENT_ALLOWED",
+        "resource": resource,
+        "for_event": current_event,
+    }
+
+
 PLAYBOOKS = {
     "shadowfront": {
         "name": "Shadowfront",
@@ -72,8 +116,9 @@ PLAYBOOKS = {
             {"day":"Day 6","objective":"PvP according to server rules","do":"Participate in PvP only within current server/event rules; overlap with other PvP events where useful.","save":"Normal progression reserve after the event.","avoid":"Do not assume PvP requirements without checking the live server rules.","state":"COMMUNITY_GUIDE"},
         ],
         "global": {
-            "before":"Save event-relevant resources and inspect the current milestone ladder.",
-            "during":"Match spending to the active objective and stop when marginal reward value drops.",
+            "priority_policy":"GvG-first when T100 and GvG compete for scarce resources: protect the GvG reserve before optional T100 spending.",
+            "before":"Build the event reserve, but protect the GvG reserve first; inspect the current T100 milestone ladder before releasing contested resources.",
+            "during":"Match spending to the active objective and stop when marginal reward value drops; never consume a contested resource needed for the higher-priority GvG reserve merely to chase an optional T100 milestone.",
             "after":"Claim rewards, check expiring currencies and rebuild the reserve."
         },
         "source":"Curated from stored community/player guide material."
