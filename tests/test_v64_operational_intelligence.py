@@ -186,3 +186,21 @@ class OperationalIntelligenceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_gvg_gets_first_claim_on_contested_t100_resources():
+    from operational_intelligence import event_resource_policy
+    for resource in [
+        "Speedups", "Champion XP", "Beacons",
+        "Computational Components", "rare upgrade materials",
+        "PvP-related energy",
+    ]:
+        decision = event_resource_policy("Top 100 Galactic Traders", "Guild vs Guild", resource)
+        assert decision["decision"] == "RESERVE"
+        assert decision["for_event"] == "Guild vs Guild"
+
+
+def test_t100_can_spend_non_contested_resource():
+    from operational_intelligence import event_resource_policy
+    decision = event_resource_policy("Top 100 Galactic Traders", "Guild vs Guild", "Crystals")
+    assert decision["decision"] == "CURRENT_EVENT_ALLOWED"
