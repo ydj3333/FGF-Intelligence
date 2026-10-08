@@ -1,0 +1,24 @@
+name: Interface 50-Question Matrix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  interface-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Compile interface and query engine
+        run: python -m py_compile agent.py knowledge_query_engine.py constraint_extractor.py operational_intelligence.py
+      - name: Exercise all 50 Objective #1 questions and interface routes
+        run: python -m unittest tests/test_interface_50_question_matrix.py -v
