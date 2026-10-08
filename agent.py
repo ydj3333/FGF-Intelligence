@@ -13,7 +13,7 @@ from live_runtime import LiveObservationRuntime
 from operational_intelligence import build_operational_output
 from youtube_evidence_provider import YouTubeEvidenceProvider
 from knowledge_query_engine import QuestionParser
-from constraint_extractor import extract_constraints
+from constraint_extractor import extract_constraints as extract_player_constraints
 
 ROOT=Path(__file__).parent
 ROOT=Path(__file__).parent
@@ -793,7 +793,7 @@ def synthesize(question,claims,conflicts=None,mode='answer'):
 
 def _core_progression_recommendation(q, objective='general'):
     """Build an actionable Core recommendation while preserving all explicit player state."""
-    constraints=extract_constraints(q)
+    constraints=extract_player_constraints(q)
     ql=str(q or '').lower()
     m=re.search(r'\b(?:energy\s+)?core\s*(?:level\s*)?(\d{1,2})\b', ql)
     if not m:
@@ -826,7 +826,7 @@ def _core_progression_recommendation(q, objective='general'):
 
 def recommend(q,objective='general'):
     objective_terms={'pvp':'pvp arena gvg port war combat','pve':'pve boss event hunting ground shrine','f2p':'f2p free progression economy spending','progression':'energy core building research shipyard construction','economy':'trade home port resources credits guild vouchers','event':'event rewards currency points guild'}
-    constraints=extract_constraints(q)
+    constraints=extract_player_constraints(q)
     if objective in ('general','progression'):
         core_plan=_core_progression_recommendation(q,objective)
         if core_plan:
