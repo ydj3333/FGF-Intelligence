@@ -341,25 +341,106 @@ def _wants_best_event_strategy(question: str) -> bool:
 
 
 def _top100_best_strategy() -> Dict[str, Any]:
-    """Convert the stored T100 guide into an actionable execution strategy."""
+    """Return the evidence-backed T100 execution + pre-event resource plan."""
     return {
         "mode": "event_best_strategy",
-        "title": "Top 100 Galactic Traders — best execution strategy",
-        "basis": "Best-effort strategy synthesis from the stored Top 100 Galactic Traders community guide. The corpus does not establish a mathematically optimal resource-spend threshold.",
-        "source_state": "COMMUNITY_GUIDE",
-        "columns": ["Phase / Day", "Best action", "Resource discipline", "Why / objective", "Evidence state"],
+        "title": "Top 100 Galactic Traders — preparation & execution strategy",
+        "basis": (
+            "Event-specific strategy synthesized from the stored T100 guide, "
+            "new in-game Tribute evidence, and player/community observations. "
+            "Community efficiency observations remain conditional and under review."
+        ),
+        "source_state": "MIXED_EVENT_UI_AND_COMMUNITY_GUIDE",
+        "columns": ["Phase / Day", "SPEND / DO", "SAVE / RESERVE", "AVOID", "Evidence state"],
         "rows": [
-            ["Before Day 1", "Inspect the live milestone ladder and prepare event-relevant resources.", "Keep Speedups, Crystals, Beacons/Beacon materials and other event resources available; do not pre-spend blindly.", "Start with resources positioned for the active objective and avoid wasting resources before the reward ladder is understood.", "COMMUNITY_GUIDE"],
-            ["Day 1", "Complete Ordinary Tribute activities and use moderate Speedups.", "Spend only enough to advance the objective; preserve surplus for later days.", "Matches the stored Day 1 objective while protecting the reserve.", "COMMUNITY_GUIDE"],
-            ["Day 2", "Prioritize Commissions.", "Use Crystals cautiously and only when they directly advance the objective.", "Commission progression is the documented Day 2 focus; unnecessary Crystal spending reduces flexibility.", "COMMUNITY_GUIDE"],
-            ["Day 3", "Use Beacons / Beacon materials when required.", "Protect Computational Components and other scarce progression resources unless the live objective specifically calls for them.", "Advances the documented Beacon objective without consuming scarce resources prematurely.", "COMMUNITY_GUIDE"],
-            ["Day 4", "Return to high-value Commissions.", "Prioritize commissions that advance the active objective; keep rare resources for stronger opportunities.", "The stored guide identifies commissions as the main Day 4 activity.", "COMMUNITY_GUIDE"],
-            ["Day 5", "Take the third milestone when it is resource-efficient; reassess before pushing further.", "Do not force the fourth milestone when its resource cost is disproportionate to the reward.", "The stored guide explicitly identifies Day 5 as a weaker reward ladder and recommends stopping when value drops.", "COMMUNITY_GUIDE"],
-            ["Day 6", "Use PvP only within the current server/event rules and overlap it with other PvP events where useful.", "Keep a normal progression reserve after the event; do not assume PvP requirements without checking live rules.", "Maximizes potential overlap without inventing unsupported PvP requirements.", "COMMUNITY_GUIDE"],
-            ["Every day", "Spend against the current objective, then stop when marginal reward value drops.", "Preserve resources for later/higher-value objectives rather than chasing points for their own sake.", "This is the core resource-efficiency rule in the stored T100 guide.", "COMMUNITY_GUIDE"],
+            [
+                "7-day preparation",
+                "Build the T100 resource reserve and identify which actions can score without consuming the scarce GvG reserve.",
+                "GvG has first claim on contested scarce resources because it is the higher-priority, harder-to-finish event in the current strategy model.",
+                "Do not burn shared Speedups, Champion XP, Beacons, Computational Components or rare materials merely because T100 is approaching.",
+                "PLAYER STRATEGY + EVENT POLICY",
+            ],
+            [
+                "Pre-Day 1",
+                "Check the live T100 milestone/reward ladder; prepare Tribute activity and coordinate the guild for Sacred Tribute sharing/rallies.",
+                "Keep contested resources protected for GvG; release only resources that are safe for T100.",
+                "Do not assume a universal 7-day spend quota or fixed server schedule.",
+                "IN-GAME UI + COMMUNITY GUIDE",
+            ],
+            [
+                "Day 1 — Tribute",
+                "Share newly spawned Sacred Tribute Vessels in guild; join existing rallies with the best available ship. Where a low-level Tribute can be safely cleared by fewer ships, use the smaller force rather than waiting for three ships.",
+                "Protect scarce GvG resources; use AP efficiently and keep the event cycle moving.",
+                "Do not wait for a full three-ship rally solely for completion if the same AP/reward outcome is safely achievable with fewer participants.",
+                "UI + PLAYER/COMMUNITY",
+            ],
+            [
+                "Day 1 — Scout",
+                "Prioritize discovering/scouting Sacred Tribute Vessels when available because the supplied UI shows Scout Rewards going to the discoverer regardless of attack participation.",
+                "Treat the displayed Scout Rewards as event value; preserve the broader GvG reserve.",
+                "Do not skip discovery merely because another player will perform the attack.",
+                "IN-GAME UI",
+            ],
+            [
+                "Day 2",
+                "Prioritize Commissions; spend Crystals only when they directly advance the objective.",
+                "Keep Crystals available for higher-value needs.",
+                "Avoid unnecessary Crystal spending.",
+                "COMMUNITY GUIDE",
+            ],
+            [
+                "Day 3",
+                "Use Beacons / Beacon materials when the objective requires them.",
+                "Computational Components remain protected for GvG where applicable.",
+                "Do not consume rare Computational Components simply because they are available.",
+                "COMMUNITY GUIDE + GvG PRIORITY",
+            ],
+            [
+                "Day 4",
+                "Prioritize commissions that advance the active objective.",
+                "Keep rare resources for stronger objectives and protect the GvG reserve.",
+                "Avoid rare-resource spending without a clear milestone payoff.",
+                "COMMUNITY GUIDE",
+            ],
+            [
+                "Day 5",
+                "Take the third milestone when it is convenient and resource-efficient.",
+                "Keep resources if the fourth milestone has poor value; preserve the GvG reserve.",
+                "Do not force the fourth milestone when its resource cost is disproportionate.",
+                "COMMUNITY GUIDE",
+            ],
+            [
+                "Day 6",
+                "Use PvP only within the current server/event rules and overlap useful PvP activity where appropriate.",
+                "Keep a normal progression reserve after T100 and do not consume resources reserved for the harder GvG cycle.",
+                "Do not assume unsupported PvP requirements or sacrifice GvG completion for T100 points.",
+                "COMMUNITY GUIDE + EVENT POLICY",
+            ],
+            [
+                "Prismatic Core handling",
+                "Collect Prismatic Cores when Tribute activity yields them; they have downstream Empower value for Legendary Components.",
+                "Time large upgrades for the appropriate scoring window and protect resources needed by GvG.",
+                "Do not assume the screenshot's displayed Empower cost is universal for every level.",
+                "IN-GAME UI",
+            ],
+            [
+                "Every day",
+                "Optimize reward progress per AP and unit time; spend against the current objective and stop when marginal reward value drops.",
+                "GvG gets first claim on contested scarce resources; T100 uses safe surplus and efficient low-cost opportunities.",
+                "Do not chase T100 points at the expense of a higher-priority GvG reserve.",
+                "EVENT POLICY + PLAYER/COMMUNITY",
+            ],
         ],
-        "recommendation": "The strongest evidence-backed approach is objective-first spending: prepare before Day 1, match resources to each day's objective, use Crystals cautiously, protect scarce resources, take efficient milestones, and stop when the next reward no longer justifies the resource cost. Exact spend thresholds are not established.",
-        "guardrail": "Do not present an invented numeric spend target or claim a mathematically proven optimal route. Check the live in-game milestone ladder and server-specific rules before committing resources.",
+        "recommendation": (
+            "Plan T100 as part of the wider T100↔GvG resource cycle, not as an isolated six-day event. "
+            "Prepare the reserve before Day 1, protect the GvG reserve first, exploit low-cost Tribute activity efficiently, "
+            "and stop T100 spending when the next milestone is weaker than the resource value being consumed."
+        ),
+        "guardrail": (
+            "The Tribute solo/fewer-ship tactic is conditional player/community evidence and should be used only when "
+            "the target is safely clearable with the smaller force. Exact 7-day preparation quantities, universal solo thresholds, "
+            "and server-specific schedules are not established by the supplied evidence."
+        ),
     }
 
 
