@@ -13,6 +13,7 @@ from live_runtime import LiveObservationRuntime
 from operational_intelligence import build_operational_output
 from youtube_evidence_provider import YouTubeEvidenceProvider
 from knowledge_query_engine import QuestionParser
+from constraint_extractor import extract_constraints
 
 ROOT=Path(__file__).parent
 ROOT=Path(__file__).parent
@@ -791,31 +792,27 @@ def synthesize(question,claims,conflicts=None,mode='answer'):
     return local
 
 def _core_progression_recommendation(q, objective='general'):
-    """Build an actionable Energy Core recommendation from explicit player state.
-
-    The player's Core level personalizes the recommendation, but exact next-level
-    prerequisites are never invented.
-    """
+    """Build an actionable Core recommendation while preserving all explicit player state."""
+    constraints=extract_constraints(q)
     ql=str(q or '').lower()
     m=re.search(r'\b(?:energy\s+)?core\s*(?:level\s*)?(\d{1,2})\b', ql)
     if not m:
         return None
     core_level=int(m.group(1))
+    fleet_tier=constraints.fleet_tier
     progression_query=(
         'Energy Core progression building upgrade limits fleet slots technology '
-        'Flagship Champion level caps Warehouse primary priority'
+        'Flagship Champion level caps Warehouse primary priority fleet tier '
+        + (fleet_tier or '')
     )
-    hits=retrieve(progression_query, 16, include_candidates=True)
+    hits=retrieve(progression_query,16,include_candidates=True)
     current=[]
     for c in hits:
-        status=str(c.get('Status','')).lower()
-        tier=str(c.get('Evidence Tier','')).lower()
-        if status in ('rejected','superseded'):
-            continue
-        if 'tier 1' not in tier and 'tier 2' not in tier:
-            continue
+        status=str(c.get('Status','')).lower(); tier=str(c.get('Evidence Tier','')).lower()
+        if status in ('rejected','superseded'): continue
+        if 'tier 1' not in tier and 'tier 2' not in tier: continue
         current.append(c)
-    def claim_has(text_terms, claim):
+    def claim_has(text_terms,claim):
         low=str(claim.get('Claim','')).lower()
         return any(term in low for term in text_terms)
     selected=[]
@@ -828,41 +825,39 @@ def _core_progression_recommendation(q, objective='general'):
         ('warehouse level on par','warehouse'),
     ):
         match=next((c for c in current if claim_has(terms,c)),None)
-        if match and match not in selected:
-            selected.append(match)
-    lines=[f'At Energy Core {core_level}, your priority should be to keep Energy Core progression moving while using the Core level to unlock/raise the systems it gates.']
-    for c in selected[:5]:
-        lines.append('• '+str(c.get('Claim','')).strip())
+        if match and match not in selected: selected.append(match)
+    if fleet_tier:
+        lines=[f'Your explicit player state is Energy Core {core_level} + Fleet Tier {fleet_tier}.',
+               f'Keep Energy Core progression moving while using the Core level to unlock/raise the systems it gates. Fleet Tier {fleet_tier} is preserved as a player constraint; the current canonical evidence does not establish a different Core-priority rule specifically for this fleet tier.']
+    else:
+        lines=[f'At Energy Core {core_level}, your priority should be to keep Energy Core progression moving while using the Core level to unlock/raise the systems it gates.']
+    for c in selected[:5]: lines.append('• '+str(c.get('Claim','')).strip())
     lines.append('• Before committing resources to the next Core upgrade, open the Energy Core upgrade screen and follow the prerequisites shown there; the current evidence does not establish the exact next-level requirements.')
-    if re.search(r'\b4\b', ql):
-        lines.append('• I detected “4” in your question, but it is not labelled (for example, 4 fleets, 4 ships, 4 buildings, etc.), so I will not invent what that number represents.')
     refs=[]
     for c in selected[:6]:
-        try:
-            refs.append(hits.index(c)+1)
-        except ValueError:
-            pass
+        try: refs.append(hits.index(c)+1)
+        except ValueError: pass
     return {
         'text':'\n'.join(lines),
         'model':'deterministic-core-progression-recommendation',
         'evidence_used':refs,
         'uncertainty':'Exact next Energy Core upgrade prerequisites are not established; use the live in-game Upgrade screen.',
         'selected_evidence_count':len(selected),
-        'player_state':{'energy_core_level':core_level},
+        'player_state':{'energy_core_level':core_level,'fleet_tier':fleet_tier},
         'recommendation_type':'core_progression',
     }
 
 def recommend(q,objective='general'):
     objective_terms={'pvp':'pvp arena gvg port war combat','pve':'pve boss event hunting ground shrine','f2p':'f2p free progression economy spending','progression':'energy core building research shipyard construction','economy':'trade home port resources credits guild vouchers','event':'event rewards currency points guild'}
-    # Player-state-aware recommendation routing must precede generic synthesis.
+    constraints=extract_constraints(q)
     if objective in ('general','progression'):
         core_plan=_core_progression_recommendation(q,objective)
         if core_plan:
-            hits=retrieve('Energy Core progression building upgrade limits fleet slots technology Flagship Champion Warehouse',12,include_candidates=True)
-            return {'question':q,'objective':objective,'answer':core_plan['text'],'model':core_plan['model'],'evidence_used':core_plan.get('evidence_used',[]),'uncertainty':core_plan.get('uncertainty',''),'synthesis_error':None,'synthesis_error_detail':None,'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'recommendation_type':core_plan.get('recommendation_type'),'player_state':core_plan.get('player_state'),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
+            hits=retrieve('Energy Core progression building upgrade limits fleet slots technology Flagship Champion Warehouse '+(constraints.fleet_tier or ''),12,include_candidates=True)
+            return {'question':q,'objective':objective,'answer':core_plan['text'],'model':core_plan['model'],'evidence_used':core_plan.get('evidence_used',[]),'uncertainty':core_plan.get('uncertainty',''),'synthesis_error':None,'synthesis_error_detail':None,'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'recommendation_type':core_plan.get('recommendation_type'),'player_state':core_plan.get('player_state'),'constraints':{'fleet_tier':constraints.fleet_tier},'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
     qq=(q+' '+objective_terms.get(objective,'')).strip();hits=retrieve(qq,12,include_candidates=True)
     s=synthesize(q or ('Give me the best recommendation for '+objective),hits,relevant_conflicts(q+' '+objective),'recommendation')
-    return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
+    return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'constraints':{'fleet_tier':constraints.fleet_tier},'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
 
 def answer_quality_gate(q,text,claims,evidence_used=None):
     """Final pre-display validation. A fluent answer is not accepted unless
