@@ -790,8 +790,76 @@ def synthesize(question,claims,conflicts=None,mode='answer'):
                     return enhanced
     return local
 
+def _core_progression_recommendation(q, objective='general'):
+    """Build an actionable Energy Core recommendation from explicit player state.
+
+    The player's Core level personalizes the recommendation, but exact next-level
+    prerequisites are never invented.
+    """
+    ql=str(q or '').lower()
+    m=re.search(r'\b(?:energy\s+)?core\s*(?:level\s*)?(\d{1,2})\b', ql)
+    if not m:
+        return None
+    core_level=int(m.group(1))
+    progression_query=(
+        'Energy Core progression building upgrade limits fleet slots technology '
+        'Flagship Champion level caps Warehouse primary priority'
+    )
+    hits=retrieve(progression_query, 16, include_candidates=True)
+    current=[]
+    for c in hits:
+        status=str(c.get('Status','')).lower()
+        tier=str(c.get('Evidence Tier','')).lower()
+        if status in ('rejected','superseded'):
+            continue
+        if 'tier 1' not in tier and 'tier 2' not in tier:
+            continue
+        current.append(c)
+    def claim_has(text_terms, claim):
+        low=str(claim.get('Claim','')).lower()
+        return any(term in low for term in text_terms)
+    selected=[]
+    for terms in (
+        ('primary base-development priority','core upgrades'),
+        ('maximum building levels','building upgrade limits'),
+        ('fleet slots','deployable fleet queues'),
+        ('technology access','technology'),
+        ('flagships, champions','champion level caps','flagship improvements'),
+        ('warehouse level on par','warehouse'),
+    ):
+        match=next((c for c in current if claim_has(terms,c)),None)
+        if match and match not in selected:
+            selected.append(match)
+    lines=[f'At Energy Core {core_level}, your priority should be to keep Energy Core progression moving while using the Core level to unlock/raise the systems it gates.']
+    for c in selected[:5]:
+        lines.append('• '+str(c.get('Claim','')).strip())
+    lines.append('• Before committing resources to the next Core upgrade, open the Energy Core upgrade screen and follow the prerequisites shown there; the current evidence does not establish the exact next-level requirements.')
+    if re.search(r'\b4\b', ql):
+        lines.append('• I detected “4” in your question, but it is not labelled (for example, 4 fleets, 4 ships, 4 buildings, etc.), so I will not invent what that number represents.')
+    refs=[]
+    for c in selected[:6]:
+        try:
+            refs.append(hits.index(c)+1)
+        except ValueError:
+            pass
+    return {
+        'text':'\n'.join(lines),
+        'model':'deterministic-core-progression-recommendation',
+        'evidence_used':refs,
+        'uncertainty':'Exact next Energy Core upgrade prerequisites are not established; use the live in-game Upgrade screen.',
+        'selected_evidence_count':len(selected),
+        'player_state':{'energy_core_level':core_level},
+        'recommendation_type':'core_progression',
+    }
+
 def recommend(q,objective='general'):
     objective_terms={'pvp':'pvp arena gvg port war combat','pve':'pve boss event hunting ground shrine','f2p':'f2p free progression economy spending','progression':'energy core building research shipyard construction','economy':'trade home port resources credits guild vouchers','event':'event rewards currency points guild'}
+    # Player-state-aware recommendation routing must precede generic synthesis.
+    if objective in ('general','progression'):
+        core_plan=_core_progression_recommendation(q,objective)
+        if core_plan:
+            hits=retrieve('Energy Core progression building upgrade limits fleet slots technology Flagship Champion Warehouse',12,include_candidates=True)
+            return {'question':q,'objective':objective,'answer':core_plan['text'],'model':core_plan['model'],'evidence_used':core_plan.get('evidence_used',[]),'uncertainty':core_plan.get('uncertainty',''),'synthesis_error':None,'synthesis_error_detail':None,'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'recommendation_type':core_plan.get('recommendation_type'),'player_state':core_plan.get('player_state'),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
     qq=(q+' '+objective_terms.get(objective,'')).strip();hits=retrieve(qq,12,include_candidates=True)
     s=synthesize(q or ('Give me the best recommendation for '+objective),hits,relevant_conflicts(q+' '+objective),'recommendation')
     return {'question':q,'objective':objective,'answer':s['text'],'model':s['model'],'evidence_used':s.get('evidence_used',[]),'uncertainty':s.get('uncertainty',''),'synthesis_error':s.get('synthesis_error'),'synthesis_error_detail':s.get('synthesis_error_detail'),'evidence':hits,'conflicts':relevant_conflicts(q+' '+objective),'disclaimer':'Recommendations are synthesized from retrieved evidence; they are not hard mechanics unless the evidence itself establishes a mechanic.'}
