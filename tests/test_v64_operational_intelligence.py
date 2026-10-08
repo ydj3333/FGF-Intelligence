@@ -204,3 +204,20 @@ def test_t100_can_spend_non_contested_resource():
     from operational_intelligence import event_resource_policy
     decision = event_resource_policy("Top 100 Galactic Traders", "Guild vs Guild", "Crystals")
     assert decision["decision"] == "CURRENT_EVENT_ALLOWED"
+
+
+def test_t100_strategy_contains_preparation_and_tribute_efficiency():
+    out = build_operational_output("t100 strategy - how to plan this to do from before time", [])
+    assert out["mode"] == "event_best_strategy"
+    text = " ".join(str(x) for row in out["rows"] for x in row)
+    assert "7-day preparation" in text
+    assert "Sacred Tribute Vessels" in text
+    assert "Scout Rewards" in text
+    assert "GvG" in text
+    assert "Prismatic Cores" in text
+
+
+def test_t100_tribute_efficiency_is_explicitly_conditional():
+    out = build_operational_output("best way to do T100", [])
+    assert "conditional" in out["guardrail"].lower()
+    assert "universal solo thresholds" in out["guardrail"]
