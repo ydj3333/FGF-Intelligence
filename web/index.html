@@ -1,112 +1,125 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FGF Intelligence — Operational Intelligence</title><style>
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:#08111f;color:#edf4ff}header{padding:28px 5vw;border-bottom:1px solid #20334f;background:#0d1a2c}main{max-width:1280px;margin:auto;padding:24px 5vw}input,select{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;border:1px solid #314968;background:#0e1b2d;color:#fff;font-size:16px;margin:6px 0}button{padding:11px 16px;border:0;border-radius:10px;background:#76b7ff;color:#06101c;font-weight:800;cursor:pointer;margin:6px 5px 6px 0}.card{background:#0d192b;border:1px solid #243a57;border-radius:14px;padding:16px;margin:12px 0}.tier1{border-color:#4ecb91}.conflict{border-color:#ff956e}.muted{color:#a9b8cf}.claim{font-size:17px;line-height:1.45}.small{font-size:13px}.pill{display:inline-block;border:1px solid #3a5575;border-radius:999px;padding:3px 8px;font-size:12px;margin:2px}.kpi{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}.k{padding:12px 16px;background:#102039;border-radius:12px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{background:#14243a;color:#dce9f9}.tab.active{background:#76b7ff;color:#06101c}.hidden{display:none}.source{color:#c5d6ff}.warn{background:#2a1915}.hero{padding:20px;border:1px solid #2a4766;border-radius:16px;background:linear-gradient(135deg,#0d1b2e,#10253d)}.answer{font-size:18px;line-height:1.6;white-space:pre-wrap}.evidence{border-left:3px solid #4ecb91;padding-left:12px}.error{border-color:#ff5f5f;background:#2a1515}
-</style></head><body><header><h1>🚀 FGF Intelligence</h1><div class="muted">Evidence-first • Tier-1 prioritized • S2 • calendar-aware • continuously evolving</div></header><main>
-<div id="kpi" class="kpi"></div><div class="tabs"><button class="tab active" onclick="show('ask',this)">Ask FGF</button><button class="tab" onclick="show('recommend',this)">Recommendations</button><button class="tab" onclick="show('knowledge',this)">Knowledge</button><button class="tab" onclick="show('tools',this)">Builders & Calculators</button><button class="tab" onclick="show('conflicts',this)">Conflicts</button></div>
-<section id="ask"><div class="hero"><h2>Ask the game</h2><p class="muted">Ask mechanics, rules, costs, systems, events, calendars or strategy. Operational questions automatically become actionable tables; unknown details are shown explicitly instead of guessed.</p><input id="q" placeholder="e.g. What happens when a fleet has Major Damage?"/><button onclick="ask()">Ask FGF</button></div><div id="answer"></div></section>
-<section id="recommend" class="hidden"><div class="card"><h2>Decision support</h2><input id="rq" placeholder="e.g. What should I prioritize next?"/><select id="obj"><option value="general">General</option><option value="progression">Fast progression</option><option value="f2p">F2P efficiency</option><option value="pvp">PvP / GvG</option><option value="pve">PvE / Events</option><option value="economy">Economy / Trade</option><option value="event">Event optimization</option></select><button onclick="recommend()">Recommend</button></div><div id="recs"></div></section>
-<section id="knowledge" class="hidden"><div class="card"><h2>Search knowledge</h2><input id="kq" placeholder="Search claims..."/><button onclick="searchClaims()">Search</button></div><div id="knowledgeResults"></div></section>
-<section id="tools" class="hidden">
-<div class="card"><h2>🛠️ Evidence-aware tools</h2><p class="muted">These tools calculate or plan only from mechanics established in the current evidence layer. Unknown costs/timers are left unknown.</p></div>
-<div class="card"><h3>Fleet Repair Planner</h3><select id="damageType"><option value="minor">Minor Damage</option><option value="major">Major Damage</option></select><input id="repairModules" type="number" min="0" value="0" placeholder="Repair Modules available"/><label><input id="inCombat" type="checkbox" style="width:auto"> Currently in combat</label><br><button onclick="repairTool()">Calculate repair path</button><div id="repairResult"></div></div>
-<div class="card"><h3>Fleet Synergy Builder</h3><select id="fleetStyle"><option>Beam</option><option>Kinetic</option><option>Ion</option></select><select id="champ1"><option value="">Select Champion 1</option></select><select id="champ2"><option value="">Select Champion 2</option></select><select id="champ3"><option value="">Select Champion 3</option></select><button onclick="fleetTool()">Build lineup</button><div id="fleetResult"></div></div>
-<div class="card"><h3>Energy Core Progression Planner</h3><input id="coreNow" type="number" min="1" value="1" placeholder="Current Core"/><input id="coreTarget" type="number" min="1" value="30" placeholder="Target Core"/><select id="coreSeason"><option>S1</option><option>S2</option><option>S3</option></select><button onclick="progressionTool()">Build progression plan</button><div id="progressionResult"></div></div>
-</section><section id="conflicts" class="hidden"><div id="conflictResults"></div></section>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FGF Intelligence — Command Center</title>
+<style>
+:root{
+ --bg:#07101d;--panel:#0c1828;--panel2:#101f33;--line:#1d3550;--line2:#294762;
+ --text:#edf5ff;--muted:#91a5bf;--blue:#72b7ff;--cyan:#65e6ff;--green:#43d39b;
+ --amber:#ffca67;--red:#ff716d;--shadow:0 18px 45px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}html{background:var(--bg)}
+body{margin:0;background:radial-gradient(circle at 70% -10%,#102943 0,#07101d 38%),var(--bg);color:var(--text);font:14px Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:238px;border-right:1px solid var(--line);background:rgba(7,16,29,.9);padding:22px 14px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:11px;padding:7px 10px 25px}
+.logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;color:#06101b;font-weight:950;box-shadow:0 0 28px rgba(101,230,255,.18)}
+.brand b{font-size:15px}.brand span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.nav{display:grid;gap:5px}.nav button{width:100%;border:1px solid transparent;background:transparent;color:#b7c8dd;text-align:left;padding:11px 12px;border-radius:10px;font-weight:700}
+.nav button:hover{background:#0e1d30;color:#fff}.nav button.active{background:#132944;border-color:#254968;color:#fff}
+.side-status{position:absolute;bottom:18px;left:18px;right:18px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#0b1727}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--green);box-shadow:0 0 9px var(--green);margin-right:7px}
+.main{flex:1;min-width:0}.topbar{height:70px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(7,16,29,.62);backdrop-filter:blur(12px);position:sticky;top:0;z-index:5}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:#6f89a7;font-weight:800}.top-title{font-size:18px;font-weight:850;margin-top:3px}
+.status{display:flex;gap:8px;align-items:center;color:#b7c8dd;font-size:12px}.status-pill{border:1px solid var(--line);background:#0d1b2c;padding:7px 10px;border-radius:999px}
+.content{max-width:1420px;margin:auto;padding:30px 34px 60px}
+.view{display:none}.view.active{display:block}
+.hero{border:1px solid #264967;border-radius:20px;padding:28px;background:linear-gradient(135deg,#0d1e32 0,#0b1728 58%,#10283e 100%);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-90px;top:-150px;background:rgba(101,230,255,.08);filter:blur(5px)}
+.hero h1{font-size:31px;line-height:1.1;margin:5px 0 10px;letter-spacing:-.03em}.hero p{max-width:760px;color:#9eb1c9;line-height:1.65;margin:0}
+.search-row{display:flex;gap:10px;margin-top:22px}.search-row input{flex:1}.input,.select,.textarea{width:100%;background:#091525;border:1px solid #294561;color:#edf5ff;border-radius:11px;padding:13px 14px;outline:none}.input:focus,.select:focus{border-color:#579bd2;box-shadow:0 0 0 3px rgba(114,183,255,.1)}
+.primary{border:0;background:linear-gradient(135deg,#7cc1ff,#65e6ff);color:#06101b;border-radius:11px;padding:0 19px;font-weight:900;min-width:105px}.primary:hover{filter:brightness(1.08)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:17px 0 28px}.kpi{background:#0b1727;border:1px solid var(--line);border-radius:13px;padding:13px 15px}.kpi .n{font-size:19px;font-weight:850}.kpi .l{font-size:11px;color:var(--muted);margin-top:2px}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:25px 0 12px}.section-head h2{margin:0;font-size:18px}.section-head p{margin:0;color:var(--muted);font-size:12px}
+.card{background:rgba(12,24,40,.92);border:1px solid var(--line);border-radius:16px;padding:18px;margin:12px 0}.card h2,.card h3{margin:0 0 8px}.muted{color:var(--muted)}.small{font-size:12px}
+.rec-hero{border:1px solid #315978;background:linear-gradient(135deg,#102a42,#0d1b2c);padding:22px;border-radius:18px;box-shadow:var(--shadow)}
+.rec-label{color:var(--cyan);font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:900}.rec-title{font-size:24px;font-weight:900;margin:7px 0 12px}.rec-answer{font-size:16px;line-height:1.65;color:#dce9f8}
+.action-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px;margin-top:12px}.action-card{background:#0b1829;border:1px solid var(--line);border-radius:15px;padding:16px}.action-card h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#91a8c2;margin:0 0 10px}
+.action-list{display:grid;gap:9px}.action{display:flex;gap:10px;line-height:1.45}.num{min-width:24px;height:24px;border-radius:8px;background:#15304a;color:#82c5ff;display:grid;place-items:center;font-weight:900;font-size:11px}
+.state-row{display:flex;flex-wrap:wrap;gap:8px}.state{border:1px solid #31506c;background:#0c1b2d;padding:8px 10px;border-radius:9px}.state b{color:#fff}.guard{border-color:#5a4930;background:#211b11;color:#e8d7b5}.guard .icon{color:var(--amber)}
+.evidence-list{display:grid;gap:8px}.ev{border:1px solid #1e3851;background:#0a1625;border-radius:11px;padding:12px}.ev-top{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.badge{display:inline-flex;border:1px solid #2c4964;border-radius:999px;padding:3px 7px;font-size:10px;color:#a9bed5}.badge.t1{border-color:#287458;color:#70e1b1;background:#0c241d}.badge.warn{border-color:#735a28;color:#f2cf7b;background:#251d0c}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.filter{border:1px solid var(--line);background:#0c1929;color:#aebfd3;border-radius:9px;padding:9px 11px;font-weight:750}.filter.active{background:#16314c;color:#fff;border-color:#356184}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}.data-table{width:100%;border-collapse:collapse}.data-table th,.data-table td{text-align:left;padding:10px;border-bottom:1px solid #1b3046;vertical-align:top}.data-table th{color:#91a9c2;font-size:11px;text-transform:uppercase}.data-table tr:last-child td{border-bottom:0}
+.error{border-color:#713d3c;background:#251517}.loading{color:#91a9c2;padding:15px}
+.empty{padding:28px;text-align:center;border:1px dashed #2a425b;border-radius:15px;color:#8399b2}
+@media(max-width:900px){.sidebar{width:76px}.brand div:last-child,.nav button span,.side-status{display:none}.brand{padding-left:8px}.nav button{text-align:center}.content{padding:22px 18px}.topbar{padding:0 18px}.kpis{grid-template-columns:repeat(2,1fr)}.action-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.sidebar{display:none}.topbar{height:auto;padding:14px 16px}.content{padding:16px 12px}.hero{padding:20px}.hero h1{font-size:25px}.search-row{flex-direction:column}.primary{height:45px}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><div class="logo">F</div><div><b>FGF Intelligence</b><span>Command Center</span></div></div>
+ <nav class="nav">
+  <button class="active" onclick="show('ask',this)">◈ <span>Ask FGF</span></button>
+  <button onclick="show('recommend',this)">◆ <span>Recommendations</span></button>
+  <button onclick="show('knowledge',this)">⌕ <span>Knowledge</span></button>
+  <button onclick="show('tools',this)">▦ <span>Builders & Calculators</span></button>
+  <button onclick="show('conflicts',this)">⚠ <span>Conflicts</span></button>
+ </nav>
+ <div class="side-status"><span class="dot"></span><b>Intelligence online</b><div class="muted small" style="margin-top:5px">Evidence-first · S2</div></div>
+</aside>
+<div class="main">
+<header class="topbar"><div><div class="eyebrow">Foundation: Galactic Frontier</div><div class="top-title" id="viewTitle">Ask FGF</div></div><div class="status"><span class="status-pill"><span class="dot"></span>Live knowledge</span><span class="status-pill" id="version">Loading…</span></div></header>
+<main class="content">
+<section id="ask" class="view active">
+ <div class="hero"><div class="eyebrow">Game intelligence</div><h1>Ask FGF anything.</h1><p>Get evidence-ranked mechanics, strategy and event decisions. The system separates confirmed facts, community knowledge and unresolved uncertainty.</p>
+  <div class="search-row"><input class="input" id="q" placeholder="e.g. Core 25 and 4 — what should I do?" onkeydown="if(event.key==='Enter')ask()"><button class="primary" onclick="ask()">Ask FGF</button></div>
+ </div>
+ <div id="kpi" class="kpis"></div><div id="answer"></div>
+</section>
+
+<section id="recommend" class="view">
+ <div class="hero"><div class="eyebrow">Decision engine</div><h1>Turn your game state into a plan.</h1><p>Recommendations prioritize what you should do next, then show the evidence behind that decision.</p>
+  <div class="search-row"><input class="input" id="rq" placeholder="e.g. Core 25 and 4 what should I do?"><select class="select" id="obj" style="max-width:210px"><option value="general">General</option><option value="progression">Fast progression</option><option value="f2p">F2P efficiency</option><option value="pvp">PvP / GvG</option><option value="pve">PvE / Events</option><option value="economy">Economy / Trade</option><option value="event">Event optimization</option></select><button class="primary" onclick="recommend()">Recommend</button></div>
+ </div>
+ <div id="recs"></div>
+</section>
+
+<section id="knowledge" class="view">
+ <div class="hero"><div class="eyebrow">Evidence graph</div><h1>Search the knowledge base.</h1><p>Inspect the claims behind FGF Intelligence. Historical and conflicting evidence remains traceable.</p><div class="search-row"><input class="input" id="kq" placeholder="Search Energy Core, Tribute, GvG…"><button class="primary" onclick="searchClaims()">Search</button></div></div>
+ <div id="knowledgeResults"></div>
+</section>
+
+<section id="tools" class="view">
+ <div class="section-head"><div><h2>Builders & Calculators</h2><p>Evidence-aware tools. Unknown mechanics stay unknown.</p></div></div>
+ <div class="action-grid">
+  <div class="card"><h3>Fleet Repair Planner</h3><select class="select" id="damageType"><option value="minor">Minor Damage</option><option value="major">Major Damage</option></select><input class="input" id="repairModules" type="number" min="0" value="0" placeholder="Repair Modules available"><label class="muted small"><input id="inCombat" type="checkbox"> Currently in combat</label><br><button class="filter active" onclick="repairTool()">Calculate path</button><div id="repairResult"></div></div>
+  <div class="card"><h3>Energy Core Progression</h3><div class="state-row"><input class="input" id="coreNow" type="number" min="1" value="1" placeholder="Current Core"><input class="input" id="coreTarget" type="number" min="1" value="30" placeholder="Target Core"></div><select class="select" id="coreSeason"><option>S1</option><option>S2</option><option>S3</option></select><button class="filter active" onclick="progressionTool()">Build plan</button><div id="progressionResult"></div></div>
+ </div>
+ <div class="card"><h3>Fleet Synergy Builder</h3><div class="state-row"><select class="select" id="fleetStyle"><option>Beam</option><option>Kinetic</option><option>Ion</option></select><select class="select" id="champ1"><option>Champion 1</option></select><select class="select" id="champ2"><option>Champion 2</option></select><select class="select" id="champ3"><option>Champion 3</option></select></div><button class="filter active" onclick="fleetTool()">Build lineup</button><div id="fleetResult"></div></div>
+</section>
+
+<section id="conflicts" class="view"><div class="section-head"><div><h2>Evidence Conflict Resolution</h2><p>Conflicts are preserved; only the current decision changes.</p></div></div><div id="conflictResults"></div></section>
+</main>
+</div>
+</div>
+
 <script>
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function card(c){return `<div class="card ${String(c['Evidence Tier']||'').startsWith('Tier 1')?'tier1':''}"><div class="claim">${esc(c.Claim)}</div><div class="small"><span class=pill>${esc(c.Category)}</span><span class=pill>${esc(c['Evidence Tier'])}</span><span class=pill>${esc(c.Confidence)}</span><span class=pill>${esc(c.Status)}</span></div><p class="source small">${esc(c.Source)} ${esc(c.Timestamp||'')}</p><p class="muted small">${esc(c.Notes)}</p></div>`}
-function show(id,btn){document.querySelectorAll('main>section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
-async function getJSON(url){
-  let lastErr;
-  for(let attempt=0;attempt<2;attempt++){
-    try{
-      const r=await fetch(url,{cache:'no-store'});
-      const raw=await r.text();
-      let a=null;
-      try{a=JSON.parse(raw)}catch(e){
-        lastErr=new Error(`Server returned a non-JSON response (HTTP ${r.status}). The Render service may be waking up; retrying…`);
-        if(attempt===0){await new Promise(x=>setTimeout(x,2500));continue}
-        throw lastErr;
-      }
-      if(!r.ok)throw new Error(a.error||a.detail||`Request failed (HTTP ${r.status})`);
-      return a;
-    }catch(e){
-      lastErr=e;
-      if(attempt===0){await new Promise(x=>setTimeout(x,2500));continue}
-    }
-  }
-  throw lastErr||new Error('Request failed');
-}
-async function init(){try{let h=await getJSON('/api/health');document.getElementById('kpi').innerHTML=`<div class=k>Claims <b>${h.claims}</b></div><div class=k>Tier 1 <b>${h.tier1}</b></div><div class=k>Sources <b>${h.sources}</b></div><div class=k>Changes <b>${h.changes}</b></div><div class=k>Open conflicts <b>${h.conflicts}</b></div><div class=k>Calendar <b>${h.event_calendar_aware?'ON':'OFF'}</b></div>`;loadConflicts()}catch(e){document.getElementById('kpi').innerHTML=`<div class="card error">Backend error: ${esc(e.message)}</div>`}}
-function renderAsk(a){let html='';if(a.operational){html+='<div class=card><h2>⚡ '+esc(a.operational.title||'Operational plan')+'</h2><p class=muted>'+esc(a.operational.basis||'')+'</p>'+(a.operational.rows?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+((a.operational.columns||[]).map(x=>'<th style="text-align:left;padding:9px;border:1px solid #29415f;background:#142943">'+esc(x)+'</th>').join(''))+'</tr></thead><tbody>'+a.operational.rows.map(r=>'<tr>'+r.map(v=>'<td style="padding:9px;border:1px solid #29415f;vertical-align:top">'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>':'')+(a.operational.guardrail?'<div class=muted style="margin-top:10px">'+esc(a.operational.guardrail)+'</div>':'')+'</div>';}if(a.answer){html+=`<div class="card"><b>FGF Intelligence</b><div class="answer">${esc(a.answer)}</div>${a.model?`<div class="muted small">${a.model==='evidence-fallback'?'Evidence-safe fallback':'Synthesized by '+esc(a.model)}</div>`:''}${a.uncertainty?`<p class="muted small">Uncertainty: ${esc(a.uncertainty)}</p>`:''}</div>`}else if(a.note){html+=`<div class="card"><b>Evidence-ranked response</b><p class="muted">${esc(a.note)}</p></div>`}if(a.critical_conflicts?.length)html+=a.critical_conflicts.map(x=>`<div class="card conflict warn"><b>⚠ ${esc(x.Topic)}</b><p>${esc(x['Tier-1 evidence'])}</p><p class=muted>${esc(x.Notes)}</p></div>`).join('');if(a.evidence?.length){html+=`<div class="card"><h3>Evidence used</h3>`+a.evidence.map((x,i)=>`<div class="evidence"><b>Evidence ${i+1}</b><p>${esc(x.Claim||x.claim||x.Notes||x.notes||((typeof x==='object')?JSON.stringify(x):x))}</p><p class="muted small">${esc(x.Source||x.source||'')} ${esc(x['Evidence Tier']||x.tier||'')} ${esc(x.Confidence||x.confidence||'')} ${esc(x.Status||x.status||'')}</p></div>`).join('')+'</div>'}else if(a.results?.length){html+=a.results.map(card).join('')}return html||'<div class="card">No answer was returned. Please try another question.</div>'}
-async function ask(){let q=document.getElementById('q').value.trim();if(!q)return;document.getElementById('answer').innerHTML='<div class="card">Thinking… retrieving evidence and synthesizing an answer.</div>';try{let a=await getJSON('/api/ask?q='+encodeURIComponent(q));document.getElementById('answer').innerHTML=renderAsk(a)}catch(e){document.getElementById('answer').innerHTML=`<div class="card error"><b>Unable to answer</b><p>${esc(e.message)}</p></div>`}}
-async function recommend(){let q=document.getElementById('rq').value.trim(),o=document.getElementById('obj').value;if(!q)return;document.getElementById('recs').innerHTML='<div class="card">Building recommendation…</div>';try{let a=await getJSON('/api/recommend?q='+encodeURIComponent(q)+'&objective='+o);document.getElementById('recs').innerHTML=`<div class=card><b>Decision support</b><p class=muted>${esc(a.disclaimer||'')}</p></div>`+(a.answer?`<div class="card"><div class=answer>${esc(a.answer)}</div></div>`:'')+(a.results?.length?a.results.map(card).join(''):'<div class="card">No recommendation results were returned.</div>')}catch(e){document.getElementById('recs').innerHTML=`<div class="card error"><b>Unable to build recommendation</b><p>${esc(e.message)}</p></div>`}}
-async function searchClaims(){let q=document.getElementById('kq').value.trim();if(!q)return;try{let a=await getJSON('/api/claims?q='+encodeURIComponent(q)+'&limit=30');document.getElementById('knowledgeResults').innerHTML=(a.results||[]).map(card).join('')||'<div class="card">No matching claims found.</div>'}catch(e){document.getElementById('knowledgeResults').innerHTML=`<div class="card error">${esc(e.message)}</div>`}}
-async function loadConflicts(){
- try{
-  let a=await getJSON('/api/conflicts');
-  const admin=await getJSON('/api/admin/status').catch(()=>({admin_configured:false}));
-  window.fgfAdminConfigured=!!admin.admin_configured;
-  let rows=a.results||[];
-  document.getElementById('conflictResults').innerHTML='<h2>Evidence Conflict Resolution Desk</h2><p class="muted">Review each preserved conflict. Choose a decision, add your evidence/notes, then submit. Historical claims are never deleted.</p>'+
-  rows.map(x=>`<div class="card conflict">
-    <h3>${esc(x['Conflict ID'])} — ${esc(x.Topic)}</h3>
-    <p><b>Existing claim:</b> ${esc(x['Existing / Tier-2 claim'])}</p>
-    <p><b>Higher-authority evidence:</b> ${esc(x['Tier-1 evidence'])}</p>
-    <p><b>Current decision:</b> ${esc(x.Decision||'Unresolved')}</p>
-    <p><b>Impact:</b> <span class="pill">${esc(x.Impact)}</span> <span class="pill">${esc(x.Status)}</span></p>
-    <p class="muted">${esc(x.Notes)}</p>
-    <label><b>Your decision</b></label>
-    <select id="decision-${esc(x['Conflict ID'])}">
-      <option value="keep_under_review">Keep under review</option>
-      <option value="confirm">Confirm higher-authority/current evidence</option>
-      <option value="reject">Reject current decision / retain opposing claim</option>
-      <option value="supersede">Supersede with new evidence</option>
-    </select>
-    <label><b>Evidence / source</b></label>
-    <textarea id="evidence-${esc(x['Conflict ID'])}" placeholder="Paste screenshot details, page reference, video timestamp, official source, or other evidence…" style="width:100%;min-height:90px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
-    <label><b>Reviewer notes</b></label>
-    <textarea id="notes-${esc(x['Conflict ID'])}" placeholder="Explain why you made this decision…" style="width:100%;min-height:70px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #314968;background:#0e1b2d;color:#fff"></textarea>
-    <button onclick="submitConflict('${esc(x['Conflict ID'])}')">Submit resolution</button>
-    <span id="status-${esc(x['Conflict ID'])}" class="muted small"></span>
-  </div>`).join('');
- }catch(e){document.getElementById('conflictResults').innerHTML=`<div class="card error">${esc(e.message)}</div>`}
-}
-function toolHTML(title,body){return '<div class="card"><b>'+esc(title)+'</b><p>'+esc(body)+'</p></div>'}
-async function loadChampionSelectors(){
- try{
-  const a=await getJSON('/api/champions');
-  ['champ1','champ2','champ3'].forEach((id,i)=>{
-   const s=document.getElementById(id);
-   s.innerHTML='<option value="">Select Champion '+(i+1)+'</option>'+(a.champions||[]).map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
-  });
- }catch(e){document.getElementById('fleetResult').innerHTML='<div class="card error">Unable to load standardized Champion list: '+esc(e.message)+'</div>'}
-}
-async function repairTool(){
- const d=document.getElementById('damageType').value,m=document.getElementById('repairModules').value,combat=document.getElementById('inCombat').checked;
- try{const a=await getJSON('/api/tools/repair?damage='+encodeURIComponent(d)+'&repair_modules='+encodeURIComponent(m)+'&in_combat='+combat);document.getElementById('repairResult').innerHTML=toolHTML('Repair path',a.action||a.error)+(a.evidence_basis||[]).map(x=>'<div class="evidence small">'+esc(x)+'</div>').join('')}catch(e){document.getElementById('repairResult').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}
-}
-async function fleetTool(){
- const style=document.getElementById('fleetStyle').value,cs=[document.getElementById('champ1').value,document.getElementById('champ2').value,document.getElementById('champ3').value];
- try{const u='/api/tools/fleet-builder?style='+encodeURIComponent(style)+'&champion='+cs.map(encodeURIComponent).join('&champion=');const a=await getJSON(u);document.getElementById('fleetResult').innerHTML=toolHTML('Synergy result',(a.synergy_bonus||a.error||'')+' Matched: '+(a.matched_champions??0)+'/3')+(a.note?'<p class="muted small">'+esc(a.note)+'</p>':'')+(a.champions||[]).map(x=>'<div class="evidence"><b>'+esc(x.champion)+'</b><div class="small">'+esc(x.evidence||'No direct style evidence found')+'</div></div>').join('')}catch(e){document.getElementById('fleetResult').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}
-}
-async function progressionTool(){
- const c=document.getElementById('coreNow').value,t=document.getElementById('coreTarget').value,se=document.getElementById('coreSeason').value;
- try{const a=await getJSON('/api/tools/progression?core_level='+encodeURIComponent(c)+'&target_level='+encodeURIComponent(t)+'&season='+se);document.getElementById('progressionResult').innerHTML=toolHTML('Progression plan','Core '+c+' → '+t)+(a.known_milestones||[]).map(x=>'<div class="evidence">'+esc(x)+'</div>').join('')+'<p class="muted small">'+esc(a.cost_note||'')+'</p>'+(a.evidence||[]).slice(0,8).map(x=>'<div class="evidence small">'+esc(x.claim)+' <span class="pill">'+esc(x.tier)+'</span></div>').join('')}catch(e){document.getElementById('progressionResult').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}
-}
-
-async function submitConflict(cid){
- const status=document.getElementById('status-'+cid);
- status.textContent='Saving…';
- if(!window.fgfAdminConfigured){status.textContent='✕ Admin endpoint is disabled until server auth is configured.';status.style.color='#ff5f5f';return}
- let token=sessionStorage.getItem('fgf_admin_token');
- if(!token){token=prompt('Enter FGF admin token');if(!token)return;sessionStorage.setItem('fgf_admin_token',token)}
- const payload={conflict_id:cid,decision:document.getElementById('decision-'+cid).value,evidence:document.getElementById('evidence-'+cid).value,notes:document.getElementById('notes-'+cid).value,reviewed_at:new Date().toISOString()};
- try{
-  const r=await fetch('/api/conflicts/review',{method:'POST',headers:{'Content-Type':'application/json','X-FGF-Admin-Token':token},body:JSON.stringify(payload)});
-  const a=await r.json();
-  if(!r.ok||!a.ok)throw new Error(a.error||'Review submission failed');
-  status.textContent='✓ Resolution captured';
-  status.style.color='#4ecb91';
- }catch(e){status.textContent='✕ '+e.message;status.style.color='#ff5f5f'}
-}
-init();loadChampionSelectors();document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});</script></main></body></html>
+const titles={ask:'Ask FGF',recommend:'Recommendations',knowledge:'Knowledge',tools:'Builders & Calculators',conflicts:'Conflicts'};
+function show(id,btn){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.getElementById('viewTitle').textContent=titles[id]}
+async function getJSON(url){let last;for(let i=0;i<2;i++){try{const r=await fetch(url,{cache:'no-store'}),raw=await r.text();let a;try{a=JSON.parse(raw)}catch(e){throw new Error('The intelligence service returned an invalid response.')}if(!r.ok)throw new Error(a.error||a.detail||'Request failed');return a}catch(e){last=e;if(i===0)await new Promise(x=>setTimeout(x,1200))}}throw last}
+function badge(t,cls=''){return '<span class="badge '+cls+'">'+esc(t)+'</span>'}
+function card(c){let tier=String(c['Evidence Tier']||'');return '<div class="card"><div style="font-size:15px;line-height:1.5">'+esc(c.Claim)+'</div><div style="margin-top:9px">'+badge(c.Category||'Claim')+badge(tier,tier.startsWith('Tier 1')?'t1':'')+badge(c.Confidence||'')+badge(c.Status||'')+'</div><div class="muted small" style="margin-top:8px">'+esc(c.Source||'')+'</div></div>'}
+function renderAnswer(a){let h='';if(a.operational)h+='<div class="card"><div class="rec-label">Operational plan</div><div class="rec-title">'+esc(a.operational.title||'Plan')+'</div><div class="table-wrap"><table class="data-table"><tbody>'+((a.operational.rows||[]).map(r=>'<tr>'+r.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join(''))+'</tbody></table></div></div>';if(a.answer)h+='<div class="card"><div class="rec-label">Answer</div><div class="rec-answer" style="white-space:pre-wrap">'+esc(a.answer)+'</div></div>';if(a.evidence?.length)h+='<div class="card"><div class="section-head"><h2>Evidence</h2><p>'+a.evidence.length+' records</p></div><div class="evidence-list">'+a.evidence.map((x,i)=>'<div class="ev"><div class="ev-top">'+badge('E'+(i+1),'t1')+badge(x["Evidence Tier"]||x.tier||'')+badge(x.Confidence||x.confidence||'')+'</div><div style="margin-top:6px">'+esc(x.Claim||x.claim||x.Notes||x.notes||'')+'</div></div>').join('')+'</div></div>';return h||'<div class="empty">No answer returned.</div>'}
+async function ask(){const q=document.getElementById('q').value.trim();if(!q)return;document.getElementById('answer').innerHTML='<div class="card loading">Analyzing question → retrieving evidence → validating answer…</div>';try{document.getElementById('answer').innerHTML=renderAnswer(await getJSON('/api/ask?q='+encodeURIComponent(q)))}catch(e){document.getElementById('answer').innerHTML='<div class="card error"><b>Unable to answer</b><div class="muted" style="margin-top:5px">'+esc(e.message)+'</div></div>'}}
+function parseRecommendation(a){const text=String(a.answer||'');const lines=text.split('\n').map(x=>x.trim()).filter(Boolean);const lead=lines.shift()||'Recommendation generated from current evidence.';const bullets=lines.filter(x=>x.startsWith('•')).map(x=>x.replace(/^•\s*/,''));const guard=bullets.findIndex(x=>/exact next|detected “4”|will not invent/i.test(x));const actions=guard<0?bullets:bullets.slice(0,guard);const guards=guard<0?[]:bullets.slice(guard);return {lead,actions,guards}}
+function renderRecommendation(a){if(!a||!a.answer)return '<div class="empty">No decision could be generated. Try including your current Core level, event, resources or objective.</div>';const p=parseRecommendation(a);let state=a.player_state||{};let h='<div class="rec-hero"><div class="rec-label">Recommended next move</div><div class="rec-title">'+(a.recommendation_type==='core_progression'?'Keep Core progression moving':'Decision support')+'</div><div class="rec-answer">'+esc(p.lead)+'</div><div class="state-row" style="margin-top:14px">'+(state.energy_core_level?'<span class="state">Energy Core <b>'+esc(state.energy_core_level)+'</b></span>':'')+'<span class="state">'+esc(a.model||'Evidence-gated decision engine')+'</span></div></div>';h+='<div class="action-grid"><div class="action-card"><h3>What to do</h3><div class="action-list">'+(p.actions.length?p.actions.map((x,i)=>'<div class="action"><span class="num">'+(i+1)+'</span><span>'+esc(x)+'</span></div>').join(''):'<div class="muted">Follow the live in-game prerequisites for the next upgrade.</div>')+'</div></div><div class="action-card"><h3>Decision guardrails</h3><div class="action-list">'+(p.guards.length?p.guards.map(x=>'<div class="action"><span class="num">!</span><span>'+esc(x)+'</span></div>').join(''):'<div class="action"><span class="num">✓</span><span>No additional ambiguity detected.</span></div>')+'</div></div></div>';if(a.uncertainty)h+='<div class="card guard"><b><span class="icon">⚠</span> Evidence boundary</b><div style="margin-top:5px">'+esc(a.uncertainty)+'</div></div>';const ev=a.evidence||[];if(ev.length)h+='<div class="card"><div class="section-head"><h2>Why this recommendation?</h2><p>'+ev.length+' evidence records</p></div><div class="evidence-list">'+ev.slice(0,6).map((x,i)=>'<div class="ev"><div class="ev-top">'+badge('E'+(i+1),'t1')+badge(x["Evidence Tier"]||'')+badge(x.Confidence||'')+'</div><div style="margin-top:6px">'+esc(x.Claim||'')+'</div></div>').join('')+'</div></div>';return h}
+async function recommend(){const q=document.getElementById('rq').value.trim(),o=document.getElementById('obj').value;if(!q)return;document.getElementById('recs').innerHTML='<div class="card loading">Reading your player state → ranking evidence → building decision…</div>';try{document.getElementById('recs').innerHTML=renderRecommendation(await getJSON('/api/recommend?q='+encodeURIComponent(q)+'&objective='+o))}catch(e){document.getElementById('recs').innerHTML='<div class="card error"><b>Unable to build recommendation</b><div class="muted">'+esc(e.message)+'</div></div>'}}
+async function searchClaims(){const q=document.getElementById('kq').value.trim();if(!q)return;document.getElementById('knowledgeResults').innerHTML='<div class="card loading">Searching evidence graph…</div>';try{const a=await getJSON('/api/claims?q='+encodeURIComponent(q)+'&limit=30');document.getElementById('knowledgeResults').innerHTML=(a.results||[]).map(card).join('')||'<div class="empty">No matching claims.</div>'}catch(e){document.getElementById('knowledgeResults').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}}
+async function init(){try{const h=await getJSON('/api/health');document.getElementById('version').textContent=h.version||'S2 Intelligence';document.getElementById('kpi').innerHTML=[['Claims',h.claims],['Tier 1',h.tier1],['Sources',h.sources],['Changes',h.changes],['Conflicts',h.conflicts]].map(x=>'<div class="kpi"><div class="n">'+esc(x[1])+'</div><div class="l">'+esc(x[0])+'</div></div>').join('')}catch(e){document.getElementById('kpi').innerHTML='<div class="card error">Backend unavailable</div>'}loadChampionSelectors();loadConflicts()}
+async function loadChampionSelectors(){try{const a=await getJSON('/api/champions');['champ1','champ2','champ3'].forEach((id,i)=>document.getElementById(id).innerHTML='<option value="">Champion '+(i+1)+'</option>'+(a.champions||[]).map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join(''))}catch(e){}}
+function resultBox(id,title,body){document.getElementById(id).innerHTML='<div class="card"><b>'+esc(title)+'</b><div style="margin-top:7px;line-height:1.5">'+esc(body)+'</div></div>'}
+async function repairTool(){try{const a=await getJSON('/api/tools/repair?damage='+encodeURIComponent(document.getElementById('damageType').value)+'&repair_modules='+document.getElementById('repairModules').value+'&in_combat='+document.getElementById('inCombat').checked);resultBox('repairResult','Repair path',a.action||a.error||'No path returned')}catch(e){resultBox('repairResult','Error',e.message)}}
+async function fleetTool(){const c=['champ1','champ2','champ3'].map(x=>document.getElementById(x).value);try{const a=await getJSON('/api/tools/fleet-builder?style='+encodeURIComponent(document.getElementById('fleetStyle').value)+'&champion='+c.map(encodeURIComponent).join('&champion='));resultBox('fleetResult','Synergy result',(a.synergy_bonus||a.error||'')+' Matched '+(a.matched_champions??0)+'/3')}catch(e){resultBox('fleetResult','Error',e.message)}}
+async function progressionTool(){try{const a=await getJSON('/api/tools/progression?core_level='+document.getElementById('coreNow').value+'&target_level='+document.getElementById('coreTarget').value+'&season='+document.getElementById('coreSeason').value);resultBox('progressionResult','Progression plan',(a.known_milestones||[]).join(' · ')||a.cost_note||'No established milestones returned')}catch(e){resultBox('progressionResult','Error',e.message)}}
+async function loadConflicts(){try{const a=await getJSON('/api/conflicts');const rows=a.results||[];document.getElementById('conflictResults').innerHTML=rows.map(x=>'<div class="card"><div class="rec-label">'+esc(x["Conflict ID"])+'</div><h3>'+esc(x.Topic)+'</h3><p><b>Higher-authority evidence:</b> '+esc(x["Tier-1 evidence"])+'</p><p class="muted">'+esc(x.Notes)+'</p><div class="state-row">'+badge(x.Decision||'Unresolved',x.Decision?'':'warn')+badge(x.Impact||'')+badge(x.Status||'')+'</div></div>').join('')||'<div class="empty">No active conflicts.</div>'}catch(e){document.getElementById('conflictResults').innerHTML='<div class="card error">'+esc(e.message)+'</div>'}}
+init();
+</script>
+</body>
+</html>
