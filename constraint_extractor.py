@@ -34,6 +34,7 @@ class ExtractedConstraints:
     role: str | None = None
     explicit_time_limit: str | None = None
     resource_limit: str | None = None
+    fleet_tier: str | None = None
     confidence: str = "low"
     unresolved_phrases: Tuple[str, ...] = ()
 
@@ -98,12 +99,19 @@ def extract_constraints(question: str) -> ExtractedConstraints:
     rm = re.search(r"(?:under|within|limit(?:ed)? to|max(?:imum)?(?: of)?)s*([0-9,.]+)s*(credits?|points?|resources?|m|k)?", q)
     resource_limit = rm.group(0) if rm else None
 
+    # FGF player-state terminology: T1–T5 are fleet progression tiers in this project.
+    # Treat an explicit T1..T5 token as player state; never silently discard it.
+    fleet_tier = None
+    tm_tier = re.search(r"(?<![a-z0-9])(?:fleet\\s*(?:tier|level)?\\s*)?t([1-5])(?![a-z0-9])", q, re.I)
+    if tm_tier:
+        fleet_tier = "T" + tm_tier.group(1)
+
     if ownership_context and not owned:
         unresolved.append("Ownership was stated, but no recognized Champion name was found.")
     if _has(q, (r"best", r"optimal")) and not (owned or unavailable):
         unresolved.append("No player roster constraint was explicitly supplied.")
 
-    confidence = "high" if (owned or unavailable or requested_count or requested_positions or optimization_goal or role) else "low"
+    confidence = "high" if (owned or unavailable or requested_count or requested_positions or optimization_goal or role or fleet_tier) else "low"
 
     return ExtractedConstraints(
         owned_entities=tuple(owned),
@@ -114,6 +122,7 @@ def extract_constraints(question: str) -> ExtractedConstraints:
         role=role,
         explicit_time_limit=explicit_time_limit,
         resource_limit=resource_limit,
+        fleet_tier=fleet_tier,
         confidence=confidence,
         unresolved_phrases=tuple(unresolved),
     )
