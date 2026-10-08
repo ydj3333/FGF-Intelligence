@@ -91019,6 +91019,186 @@
           "season_scope": "S2 / 1.1.36"
         }
       }
+    },
+    {
+      "event": "Top 100 Galactic Traders",
+      "requires_validation": true,
+      "derived_from_user_observation": true,
+      "Claim": "For Tribute activity, the strategic objective is to maximize reward progress per AP and unit time while avoiding unnecessary waiting for a full three-ship rally when a smaller safe force produces the same AP/reward outcome.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "Season 2",
+      "Evidence Type": "strategy",
+      "Evidence Tier": "Tier 3 — Player/Community",
+      "Confidence": "Medium",
+      "Status": "Under Review",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "strategy",
+      "claim_key": "event.t100.tribute.resource_efficiency",
+      "supabase_id": "712c73e8-aa67-431a-aa30-14f146835068",
+      "metadata": {
+        "event": "Top 100 Galactic Traders",
+        "requires_validation": true,
+        "derived_from_user_observation": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "Under Review",
+          "tier": 3
+        },
+        "temporal": {
+          "season_scope": "Season 2"
+        }
+      }
+    },
+    {
+      "event": "Top 100 Galactic Traders",
+      "requires_validation": true,
+      "Claim": "Community/player guidance recommends sharing newly spawned Sacred Tribute Vessels with the guild and joining existing rallies with the best available ship.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "Season 2",
+      "Evidence Type": "strategy",
+      "Evidence Tier": "Tier 3 — Player/Community",
+      "Confidence": "Medium",
+      "Status": "Under Review",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "strategy",
+      "claim_key": "event.t100.tribute.guild_share_rally",
+      "supabase_id": "79fd1b90-cf79-488f-a015-6f2d455526f7",
+      "metadata": {
+        "event": "Top 100 Galactic Traders",
+        "requires_validation": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "Under Review",
+          "tier": 3
+        },
+        "temporal": {
+          "season_scope": "Season 2"
+        }
+      }
+    },
+    {
+      "event": "Top 100 Galactic Traders",
+      "requires_validation": true,
+      "Claim": "Player/community observation reports that some players can clear certain low-level Tribute Vessels solo or with fewer than three participants in under one minute while reporting the same AP cost and rewards; this is a conditional efficiency tactic, not a universal rule.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "Season 2",
+      "Evidence Type": "strategy",
+      "Evidence Tier": "Tier 3 — Player/Community",
+      "Confidence": "Medium",
+      "Status": "Under Review",
+      "Verification Status": "Needs Review",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "strategy",
+      "claim_key": "event.t100.tribute.low_level_solo_efficiency",
+      "supabase_id": "7ae56120-4c7a-4fcb-97a5-3ed372c3fa9f",
+      "metadata": {
+        "event": "Top 100 Galactic Traders",
+        "requires_validation": true,
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "Under Review",
+          "tier": 3
+        },
+        "temporal": {
+          "season_scope": "Season 2"
+        }
+      }
+    },
+    {
+      "event": "Top 100 Galactic Traders",
+      "source": "user-provided in-game screenshot",
+      "Claim": "The supplied Anti-Plunder Operation UI states that defeating Tribute Vessels and cutting off Ascendancy supply lines earns rare rewards such as Flagship Components and shows a personal-points progression ladder.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "Season 2",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "Tier 1 — In-game UI",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "event.t100.anti_plunder.tribute_rewards",
+      "supabase_id": "8f27c980-dfb6-4b20-8cd0-63981ce5d2ba",
+      "metadata": {
+        "event": "Top 100 Galactic Traders",
+        "source": "user-provided in-game screenshot",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Season 2"
+        }
+      }
+    },
+    {
+      "event": "Top 100 Galactic Traders",
+      "source": "user-provided in-game screenshot",
+      "Claim": "In the supplied Sacred Tribute Vessel UI, the discoverer receives Scout Rewards upon victory regardless of whether they participated in the attack; the displayed reward bundle includes Prismatic Core x24, Ruins Map x6, and three Level Chests each for Galactic Coin, Metal, and Water.",
+      "Category": "Events",
+      "Source": "",
+      "Season/Version": "Season 2",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "Tier 1 — In-game UI",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "event.t100.tribute.scout_rewards_discoverer",
+      "supabase_id": "a909544f-0c24-457d-ba9d-d3c1c1a43bf9",
+      "metadata": {
+        "event": "Top 100 Galactic Traders",
+        "source": "user-provided in-game screenshot",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Season 2"
+        }
+      }
+    },
+    {
+      "source": "user-provided in-game screenshot",
+      "Claim": "Prismatic Cores can be used to Empower Legendary Components; the supplied UI shows the Empower action increasing displayed Power, HP, DEF and Command Points.",
+      "Category": "Flagships",
+      "Source": "",
+      "Season/Version": "Season 2",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "Tier 1 — In-game UI",
+      "Confidence": "High",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "event.t100.prismatic_core.empower_value",
+      "supabase_id": "edd3aebb-d911-4499-b268-1f20e1d03ca9",
+      "metadata": {
+        "source": "user-provided in-game screenshot",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Season 2"
+        }
+      }
     }
   ],
   "conflicts": [
@@ -91082,9 +91262,9 @@
     "claims": 1083,
     "sources": 48,
     "change_log_entries": 45,
-    "tier1_claims": 483,
+    "tier1_claims": 486,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1580
+    "total_claims": 1586
   }
 }
