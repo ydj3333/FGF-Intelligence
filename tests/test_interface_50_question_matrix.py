@@ -37,9 +37,19 @@ class Interface50QuestionMatrix(unittest.TestCase):
         url = self.base + path
         if params:
             url += "?" + urlencode(params, doseq=True)
-        with urlopen(url, timeout=15) as response:
-            self.assertEqual(response.status, 200, path)
-            return json.loads(response.read().decode("utf-8"))
+        try:
+            with urlopen(url, timeout=30) as response:
+                self.assertEqual(response.status, 200, path)
+                return json.loads(response.read().decode("utf-8"))
+        except Exception as exc:
+            # Preserve JSON diagnostics from API error boundaries instead of
+            # reporting only a generic HTTPError/connection reset in CI.
+            body = ""
+            try:
+                body = exc.read().decode("utf-8")
+            except Exception:
+                pass
+            self.fail(f"{path} request failed: {type(exc).__name__}: {body or exc}")
 
     def test_original_50_questions_through_player_ask_route(self):
         failures = []
