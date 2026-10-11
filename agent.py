@@ -1573,9 +1573,9 @@ try:
                 "prerequisites and verify each in-game cost before committing resources."
             )
             current_uncertainty = str(merged.get("uncertainty") or "").strip()
-            if not any(term in (str(merged.get("answer") or "") + " " + current_uncertainty).lower()
-                       for term in ("does not establish", "not established", "unknown", "insufficient evidence", "uncertain")):
-                merged["answer"] = (str(merged.get("answer") or "").rstrip() + "\\n\\n" + boundary).strip()
+            current_answer = str(merged.get("answer") or "").rstrip()
+            if "not invent totals" not in (current_answer + " " + current_uncertainty).lower():
+                merged["answer"] = (current_answer + "\n\n" + boundary).strip()
             merged["uncertainty"] = current_uncertainty or boundary
 
         # v6.4: transform operational questions into a player-facing structure
