@@ -322,12 +322,12 @@ class QuestionParser:
   # different relation from combat-counter language; the distinction applies to
   # any event/guild/battlefield question, not a single named event.
   opponent_intent = bool(re.search(
-      r"\b(?:who|whom|which)\\b.{0,55}\\b(?:opponent|opponents|enemy|enemies|fight|fighting|attack|attacking)\\b|"
-      r"\b(?:opponent|opponents|enemy|enemies)\\b|"
-      r"\bwho\\s+(?:do|does|are)\\s+(?:we|i)\\s+(?:fight|attack)\\b",
+      r"\b(?:who|whom|which)\b.{0,55}\b(?:opponent|opponents|enemy|enemies|fight|fighting|attack|attacking)\b|"
+      r"\b(?:opponent|opponents|enemy|enemies)\b|"
+      r"\bwho\s+(?:do|does|are)\s+(?:we|i)\s+(?:fight|attack)\b",
       ql
   ))
-  if opponent_intent and re.search(r"\b(?:event|duel|guild|league|battlefield|showdown|war)\\b", ql):
+  if opponent_intent and re.search(r"\b(?:event|duel|guild|league|battlefield|showdown|war)\b", ql):
    prop="opponent"
   elif opponent_intent and prop=="counter":
    prop="opponent"
@@ -380,7 +380,7 @@ class KnowledgeQueryEngine:
    terms=contract[0]
    return 6.0 if any(term in blob for term in terms) else -7.0
   if p.question_type=="numeric":
-   return 2.5 if re.search(r"\b\\d+(?:\.\\d+)?%?\\b",blob) else -2.5
+   return 2.5 if re.search(r"\b\d+(?:\.\d+)?%?\b",blob) else -2.5
   return 0.0
 
  def rank(self,p,limit=12):
