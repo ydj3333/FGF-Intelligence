@@ -14,6 +14,7 @@ from operational_intelligence import build_operational_output
 from youtube_evidence_provider import YouTubeEvidenceProvider
 from knowledge_query_engine import QuestionParser
 from constraint_extractor import extract_constraints
+from visual_answers import build_visual_answer
 
 ROOT=Path(__file__).parent
 ROOT=Path(__file__).parent
@@ -22,6 +23,37 @@ LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixz
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v7.1.2-fleet-state'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
+
+# Stable, source-linked guide facts are loaded into the same corpus used by the
+# production query engine. Supabase-only additions are not automatically visible
+# to this local corpus, so this explicit bridge prevents curated guides from
+# existing only in storage while Ask FGF cannot retrieve them.
+try:
+    _guide_data=json.loads((ROOT/'data'/'verified_guides.json').read_text(encoding='utf-8'))
+    _known_claims={re.sub(r'\\W+',' ',str(x.get('Claim','')).lower()).strip() for x in CLAIMS}
+    for _guide in _guide_data.get('guides',[]):
+        for _claim_text in _guide.get('claims',[]):
+            _key=re.sub(r'\\W+',' ',str(_claim_text).lower()).strip()
+            if not _key or _key in _known_claims:
+                continue
+            CLAIMS.append({
+                'Claim': _claim_text,
+                'Category': _guide.get('title','Curated Guide'),
+                'Claim Type': 'Requirement',
+                'Season/Version': _guide.get('source_published',''),
+                'Evidence Tier': 'Tier 2 — Official FGF Wiki',
+                'Confidence': 'High',
+                'Status': 'confirmed',
+                'Canonical': True,
+                'Source': _guide.get('source',''),
+                'Notes': _guide.get('source_title','') + '. ' + _guide.get('caveat',''),
+                'Guide Key': _guide.get('key',''),
+            })
+            _known_claims.add(_key)
+except (OSError, ValueError, TypeError):
+    # Visuals and the answer engine must continue safely if optional guide data
+    # is missing or malformed; no unsourced fallback facts are created.
+    pass
 CANONICAL_VOCABULARY_AUDIT=QuestionParser(CLAIMS).vocabulary_audit()
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -1558,6 +1590,11 @@ try:
         except Exception as exc:
             merged['operational'] = None
             merged['operational_warning'] = 'Operational renderer unavailable: ' + type(exc).__name__
+        try:
+            merged['visual'] = build_visual_answer(question, merged)
+        except Exception as exc:
+            merged['visual'] = None
+            merged['visual_warning'] = 'Visual answer renderer unavailable: ' + type(exc).__name__
         return merged
 
 except Exception:
