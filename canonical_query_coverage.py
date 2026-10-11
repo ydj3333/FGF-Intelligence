@@ -286,6 +286,9 @@ def _event_supported(entity: str, claims: List[Dict[str, Any]]) -> bool:
 def build_query_cases(claims: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     cases: List[Dict[str, Any]] = []
     seen = set()
+    # Reuse the parser for numeric query validation; rebuilding its vocabulary
+    # for every numeric case made the benchmark scale poorly as the corpus grew.
+    numeric_parser = QuestionParser(claims)
 
     for entity, supporting in canonical_entities(claims):
         queries = [("factual", f"what is {entity}")]
@@ -320,7 +323,7 @@ def build_query_cases(claims: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                 # ("Shadowfront"). Record that separately so numeric coverage
                 # tests both canonical concepts without forcing an incorrect
                 # parser identity.
-                case["expected_entity"] = QuestionParser(claims).parse(query).entity
+                case["expected_entity"] = numeric_parser.parse(query).entity
             cases.append(case)
     return cases
 
@@ -355,7 +358,7 @@ def run_coverage_benchmark(
         if max_failures is not None and len(failures) >= max_failures:
             break
 
-    entity_count = len(canonical_entities(claims))
+    # Every generated entity contributes a factual case, so this avoids a second full corpus indexing pass.\n    entity_count = len({case["entity"] for case in cases})
     return {
         "entity_count": entity_count,
         "case_count": len(cases),
