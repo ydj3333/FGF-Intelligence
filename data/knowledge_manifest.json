@@ -2,20 +2,20 @@
   "schema_version": 1,
   "source_of_truth": "supabase.public.claims",
   "supabase_project": "qdoixzfkkmvzjfkhzups",
-  "claim_count": 1586,
-  "tier1_count": 486,
+  "claim_count": 1593,
+  "tier1_count": 492,
   "lifecycle_counts": {
     "discovered": 0,
-    "candidate": 605,
+    "candidate": 606,
     "validated": 0,
     "verified": 0,
-    "current": 976,
+    "current": 982,
     "superseded": 2,
     "archived": 0,
     "rejected": 0,
     "conflicting": 3
   },
-  "checksum": "75988a55bb2065930a42a551b28ad646cd403419bd0e67a5fb19d9a1894da345",
-  "generated": "2026-10-08",
-  "synced_at_utc": "2026-10-08T16:57:30.538483+00:00"
+  "checksum": "17ae2e772b9d8bec7efb9e47e1f5ca1d9da2b419dd62b3e108544c0b74e8b431",
+  "generated": "2026-10-11",
+  "synced_at_utc": "2026-10-11T13:04:16.049770+00:00"
 }

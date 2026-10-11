@@ -1,6 +1,6 @@
 {
   "name": "FGF Knowledge Engine — S2 Evidence Pack v2",
-  "generated": "2026-10-08",
+  "generated": "2026-10-11",
   "authority_order": [
     "Tier 1 — Ultimate/Official",
     "Tier 2 — Tested Community",
@@ -91199,6 +91199,218 @@
           "season_scope": "Season 2"
         }
       }
+    },
+    {
+      "topic": "server_migration",
+      "source_url": "https://fgfwiki.com/en/news/migration",
+      "Claim": "Server migration requires 10 Migration Permits.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "Interstellar Migration / 2026 guide",
+      "Evidence Type": "requirement",
+      "Evidence Tier": "Tier 1 — Ultimate/Official",
+      "Confidence": "high",
+      "Status": "Confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "requirement",
+      "claim_key": "migration-permit-cost-10",
+      "supabase_id": "c8d3fc85-c22c-4567-bd81-929e23785af4",
+      "metadata": {
+        "topic": "server_migration",
+        "source_url": "https://fgfwiki.com/en/news/migration",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Interstellar Migration / 2026 guide"
+        }
+      }
+    },
+    {
+      "topic": "server_migration",
+      "source_url": "https://fgfwiki.com/en/news/migration",
+      "Claim": "A player must not have an existing character on the target server to migrate there.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "Interstellar Migration / 2026 guide",
+      "Evidence Type": "eligibility",
+      "Evidence Tier": "Tier 1 — Ultimate/Official",
+      "Confidence": "high",
+      "Status": "Confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "eligibility",
+      "claim_key": "migration-no-existing-target-character",
+      "supabase_id": "b976108b-5ab6-4d42-9fc3-59ccb4bdb47e",
+      "metadata": {
+        "topic": "server_migration",
+        "source_url": "https://fgfwiki.com/en/news/migration",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Interstellar Migration / 2026 guide"
+        }
+      }
+    },
+    {
+      "topic": "server_migration",
+      "source_url": "https://fgfwiki.com/en/news/migration",
+      "Claim": "Before migration registration, flagships must be docked/idle, the player must leave their current guild, and Trader Princes or other official title holders must step down as required.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "Interstellar Migration / 2026 guide",
+      "Evidence Type": "requirement",
+      "Evidence Tier": "Tier 1 — Ultimate/Official",
+      "Confidence": "high",
+      "Status": "Confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "requirement",
+      "claim_key": "migration-preconditions-flagship-guild-titles",
+      "supabase_id": "147180e9-8b54-4403-9b38-6786b7b74c82",
+      "metadata": {
+        "topic": "server_migration",
+        "source_url": "https://fgfwiki.com/en/news/migration",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Interstellar Migration / 2026 guide"
+        }
+      }
+    },
+    {
+      "topic": "server_migration",
+      "source_url": "https://fgfwiki.com/en/news/migration",
+      "Claim": "Players must submit a migration application before migration day and actively complete the transfer on the designated migration day.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "Interstellar Migration / 2026 guide",
+      "Evidence Type": "procedure",
+      "Evidence Tier": "Tier 1 — Ultimate/Official",
+      "Confidence": "high",
+      "Status": "Confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "procedure",
+      "claim_key": "migration-apply-before-day-confirm-transfer",
+      "supabase_id": "4aeeea2c-708b-4121-a1bc-74ae4acf45b8",
+      "metadata": {
+        "topic": "server_migration",
+        "source_url": "https://fgfwiki.com/en/news/migration",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Interstellar Migration / 2026 guide"
+        }
+      }
+    },
+    {
+      "topic": "server_migration",
+      "source_url": "https://fgfwiki.com/en/news/migration",
+      "Claim": "Migration eligibility and destination slots can vary by migration group, destination server strength, and player historical peak power.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "Interstellar Migration / 2026 guide",
+      "Evidence Type": "eligibility",
+      "Evidence Tier": "Tier 1 — Ultimate/Official",
+      "Confidence": "high",
+      "Status": "Confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "eligibility",
+      "claim_key": "migration-eligibility-slots-variable",
+      "supabase_id": "1e3c870c-ab0a-41a5-9cbd-20d977808467",
+      "metadata": {
+        "topic": "server_migration",
+        "source_url": "https://fgfwiki.com/en/news/migration",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Interstellar Migration / 2026 guide"
+        }
+      }
+    },
+    {
+      "topic": "server_migration",
+      "source_url": "https://fgfwiki.com/en/news/migration",
+      "Claim": "After migration, Home Port relocates to a random starting region, server and Arena rankings are cleared, in-game mail is permanently deleted, urgent/regular trade orders are paused while attempts are preserved, and group/private messages remain.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "Interstellar Migration / 2026 guide",
+      "Evidence Type": "consequence",
+      "Evidence Tier": "Tier 1 — Ultimate/Official",
+      "Confidence": "high",
+      "Status": "Confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "consequence",
+      "claim_key": "migration-post-transfer-effects",
+      "supabase_id": "e75834bb-5489-4dfb-90e3-6e605c43025b",
+      "metadata": {
+        "topic": "server_migration",
+        "source_url": "https://fgfwiki.com/en/news/migration",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "Confirmed",
+          "tier": 1
+        },
+        "temporal": {
+          "season_scope": "Interstellar Migration / 2026 guide"
+        }
+      }
+    },
+    {
+      "topic": "server_migration",
+      "warning": "Not verified in current official guide; do not answer as confirmed",
+      "source_url": "user-provided infographic",
+      "Claim": "A minimum 25-day wait since the last successful migration is required.",
+      "Category": "Progression",
+      "Source": "",
+      "Season/Version": "Interstellar Migration / 2026 guide",
+      "Evidence Type": "eligibility",
+      "Evidence Tier": "Unverified",
+      "Confidence": "low",
+      "Status": "Needs verification",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "eligibility",
+      "claim_key": "migration-25-day-cooldown-unverified",
+      "supabase_id": "e7569c9e-aa12-4969-9031-fc2428ded0d0",
+      "metadata": {
+        "topic": "server_migration",
+        "warning": "Not verified in current official guide; do not answer as confirmed",
+        "source_url": "user-provided infographic",
+        "lifecycle": {
+          "state": "candidate",
+          "legacy_status": "Needs verification",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "Interstellar Migration / 2026 guide"
+        }
+      }
     }
   ],
   "conflicts": [
@@ -91262,9 +91474,9 @@
     "claims": 1083,
     "sources": 48,
     "change_log_entries": 45,
-    "tier1_claims": 486,
+    "tier1_claims": 492,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1586
+    "total_claims": 1593
   }
 }
