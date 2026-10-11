@@ -358,7 +358,8 @@ def run_coverage_benchmark(
         if max_failures is not None and len(failures) >= max_failures:
             break
 
-    # Every generated entity contributes a factual case, so this avoids a second full corpus indexing pass.\n    entity_count = len({case["entity"] for case in cases})
+    # Every generated entity contributes a factual case, so this avoids a second full corpus indexing pass.
+    entity_count = len({case["entity"] for case in cases})
     return {
         "entity_count": entity_count,
         "case_count": len(cases),
