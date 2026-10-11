@@ -62,9 +62,7 @@ def build_visual_answer(question: str, answer: Dict[str, Any]) -> Optional[Dict[
                     "Confirm that your destination server is eligible.",
                     "Check the current event window and destination quota."
                 ],
-                "warnings": [
-                    "The 25-day cooldown shown in the older infographic is not verified by the cited guide."
-                ],
+                "warnings": [],
                 "source": guide.get("source", ""),
                 "source_title": guide.get("source_title", ""),
                 "source_published": guide.get("source_published", ""),
