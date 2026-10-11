@@ -1,0 +1,24 @@
+name: Evidence-backed Visual Answer Tests
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-answer-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Compile visual answer components
+        run: python -m py_compile agent.py knowledge_query_engine.py visual_answers.py
+      - name: Run visual answer regressions
+        env:
+          PYTHONPATH: .
+        run: python -m unittest tests/test_visual_answers.py -v

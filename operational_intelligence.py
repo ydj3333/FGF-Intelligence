@@ -335,7 +335,7 @@ def _wants_best_event_strategy(question: str) -> bool:
     """Detect an explicit request for the best/efficient strategy for a known event."""
     ql = question.lower()
     return bool(re.search(
-        r"\b(best way|best strategy|optimal strategy|most efficient|maximize|maximum rewards|how do i (?:do|play|approach)|strategy for|efficient way)\b",
+        r"\b(best way|best strategy|optimal strategy|most efficient|maximize|maximum rewards|how do i (?:do|play|approach)|strategy for|efficient way|(?:t100|top 100(?: galactic traders)?) strategy)\b",
         ql,
     ))
 
@@ -344,7 +344,7 @@ def _top100_best_strategy() -> Dict[str, Any]:
     """Return the evidence-backed T100 execution + pre-event resource plan."""
     return {
         "mode": "event_best_strategy",
-        "title": "Top 100 Galactic Traders — preparation & execution strategy",
+        "title": "Top 100 Galactic Traders — best execution strategy",
         "basis": (
             "Event-specific strategy synthesized from the stored T100 guide, "
             "new in-game Tribute evidence, and player/community observations. "
@@ -434,7 +434,7 @@ def _top100_best_strategy() -> Dict[str, Any]:
         "recommendation": (
             "Plan T100 as part of the wider T100↔GvG resource cycle, not as an isolated six-day event. "
             "Prepare the reserve before Day 1, protect the GvG reserve first, exploit low-cost Tribute activity efficiently, "
-            "and stop T100 spending when the next milestone is weaker than the resource value being consumed."
+            "and stop when marginal reward value drops or the next milestone is weaker than the resource value being consumed."
         ),
         "guardrail": (
             "The Tribute solo/fewer-ship tactic is conditional player/community evidence and should be used only when "
@@ -454,6 +454,27 @@ def _event_best_strategy(key: str, question: str, evidence_count: int) -> Dict[s
     """
     if key == "top100":
         return _top100_best_strategy()
+
+    if key == "path_to_dominance":
+        # Preserve the structured primary in-game facts while routing explicit
+        # strategy requests to an event-specific answer rather than generic
+        # strategy enumeration. Do not invent dates, costs, or reward values.
+        return {
+            "mode": "event_best_strategy",
+            "title": "Paths to Dominance — best execution strategy",
+            "basis": "Primary in-game UI evidence plus dated official update context. Exact event dates and unsupported reward/cost details are not inferred.",
+            "source_state": "PRIMARY_IN_GAME_UI_WITH_CURRENT_CONTEXT",
+            "columns": ["Priority", "Action", "Why", "Evidence boundary"],
+            "rows": [
+                ["1 — Eligibility", "Confirm Energy Core level 16+ and the live server event/calendar before planning.", "Eligibility and timing must match the current server state.", "Do not infer start/end dates."],
+                ["2 — Position", "Check open Counselor applications and the current Trader Prince/appointment state.", "Applications, capacity and appointment rules are explicitly documented in the in-game UI evidence.", "Re-check live slots and cooldowns."],
+                ["3 — PvP points", "Use eligible PvP battles in Level 9 star systems when they align with your event objective.", "The v1.1.44 release notes state these battles grant Paths to Dominance points.", "Do not infer exact point totals."],
+                ["4 — Ability timing", "Review available Prince abilities and current effects before spending Unity Points or coordinating buffs.", "Stored UI evidence describes abilities; release notes document lifecycle changes.", "Do not invent Unity Point costs or unidentified rewards."],
+                ["5 — Final check", "Verify current event rules and reward thresholds in-game before committing scarce resources.", "Server and update state can change.", "Unknown values remain unknown."]
+            ],
+            "recommendation": "Prioritize eligibility, the live event state, and confirmed scoring actions first. Coordinate position/ability timing with your Commerce Guild, use documented Level 9 PvP scoring where appropriate, and do not spend against unverified costs or dates.",
+            "guardrail": "This is an evidence-backed operating plan, not a guarantee of optimal ranking. Exact event dates, unknown reward icons, Traderhunt duration, Unity Point costs, and unsupported point totals must not be invented."
+        }
 
     playbook = PLAYBOOKS.get(key)
     if not playbook:

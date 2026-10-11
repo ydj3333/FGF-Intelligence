@@ -25,6 +25,8 @@ GRAPH_ENTITY_ALIASES = [
 
 ENTITY_ALIASES={
  "flagship components":["flagship component","ship component","components"],
+ "server migration":["server migration","interstellar migration","migration","migrate server","new server"],
+ "migration permits":["migration permit","migration permits","permit","permits"],
  "core component":["core components","core component","flagship core"],
  "computational components":["computational component","computational components"],
  "component":["components","component","flagship component","core component","computational component"],
@@ -1154,7 +1156,7 @@ def get_engine():
  global _ENGINE
  if _ENGINE is None:
   import agent
-  _ENGINE=KnowledgeQueryEngine(agent.CLAIMS, alias_groups=GRAPH_ENTITY_ALIASES)
+  _ENGINE=KnowledgeQueryEngine(list(agent.CLAIMS)+list(getattr(agent,'GUIDE_CLAIMS',[])), alias_groups=GRAPH_ENTITY_ALIASES)
  return _ENGINE
 def answer(question,player_context=None):
  r=get_engine().compose(question)

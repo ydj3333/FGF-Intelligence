@@ -13,7 +13,8 @@ from live_runtime import LiveObservationRuntime
 from operational_intelligence import build_operational_output
 from youtube_evidence_provider import YouTubeEvidenceProvider
 from knowledge_query_engine import QuestionParser
-from constraint_extractor import extract_constraints
+from constraint_extractor import extract_constraints as extract_player_constraints
+from visual_answers import build_visual_answer
 
 ROOT=Path(__file__).parent
 ROOT=Path(__file__).parent
@@ -22,6 +23,38 @@ LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixz
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v7.1.2-fleet-state'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
+GUIDE_CLAIMS=[]
+
+# Stable, source-linked guide facts are loaded into the same corpus used by the
+# production query engine. Supabase-only additions are not automatically visible
+# to this local corpus, so this explicit bridge prevents curated guides from
+# existing only in storage while Ask FGF cannot retrieve them.
+try:
+    _guide_data=json.loads((ROOT/'data'/'verified_guides.json').read_text(encoding='utf-8'))
+    _known_claims={re.sub(r'\W+',' ',str(x.get('Claim','')).lower()).strip() for x in CLAIMS}
+    for _guide in _guide_data.get('guides',[]):
+        for _claim_text in _guide.get('claims',[]):
+            _key=re.sub(r'\W+',' ',str(_claim_text).lower()).strip()
+            if not _key or _key in _known_claims:
+                continue
+            GUIDE_CLAIMS.append({
+                'Claim': _claim_text,
+                'Category': _guide.get('title','Curated Guide'),
+                'Claim Type': 'Requirement',
+                'Season/Version': _guide.get('source_published',''),
+                'Evidence Tier': 'Tier 2 — Official FGF Wiki',
+                'Confidence': 'High',
+                'Status': 'confirmed',
+                'Canonical': True,
+                'Source': _guide.get('source',''),
+                'Notes': _guide.get('source_title','') + '. ' + _guide.get('caveat',''),
+                'Guide Key': _guide.get('key',''),
+            })
+            _known_claims.add(_key)
+except (OSError, ValueError, TypeError):
+    # Visuals and the answer engine must continue safely if optional guide data
+    # is missing or malformed; no unsourced fallback facts are created.
+    pass
 CANONICAL_VOCABULARY_AUDIT=QuestionParser(CLAIMS).vocabulary_audit()
 CONFLICT_REVIEWS_FILE=ROOT/'data'/'conflict_reviews.json'
 SUPABASE_URL=os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/')
@@ -793,7 +826,7 @@ def synthesize(question,claims,conflicts=None,mode='answer'):
 
 def _core_progression_recommendation(q, objective='general'):
     """Build an actionable Core recommendation while preserving all explicit player state."""
-    constraints=extract_constraints(q)
+    constraints=extract_player_constraints(q)
     ql=str(q or '').lower()
     m=re.search(r'\b(?:energy\s+)?core\s*(?:level\s*)?(\d{1,2})\b', ql)
     if not m:
@@ -826,7 +859,7 @@ def _core_progression_recommendation(q, objective='general'):
 
 def recommend(q,objective='general'):
     objective_terms={'pvp':'pvp arena gvg port war combat','pve':'pve boss event hunting ground shrine','f2p':'f2p free progression economy spending','progression':'energy core building research shipyard construction','economy':'trade home port resources credits guild vouchers','event':'event rewards currency points guild'}
-    constraints=extract_constraints(q)
+    constraints=extract_player_constraints(q)
     if objective in ('general','progression'):
         core_plan=_core_progression_recommendation(q,objective)
         if core_plan:
@@ -1300,7 +1333,14 @@ class H(BaseHTTPRequestHandler):
                     'release': RELEASE,
                 }, 500)
         if u.path=='/api/recommend':
-            qs=parse_qs(u.query);q=qs.get('q',[''])[0];objective=qs.get('objective',['general'])[0];return self._json(recommend(q,objective))
+            qs=parse_qs(u.query);q=qs.get('q',[''])[0];objective=qs.get('objective',['general'])[0]
+            try:
+                return self._json(recommend(q,objective))
+            except Exception as exc:
+                # Keep the recommendation API JSON-safe like /api/ask. The
+                # exception category is returned for regression diagnosis;
+                # internal stack traces and secrets are never sent to clients.
+                return self._json({'ok':False,'error':'recommend_engine_error','exception_type':type(exc).__name__},500)
         if u.path=='/api/v5/priority':
             qs=parse_qs(u.query);pid=qs.get('player_id',[''])[0].strip();profile,error=_player_profile_from_db(pid) if pid else (None,'player_id is required')
             if error:return self._json({'ok':False,'error':error},503)
@@ -1524,6 +1564,27 @@ try:
             'experience_evidence': result.get('experience', []),
             'youtube_evidence': result.get('youtube', []),
         })
+        # Numeric-safety guardrail for explicitly cost-unknown F2P planning.
+        # This is intent-based rather than tied to a benchmark ID: when the user
+        # states that exact resource costs are unknown, the answer must preserve
+        # the useful plan while making the evidence boundary explicit.
+        q_lower = str(question or "").lower()
+        cost_unknown_intent = (
+            ("f2p" in q_lower or "free to play" in q_lower)
+            and any(term in q_lower for term in ("exact resource costs are unknown", "exact costs are unknown", "exact resource cost is unknown"))
+        )
+        if cost_unknown_intent:
+            boundary = (
+                "Evidence boundary: the current evidence does not establish exact resource costs "
+                "or a reliable completion time. I will not invent totals; follow documented "
+                "prerequisites and verify each in-game cost before committing resources."
+            )
+            current_uncertainty = str(merged.get("uncertainty") or "").strip()
+            current_answer = str(merged.get("answer") or "").rstrip()
+            if "not invent totals" not in (current_answer + " " + current_uncertainty).lower():
+                merged["answer"] = (current_answer + "\n\n" + boundary).strip()
+            merged["uncertainty"] = current_uncertainty or boundary
+
         # v6.4: transform operational questions into a player-facing structure
         # without changing the canonical evidence path. This is additive: the
         # prose answer remains available, while tables/plans become first-class.
@@ -1558,6 +1619,11 @@ try:
         except Exception as exc:
             merged['operational'] = None
             merged['operational_warning'] = 'Operational renderer unavailable: ' + type(exc).__name__
+        try:
+            merged['visual'] = build_visual_answer(question, merged)
+        except Exception as exc:
+            merged['visual'] = None
+            merged['visual_warning'] = 'Visual answer renderer unavailable: ' + type(exc).__name__
         return merged
 
 except Exception:

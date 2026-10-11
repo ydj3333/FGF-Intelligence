@@ -17,13 +17,15 @@ jobs:
         with:
           python-version: "3.13"
       - name: Compile response engine
-        run: python -m py_compile agent.py v5_extension.py knowledge_query_engine.py evidence_graph.py
+        run: python -m py_compile agent.py v5_extension.py knowledge_query_engine.py evidence_graph.py visual_answers.py
       - name: Run Knowledge Analyzer tests
         run: python -m unittest tests/test_knowledge_analyzer.py tests/test_claim_lifecycle.py tests/test_sync_corpus.py -v
       - name: Analyze full repository corpus
         run: python scripts/run_knowledge_quality.py
       - name: Run FGF agent smoke tests
         run: python tests/test_agent.py
+      - name: Run evidence-backed visual answer regressions
+        run: python -m unittest tests/test_visual_answers.py -v
       - name: Run v6 knowledge query tests
         run: python tests/test_v6_query_engine.py
       - name: Run v6 Objective #1 safety benchmark
