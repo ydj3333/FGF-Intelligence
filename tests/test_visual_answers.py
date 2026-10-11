@@ -1,6 +1,7 @@
 import unittest
 
 from visual_answers import build_visual_answer
+from knowledge_query_engine import KnowledgeQueryEngine
 
 
 class VisualAnswerTests(unittest.TestCase):
@@ -15,6 +16,22 @@ class VisualAnswerTests(unittest.TestCase):
         self.assertEqual(visual["unit"], "Migration Permits")
         self.assertIn("not verified", " ".join(visual["warnings"]).lower())
         self.assertIn("fgfwiki.com", visual["source"])
+
+    def test_migration_permit_question_retrieves_numeric_claim(self):
+        claim = {
+            "Claim": "Server migration requires 10 Migration Permits.",
+            "Category": "Server Migration",
+            "Claim Type": "Requirement",
+            "Evidence Tier": "Tier 2 — Official FGF Wiki",
+            "Confidence": "High",
+            "Status": "confirmed",
+            "Source": "https://fgfwiki.com/en/news/migration",
+        }
+        result = KnowledgeQueryEngine([claim]).compose(
+            "how many migration permits are required for server migration"
+        )
+        self.assertIn("10 Migration Permits", result.get("answer", ""))
+        self.assertTrue(result.get("evidence"))
 
     def test_migration_requirements_get_checklist_visual(self):
         visual = build_visual_answer(
