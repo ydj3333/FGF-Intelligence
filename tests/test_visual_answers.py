@@ -14,7 +14,7 @@ class VisualAnswerTests(unittest.TestCase):
         self.assertEqual(visual["kind"], "number_card")
         self.assertEqual(visual["headline"], "10")
         self.assertEqual(visual["unit"], "Migration Permits")
-        self.assertIn("not verified", " ".join(visual["warnings"]).lower())
+        self.assertEqual(visual["warnings"], [])  # Unrelated cooldown caveat belongs on the checklist, not this numeric answer.
         self.assertIn("fgfwiki.com", visual["source"])
 
     def test_migration_permit_question_retrieves_numeric_claim(self):
