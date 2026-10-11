@@ -55,6 +55,7 @@ PROPERTY_ALIASES={
  "cost":["cost","costs","price","spend","resources","resource"],
  "effect":["effect","does","gives","boost","bonus","increase","changes"],
  "comparison":["difference","different","versus","vs","compare","compared","better than","worse than","better","worse","prefer","preferred","worth","value","instead of","rather than","disagree","disagreement","conflict","conflicts","trust","official evidence","youtube disagree"],
+ "opponent":["opponent","opponents","opposing guild","enemy","enemies","fight against","attack against"],
  "counter":["counter","counters","against","beats","advantage"],
  "upgrade":["upgrade","upgrading","level","empowerment","power up"],
  "reward":["reward","rewards","prize","prizes","limited reward","grand prize","shop reward"],
@@ -68,6 +69,7 @@ QUESTION_TYPES={
  "comparison":["difference","different","versus"," vs ","compare","better than","worse than","prefer","preferred","worth","value","instead of","rather than"],
  "strategy":["best","optimal","recommended","should i","priority","most efficient","efficiently","save resources","progression plan","plan"],
  "effect":["what happens","what does","what do","effect","benefit","bonus"],
+ "opponent":["who do we fight","whom do we fight","who are the opponents","who are we fighting","opponent","opponents","enemies","enemy","opposing guild"],
  "counter":["what counters","which counters","counter","against"],
  "numeric":["how many","how much","how long","percentage","percent","cost","maximum","max","cap"],
  "definition":["what is","what are"],
@@ -316,14 +318,21 @@ class QuestionParser:
   elif "dps" in ql: prop="dps"
   elif any(w in ql for w in ("reward","rewards","prize","prizes")): prop="reward"
 
-  # "Against" normally signals a combat-counter question, but in Commerce
-  # Guild Duel it asks for the event's opponent—not a weapon/style counter.
-  # Keep the event entity authoritative so unrelated combat bonuses cannot win.
-  if "commerce guild duel" in ql and any(
-      term in ql for term in ("whom do we fight against", "who do we fight against",
-                              "opponent", "opponents", "fight against", "attack against")
-  ):
-   prop="general"
+  # Resolve semantic intent before ranking. Interrogative opponent language is a
+  # different relation from combat-counter language; the distinction applies to
+  # any event/guild/battlefield question, not a single named event.
+  opponent_intent = bool(re.search(
+      r"\\b(?:who|whom|which)\\b.{0,55}\\b(?:opponent|opponents|enemy|enemies|fight|fighting|attack|attacking)\\b|"
+      r"\\b(?:opponent|opponents|enemy|enemies)\\b|"
+      r"\\bwho\\s+(?:do|does|are)\\s+(?:we|i)\\s+(?:fight|attack)\\b",
+      ql
+  ))
+  if opponent_intent and re.search(r"\\b(?:event|duel|guild|league|battlefield|showdown|war)\\b", ql):
+   prop="opponent"
+  elif opponent_intent and prop=="counter":
+   prop="opponent"
+
+
 
   expansions=[q]
   if entity in ENTITY_ALIASES: expansions+=ENTITY_ALIASES[entity]
@@ -347,11 +356,38 @@ class KnowledgeQueryEngine:
  def _relation_score(self,p,c):
   relation={"level_threshold":"level","source":"source","requirement":"requirement","cost":"cost","comparison":"comparison","counter":"counter","effect":"effect","strategy":"effect","definition":"effect","numeric":"level","generic":"effect"}.get(p.question_type,"effect")
   return min(4,sum(1 for x in RELATION_TERMS.get(relation,[]) if x in _blob(c)))
+ def _intent_relation_score(self,p,c):
+  """Score whether a claim expresses the relation the player asked for.
+
+  This is a generic relation contract, independent of entity-specific aliases.
+  It deliberately penalizes semantically wrong but lexically similar evidence.
+  """
+  blob=_blob(c)
+  contracts={
+   "opponent":(("opponent","opposing","enemy","enemies","fight against","attack against","guild members"),),
+   "counter":(("counter","counters","countered","beats","advantage against","weak against"),),
+   "cost":(("cost","costs","price","spend","requires","credits","crystals","resources"),),
+   "source":(("obtain","obtained","source","drops","drop","earn","farm","available from","purchase"),),
+   "requirement":(("requires","require","need","needed","prerequisite","condition","must have","unlock"),),
+   "reward":(("reward","rewards","prize","prizes","grants","receives","obtain"),),
+   "unlock_level":(("level","unlock","unlocks","available","opens","introduced"),),
+   "effect":(("effect","boost","bonus","increase","determines","changes","provides","grants"),),
+   "duplicate":(("duplicate","duplicates","dupe","dupes","same champion"),),
+   "dps":(("dps","damage per second","damage dealer"),),
+  }
+  contract=contracts.get(p.property)
+  if contract:
+   terms=contract[0]
+   return 6.0 if any(term in blob for term in terms) else -7.0
+  if p.question_type=="numeric":
+   return 2.5 if re.search(r"\\b\\d+(?:\\.\\d+)?%?\\b",blob) else -2.5
+  return 0.0
+
  def rank(self,p,limit=12):
   results=[]
   for c,blob,claim_tokens,claim_grams in self._index:
    if str(c.get("Status",c.get("status",""))).lower() in ("rejected","superseded"): continue
-   score=3.5*_similarity_index(p.raw,blob,claim_tokens,claim_grams)+self._entity_score(p,c)+self._property_score(p,c)+self._relation_score(p,c)+.65*_authority(c)
+   score=3.5*_similarity_index(p.raw,blob,claim_tokens,claim_grams)+self._entity_score(p,c)+self._property_score(p,c)+self._relation_score(p,c)+self._intent_relation_score(p,c)+.65*_authority(c)
    if p.qualifier: score += 2 if p.qualifier in _blob(c) else -.5
    if p.question_type in ("level_threshold","numeric") and not re.search(r"\b(?:level|lvl|core)\b|\b\d+(?:\.\d+)?%?\b",_blob(c)): score-=4
    results.append((c,score))
