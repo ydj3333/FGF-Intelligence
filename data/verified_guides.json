@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "purpose": "Curated, source-linked guide facts used to keep stable player-help topics discoverable in the local production corpus.",
+  "guides": [
+    {
+      "key": "server_migration",
+      "title": "Server Migration",
+      "source": "https://fgfwiki.com/en/news/migration",
+      "source_title": "FGF Wiki — Upcoming Server Migration: Wave 3 Timeline and Guidelines",
+      "source_published": "2026-06-23",
+      "caveat": "Migration windows, eligibility and destination quotas vary by event wave and server group. Re-check the current in-game migration event. The infographic's 25-day cooldown is not verified by this source.",
+      "claims": [
+        "Server migration requires 10 Migration Permits.",
+        "A player must not have an existing character on the target server to migrate there.",
+        "All Flagships must be docked or idle before server migration.",
+        "A player must leave their current Commerce Guild before registering for server migration.",
+        "Trader Princes and holders of other official titles must step down as required for migration; royal titles do not carry over.",
+        "A player must submit a migration application before migration day and actively confirm migration on the designated day.",
+        "Migration eligibility and destination slots vary by migration group, destination server strength, and the player's historical peak power.",
+        "After migration, the Home Port relocates to a random starting region, server and Arena rankings are cleared, and in-game mail is permanently deleted."
+      ],
+      "unverified": [
+        "At least 25 days must have passed since the last successful migration."
+      ]
+    }
+  ]
+}
