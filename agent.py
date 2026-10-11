@@ -1333,7 +1333,14 @@ class H(BaseHTTPRequestHandler):
                     'release': RELEASE,
                 }, 500)
         if u.path=='/api/recommend':
-            qs=parse_qs(u.query);q=qs.get('q',[''])[0];objective=qs.get('objective',['general'])[0];return self._json(recommend(q,objective))
+            qs=parse_qs(u.query);q=qs.get('q',[''])[0];objective=qs.get('objective',['general'])[0]
+            try:
+                return self._json(recommend(q,objective))
+            except Exception as exc:
+                # Keep the recommendation API JSON-safe like /api/ask. The
+                # exception category is returned for regression diagnosis;
+                # internal stack traces and secrets are never sent to clients.
+                return self._json({'ok':False,'error':'recommend_engine_error','exception_type':type(exc).__name__},500)
         if u.path=='/api/v5/priority':
             qs=parse_qs(u.query);pid=qs.get('player_id',[''])[0].strip();profile,error=_player_profile_from_db(pid) if pid else (None,'player_id is required')
             if error:return self._json({'ok':False,'error':error},503)
