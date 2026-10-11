@@ -24,9 +24,9 @@ if errorlevel 1 (
   exit /b 1
 )
 
-set /p FGF_SUPABASE_SERVICE_ROLE_KEY=Supabase secret key:
-if "%FGF_SUPABASE_SERVICE_ROLE_KEY%"=="" (
-  echo ERROR: Supabase secret key is required.
+set /p FGF_SUPABASE_SECRET_KEY=Supabase server secret key (sb_secret_* or legacy service_role JWT):
+if "%FGF_SUPABASE_SECRET_KEY%"=="" (
+  echo ERROR: Supabase server secret key is required.
   pause
   exit /b 1
 )
