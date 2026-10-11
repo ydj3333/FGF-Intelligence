@@ -23,6 +23,7 @@ LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixz
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
 RELEASE='v7.1.2-fleet-state'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
+GUIDE_CLAIMS=[]
 
 # Stable, source-linked guide facts are loaded into the same corpus used by the
 # production query engine. Supabase-only additions are not automatically visible
@@ -36,7 +37,7 @@ try:
             _key=re.sub(r'\W+',' ',str(_claim_text).lower()).strip()
             if not _key or _key in _known_claims:
                 continue
-            CLAIMS.append({
+            GUIDE_CLAIMS.append({
                 'Claim': _claim_text,
                 'Category': _guide.get('title','Curated Guide'),
                 'Claim Type': 'Requirement',
