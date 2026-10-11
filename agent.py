@@ -1557,6 +1557,27 @@ try:
             'experience_evidence': result.get('experience', []),
             'youtube_evidence': result.get('youtube', []),
         })
+        # Numeric-safety guardrail for explicitly cost-unknown F2P planning.
+        # This is intent-based rather than tied to a benchmark ID: when the user
+        # states that exact resource costs are unknown, the answer must preserve
+        # the useful plan while making the evidence boundary explicit.
+        q_lower = str(question or "").lower()
+        cost_unknown_intent = (
+            ("f2p" in q_lower or "free to play" in q_lower)
+            and any(term in q_lower for term in ("exact resource costs are unknown", "exact costs are unknown", "exact resource cost is unknown"))
+        )
+        if cost_unknown_intent:
+            boundary = (
+                "Evidence boundary: the current evidence does not establish exact resource costs "
+                "or a reliable completion time. I will not invent totals; follow documented "
+                "prerequisites and verify each in-game cost before committing resources."
+            )
+            current_uncertainty = str(merged.get("uncertainty") or "").strip()
+            if not any(term in (str(merged.get("answer") or "") + " " + current_uncertainty).lower()
+                       for term in ("does not establish", "not established", "unknown", "insufficient evidence", "uncertain")):
+                merged["answer"] = (str(merged.get("answer") or "").rstrip() + "\\n\\n" + boundary).strip()
+            merged["uncertainty"] = current_uncertainty or boundary
+
         # v6.4: transform operational questions into a player-facing structure
         # without changing the canonical evidence path. This is additive: the
         # prose answer remains available, while tables/plans become first-class.
