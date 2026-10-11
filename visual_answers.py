@@ -47,9 +47,10 @@ def build_visual_answer(question: str, answer: Dict[str, Any]) -> Optional[Dict[
             return None
 
         permits_claim = next((x for x in claims if "10 migration permits" in x.lower()), None)
-        is_count = _is_numeric_question(q) and any(
-            word in q.lower() for word in ("permit", "require", "cost", "number")
-        )
+        # Only show the fixed permit count when the user actually asks
+        # about permits. A migration-cost or cooldown question must not be
+        # answered with the unrelated number 10.
+        is_count = _is_numeric_question(q) and "permit" in q.lower()
         if is_count:
             return {
                 "kind": "number_card",
