@@ -30,10 +30,10 @@ CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 # existing only in storage while Ask FGF cannot retrieve them.
 try:
     _guide_data=json.loads((ROOT/'data'/'verified_guides.json').read_text(encoding='utf-8'))
-    _known_claims={re.sub(r'\\W+',' ',str(x.get('Claim','')).lower()).strip() for x in CLAIMS}
+    _known_claims={re.sub(r'\W+',' ',str(x.get('Claim','')).lower()).strip() for x in CLAIMS}
     for _guide in _guide_data.get('guides',[]):
         for _claim_text in _guide.get('claims',[]):
-            _key=re.sub(r'\\W+',' ',str(_claim_text).lower()).strip()
+            _key=re.sub(r'\W+',' ',str(_claim_text).lower()).strip()
             if not _key or _key in _known_claims:
                 continue
             CLAIMS.append({
