@@ -315,6 +315,16 @@ class QuestionParser:
   if "duplicate" in ql or "duplicates" in ql or re.search(r"\bdupes?\b", ql): prop="duplicate"
   elif "dps" in ql: prop="dps"
   elif any(w in ql for w in ("reward","rewards","prize","prizes")): prop="reward"
+
+  # "Against" normally signals a combat-counter question, but in Commerce
+  # Guild Duel it asks for the event's opponent—not a weapon/style counter.
+  # Keep the event entity authoritative so unrelated combat bonuses cannot win.
+  if "commerce guild duel" in ql and any(
+      term in ql for term in ("whom do we fight against", "who do we fight against",
+                              "opponent", "opponents", "fight against", "attack against")
+  ):
+   prop="general"
+
   expansions=[q]
   if entity in ENTITY_ALIASES: expansions+=ENTITY_ALIASES[entity]
   if prop in PROPERTY_ALIASES: expansions+=PROPERTY_ALIASES[prop]
