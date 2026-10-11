@@ -33,6 +33,15 @@ class VisualAnswerTests(unittest.TestCase):
         self.assertIn("10 Migration Permits", result.get("answer", ""))
         self.assertTrue(result.get("evidence"))
 
+    def test_migration_cost_question_does_not_show_permit_count(self):
+        visual = build_visual_answer(
+            "how much does server migration cost",
+            {"answer": "The exact currency cost is not established."},
+        )
+        self.assertIsNotNone(visual)
+        self.assertEqual(visual["kind"], "checklist")
+        self.assertNotEqual(visual.get("headline"), "10")
+
     def test_migration_requirements_get_checklist_visual(self):
         visual = build_visual_answer(
             "show me server migration requirements",
