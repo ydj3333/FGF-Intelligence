@@ -44,6 +44,22 @@ class VisualAnswerTests(unittest.TestCase):
         self.assertTrue(any("10 Migration Permits" in x for x in visual["requirements"]))
         self.assertTrue(any("25-day cooldown" in x for x in visual["warnings"]))
 
+    def test_cost_unknown_f2p_plan_surfaces_uncertainty(self):
+        import agent
+        result = agent.answer(
+            "Give me a safe F2P progression plan when exact resource costs are unknown."
+        )
+        answer = str(result.get("answer") or "").lower()
+        uncertainty = str(result.get("uncertainty") or "").lower()
+        self.assertTrue(
+            any(term in answer + " " + uncertainty for term in (
+                "does not establish", "not established", "unknown",
+                "insufficient evidence", "uncertain"
+            )),
+            "Cost-unknown F2P guidance must explicitly state uncertainty."
+        )
+        self.assertIn("not invent totals", answer + " " + uncertainty)
+
     def test_unrelated_question_does_not_force_visual(self):
         visual = build_visual_answer(
             "what does kinetic counter",
