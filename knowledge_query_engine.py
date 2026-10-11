@@ -25,6 +25,8 @@ GRAPH_ENTITY_ALIASES = [
 
 ENTITY_ALIASES={
  "flagship components":["flagship component","ship component","components"],
+ "server migration":["server migration","interstellar migration","migration","migrate server","new server"],
+ "migration permits":["migration permit","migration permits","permit","permits"],
  "core component":["core components","core component","flagship core"],
  "computational components":["computational component","computational components"],
  "component":["components","component","flagship component","core component","computational component"],
