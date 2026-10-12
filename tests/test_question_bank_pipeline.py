@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.question_bank_pipeline import audit, content_tokens, evaluation_candidates, is_safe_training_example, overlap_score
+from scripts.question_bank_pipeline import audit, content_tokens, evaluation_candidates, is_safe_training_example, normalize_source_row, overlap_score
 
 
 def row(**overrides):
@@ -39,6 +39,25 @@ class QuestionBankGovernanceTests(unittest.TestCase):
 
     def test_missing_provenance_is_not_training_eligible(self):
         self.assertFalse(is_safe_training_example(row(source_claim_id=None)))
+
+    def test_source_join_normalization_uses_claim_lifecycle_and_fails_closed(self):
+        linked = normalize_source_row({
+            "source_claim": {
+                "id": "claim-1",
+                "claim": "Ten permits are required.",
+                "status": "Confirmed",
+                "canonical": True,
+                "tier": "Tier 1",
+                "version": "S2",
+            }
+        })
+        self.assertEqual(linked["source_status"], "Confirmed")
+        self.assertTrue(linked["source_canonical"])
+        self.assertEqual(linked["source_claim_text"], "Ten permits are required.")
+        missing = normalize_source_row({"source_claim": None})
+        self.assertIsNone(missing["source_status"])
+        self.assertFalse(missing["source_canonical"])
+        self.assertIsNone(missing["source_claim_text"])
 
     def test_shell_variants_are_excluded_from_live_evaluation_candidates(self):
         rows = [
