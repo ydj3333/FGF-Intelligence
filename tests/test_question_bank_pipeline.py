@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.question_bank_pipeline import audit, is_safe_training_example
+from scripts.question_bank_pipeline import audit, content_tokens, evaluation_candidates, is_safe_training_example, overlap_score
 
 
 def row(**overrides):
@@ -9,6 +9,7 @@ def row(**overrides):
         "training_eligible": True,
         "source_canonical": True,
         "source_status": "confirmed",
+        "source_claim_text": "Migration requires ten permits for the documented group.",
         "source_claim_id": "claim-1",
         "question": "What is the verified rule?",
         "ideal_answer": "The verified rule is documented.",
@@ -38,6 +39,23 @@ class QuestionBankGovernanceTests(unittest.TestCase):
 
     def test_missing_provenance_is_not_training_eligible(self):
         self.assertFalse(is_safe_training_example(row(source_claim_id=None)))
+
+    def test_shell_variants_are_excluded_from_live_evaluation_candidates(self):
+        rows = [
+            row(id="good", generation_method="verified_claim_template_v3_subject_aware"),
+            row(id="shell", generation_method="verified_claim_template_v4_paraphrase_shell"),
+            row(id="noncanonical", source_canonical=False),
+            row(id="missing_claim_text", source_claim_text=""),
+        ]
+        self.assertEqual([r["id"] for r in evaluation_candidates(rows)], ["good"])
+
+    def test_token_overlap_is_triage_not_training_approval(self):
+        self.assertGreater(overlap_score(
+            "Commerce Guild Duel grants Glory for attacking opposing guild members",
+            "During Commerce Guild Duel, attacking opposing Guild members acquires Glory"
+        ), 0.2)
+        self.assertEqual(overlap_score("migration permits", "damage counter bonus"), 0.0)
+        self.assertIn("migration", content_tokens("How many migration permits are needed?"))
 
     def test_audit_counts_rows_without_promoting_them(self):
         rows = [row(), row(review_status="needs_review", training_eligible=False)]
