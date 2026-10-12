@@ -791,6 +791,8 @@ class KnowledgeQueryEngine:
    return False
   qtokens=set(p.terms)
   qtokens-={"2025","2026","january","february","march","april","may","june","july","august","september","october","november","december"}
+  if p.question_type=="update":
+   qtokens-={"update","hot","patch","sep","22"}
   ctokens=set(_norm_tokens(blob))
   overlap=len(qtokens & ctokens)
   if p.question_type=="numeric" and not re.search(r"\b\d+(?:\.\d+)?%?\b",blob):
