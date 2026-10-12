@@ -822,7 +822,7 @@ class KnowledgeQueryEngine:
   if mode=="direct":
    unique=[c for c in unique if self._intent_evidence_matches(p,c)]
    if not unique:
-    return self._empty(p,"The current evidence does not directly establish the requested detail; I will not substitute a nearby fact.",mode="semantic_quality_abstention")
+    return self._empty(p,"The current knowledge base does not contain sufficiently relevant evidence to establish the requested detail; I will not substitute a nearby fact.",mode="semantic_quality_abstention")
   answer=text.strip()
   for i in range(len(unique)):
    if f"[E{i+1}]" not in answer: answer+=f" [E{i+1}]"
@@ -875,7 +875,7 @@ class KnowledgeQueryEngine:
           "Use the established requirements and progression facts, mark the exact cost as unknown, "
           "and re-check the latest authoritative evidence before committing resources.")
     return self._answer(p,text,[],"safe_strategy_policy")
-   return self._empty(p,"The current evidence does not directly establish the requested detail; I will not substitute a nearby fact.")
+   return self._empty(p,"The current knowledge base does not contain sufficiently relevant evidence to establish the requested detail; I will not substitute a nearby fact.")
   if p.question_type=="level_threshold":
    cand=[]
    for c,s in rel:
@@ -1255,7 +1255,7 @@ class KnowledgeQueryEngine:
   # ranking must win over an irrelevant top-ranked claim.
   rel=[(c,s) for c,s in rel if self._intent_evidence_matches(p,c)]
   if not rel:
-   return self._empty(p,"The current evidence does not directly establish the requested detail; I will not substitute a nearby fact.",mode="semantic_quality_abstention")
+   return self._empty(p,"The current knowledge base does not contain sufficiently relevant evidence to establish the requested detail; I will not substitute a nearby fact.",mode="semantic_quality_abstention")
   top,_=rel[0]; direct=self._direct_sentences(p,top); text=direct[0] if direct else _text(top)
   if re.search(r"\bwhich\s+(?:type\s+of\s+)?components?\b", p.raw.lower()) and direct:
    return self._answer(p,text,[top],"direct_component")
