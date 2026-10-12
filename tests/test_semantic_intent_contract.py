@@ -128,7 +128,7 @@ class SemanticIntentContractTests(unittest.TestCase):
         result = engine.compose("In what order do Champion skills activate?")
         self.assertEqual(result["answer_type"], "knowledge_abstention")
         self.assertFalse(result["evidence"])
-        self.assertIn("does not directly establish", result["answer"].lower())
+        self.assertIn("sufficiently relevant evidence", result["answer"].lower())
 
     def test_update_answer_excludes_unrelated_claims_from_same_update(self):
         result = self.engine.compose("What changed for Commerce Guild rewards in Shadowfront on September 22, 2026?")
