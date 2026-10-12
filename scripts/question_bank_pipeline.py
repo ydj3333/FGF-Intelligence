@@ -27,7 +27,7 @@ DEFAULT_SUPABASE_URL = os.getenv(
     "FGF_SUPABASE_URL", "https://qdoixzfkkmvzjfkhzups.supabase.co"
 ).rstrip("/")
 TABLE = "fgf_question_bank"
-# source_status/source_canonical live on public.claims, not fgf_question_bank.
+# Use the linked claims row as source of truth; question-bank lifecycle fields are snapshots.
 FIELDS = (
     "id,question_key,question,ideal_answer,source_claim_id,category,claim_type,"
     "intent_type,source_tier,season,version,generation_method,review_status,"
