@@ -108,6 +108,23 @@ class SemanticIntentContractTests(unittest.TestCase):
         self.assertTrue(any("+10%" in item["claim"] for item in result["evidence"]))
         self.assertFalse(any("star level" in item["claim"].lower() for item in result["evidence"]))
 
+    def test_unqualified_matching_champion_bonus_question_returns_all_supported_tiers(self):
+        # This is the production-shaped wording: the player does not specify
+        # whether they have two or three matching Champions, so both supported
+        # tiers must be reported rather than guessing one or returning adjacent facts.
+        question = "What attribute bonuses do matching Champions receive?"
+        parsed = self.engine.parse(question)
+        self.assertEqual(parsed.property, "numeric_effect")
+        result = self.engine.compose(question)
+        answer = result["answer"].lower()
+        self.assertIn("attack +10%", answer)
+        self.assertIn("attack +20%", answer)
+        evidence_text = " ".join(item["claim"].lower() for item in result["evidence"])
+        self.assertIn("2 matching champions", evidence_text)
+        self.assertIn("3 matching champions", evidence_text)
+        self.assertFalse(any("star level" in item["claim"].lower() for item in result["evidence"]))
+        self.assertTrue(result["quality_gate"]["uses_relevant_evidence"])
+
     def test_champion_skill_order_uses_sequence_evidence(self):
         question = "In what order do Champion skills activate?"
         parsed = self.engine.parse(question)
