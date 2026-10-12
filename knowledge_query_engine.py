@@ -795,6 +795,9 @@ class KnowledgeQueryEngine:
   overlap=len(qtokens & ctokens)
   if p.question_type=="numeric" and not re.search(r"\b\d+(?:\.\d+)?%?\b",blob):
    return False
+  # Date/version overlap must not make unrelated items from the same patch relevant.
+  if p.question_type=="update":
+   return overlap>=2
   return overlap>=2 or _similarity(p.raw,blob)>=0.25
 
  def _answer(self,p,text,claims,mode):
@@ -861,7 +864,7 @@ class KnowledgeQueryEngine:
           "Use the established requirements and progression facts, mark the exact cost as unknown, "
           "and re-check the latest authoritative evidence before committing resources.")
     return self._answer(p,text,[],"safe_strategy_policy")
-   return self._empty(p)
+   return self._empty(p,"The current evidence does not directly establish the requested detail; I will not substitute a nearby fact.")
   if p.question_type=="level_threshold":
    cand=[]
    for c,s in rel:
