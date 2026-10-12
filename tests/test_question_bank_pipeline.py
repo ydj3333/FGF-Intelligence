@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from scripts.question_bank_pipeline import audit, call_ask, content_tokens, evaluation_candidates, is_safe_training_example, normalize_source_row, overlap_score
+from scripts.question_bank_pipeline import audit, call_ask, content_tokens, evaluation_candidates, is_safe_training_example, normalize_source_row, overlap_score, score_evidence_items
 
 
 def row(**overrides):
@@ -80,6 +80,18 @@ class QuestionBankGovernanceTests(unittest.TestCase):
             row(id="missing_claim_text", source_claim_text=""),
         ]
         self.assertEqual([r["id"] for r in evaluation_candidates(rows)], ["good"])
+
+    def test_evidence_scoring_does_not_let_one_good_claim_hide_noise(self):
+        result = score_evidence_items(
+            "Commerce Guild rewards in Shadowfront were increased in the September 22 update.",
+            [
+                {"claim": "Commerce Guild rewards in Shadowfront were increased in the September 22 update."},
+                {"claim": "Weapon Prism was added to the Discount Shop in the September 22 update."},
+            ],
+        )
+        self.assertTrue(result["source_claim_supported_by_evidence"])
+        self.assertEqual(result["irrelevant_evidence_count_triage"], 1)
+        self.assertEqual(len(result["evidence_item_scores"]), 2)
 
     def test_token_overlap_is_triage_not_training_approval(self):
         self.assertGreater(overlap_score(
