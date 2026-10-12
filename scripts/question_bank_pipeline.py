@@ -15,6 +15,7 @@ import argparse
 import collections
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -26,10 +27,12 @@ DEFAULT_SUPABASE_URL = os.getenv(
     "FGF_SUPABASE_URL", "https://qdoixzfkkmvzjfkhzups.supabase.co"
 ).rstrip("/")
 TABLE = "fgf_question_bank"
+# source_status/source_canonical live on public.claims, not fgf_question_bank.
 FIELDS = (
     "id,question_key,question,ideal_answer,source_claim_id,category,claim_type,"
-    "intent_type,source_tier,source_status,source_canonical,season,version,"
-    "generation_method,review_status,training_eligible,expected_claim_ids,metadata,topic_label"
+    "intent_type,source_tier,season,version,generation_method,review_status,"
+    "training_eligible,expected_claim_ids,metadata,topic_label,"
+    "source_claim:claims!fgf_question_bank_source_claim_id_fkey(id,claim,status,canonical,tier,season,version)"
 )
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -71,6 +74,17 @@ def fetch_rows(page_size: int = 1000) -> list[dict]:
             page = json.loads(response.read().decode("utf-8") or "[]")
         if not isinstance(page, list):
             raise RuntimeError("Supabase returned an unexpected question-bank payload.")
+        for row in page:
+            # Normalize the FK-joined source claim. Missing provenance fails closed.
+            source = row.get("source_claim")
+            if isinstance(source, list):
+                source = source[0] if source else None
+            source = source if isinstance(source, dict) else {}
+            row["source_status"] = source.get("status")
+            row["source_canonical"] = source.get("canonical") is True
+            row["source_claim_text"] = source.get("claim")
+            row["source_claim_tier"] = source.get("tier")
+            row["source_claim_version"] = source.get("version")
         rows.extend(page)
         if len(page) < page_size:
             break
@@ -169,17 +183,48 @@ def flatten_text(value) -> str:
     return ""
 
 
-def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: float) -> dict:
-    # Use only canonical, confirmed/current rows as candidate probes. Their generated
-    # wording still needs human semantic review; this report does not auto-approve them.
+STOP_WORDS = {
+    "a", "an", "and", "are", "as", "at", "be", "by", "does", "for", "from",
+    "how", "in", "is", "it", "of", "on", "or", "the", "to", "what", "when",
+    "where", "which", "who", "why", "with", "do", "can", "could", "would",
+    "should", "about", "according", "documented", "guide", "states", "state",
+}
+
+
+def content_tokens(value) -> set[str]:
+    """Small deterministic token set for triage only, never a semantic verdict."""
+    return {
+        token for token in re.findall(r"[a-z0-9]+", str(value or "").lower())
+        if len(token) > 1 and token not in STOP_WORDS
+    }
+
+
+def overlap_score(left, right) -> float:
+    a, b = content_tokens(left), content_tokens(right)
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def evaluation_candidates(rows: list[dict], limit: int | None = None) -> list[dict]:
+    """Probe only current canonical claims and exclude 9,000 synthetic shell prompts."""
     candidates = [
         r for r in rows
         if r.get("source_canonical") is True
         and str(r.get("source_status") or "").strip().lower() in {"confirmed", "current", "verified"}
         and r.get("source_claim_id")
+        and str(r.get("source_claim_text") or "").strip()
         and str(r.get("question") or "").strip()
         and str(r.get("ideal_answer") or "").strip()
-    ][:limit]
+        and "paraphrase_shell" not in str(r.get("generation_method") or "")
+    ]
+    return candidates if limit is None else candidates[:max(0, limit)]
+
+
+def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: float) -> dict:
+    # Generated prompts are diagnostic probes, not gold labels. No lexical score
+    # can approve a row or prove semantic correctness; it only prioritizes review.
+    candidates = evaluation_candidates(rows, limit)
     report = []
     failures = 0
     for index, row in enumerate(candidates, 1):
@@ -188,34 +233,37 @@ def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: fl
             "question": row["question"],
             "expected_answer": row["ideal_answer"],
             "expected_claim_id": row["source_claim_id"],
+            "expected_source_claim": row.get("source_claim_text"),
             "intent_type": row.get("intent_type"),
             "generation_method": row.get("generation_method"),
             "review_status": row.get("review_status"),
+            "evaluation_is_gold": False,
         }
         try:
             result = call_ask(api_url, row["question"])
             payload = result.get("payload", {})
-            response_text = flatten_text(payload)
-            claim_id = str(row["source_claim_id"])
-            direct_id_match = claim_id in response_text
             answer_text = flatten_text(
                 payload.get("answer", payload.get("response", payload.get("text", payload)))
                 if isinstance(payload, dict) else payload
             )
-            expected_text = str(row["ideal_answer"]).strip().lower()
-            exact_answer_in_response = bool(expected_text and expected_text in answer_text.lower())
+            evidence = payload.get("evidence", []) if isinstance(payload, dict) else []
+            evidence_text = flatten_text(evidence)
+            source_claim = row.get("source_claim_text") or row.get("ideal_answer") or ""
+            answer_overlap = overlap_score(source_claim, answer_text)
+            evidence_overlap = overlap_score(source_claim, evidence_text)
             record.update({
                 "http_status": result.get("http_status"),
                 "response_excerpt": answer_text[:1800],
-                "source_claim_id_visible_in_response": direct_id_match,
-                "expected_answer_exactly_present": exact_answer_in_response,
+                "evidence_excerpt": evidence_text[:1800],
+                "answer_source_overlap_triage": round(answer_overlap, 4),
+                "evidence_source_overlap_triage": round(evidence_overlap, 4),
                 "evaluation_status": (
-                    "direct_match_signal"
-                    if direct_id_match or exact_answer_in_response
-                    else "needs_semantic_evidence_review"
+                    "possible_relevance_failure"
+                    if result.get("http_status", 0) >= 400 or (answer_overlap < 0.12 and evidence_overlap < 0.12)
+                    else "lexical_signal_for_manual_semantic_review"
                 ),
             })
-            if not direct_id_match and not exact_answer_in_response:
+            if record["evaluation_status"] == "possible_relevance_failure":
                 failures += 1
         except (HTTPError, URLError, TimeoutError, OSError, ValueError, RuntimeError) as exc:
             record.update({"evaluation_status": "request_error", "error": str(exc)[:500]})
@@ -229,8 +277,8 @@ def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: fl
         "needs_review_or_request_error": failures,
         "report_path": str(output),
         "warning": (
-            "Lexical/exact matching is a triage signal, not semantic proof. "
-            "No rows were approved, promoted, or used to change canonical truth."
+            "Token overlap is triage only, not semantic proof. Generated prompts remain "
+            "unreviewed; no rows were approved, promoted, or used to change canonical truth."
         ),
     }
 
