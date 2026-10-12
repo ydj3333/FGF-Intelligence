@@ -1,6 +1,7 @@
 import unittest
+from unittest.mock import MagicMock, patch
 
-from scripts.question_bank_pipeline import audit, content_tokens, evaluation_candidates, is_safe_training_example, normalize_source_row, overlap_score
+from scripts.question_bank_pipeline import audit, call_ask, content_tokens, evaluation_candidates, is_safe_training_example, normalize_source_row, overlap_score
 
 
 def row(**overrides):
@@ -39,6 +40,18 @@ class QuestionBankGovernanceTests(unittest.TestCase):
 
     def test_missing_provenance_is_not_training_eligible(self):
         self.assertFalse(is_safe_training_example(row(source_claim_id=None)))
+
+    def test_live_probe_uses_supported_get_ask_route(self):
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = b'{"answer":"ok"}'
+        response.__enter__.return_value = response
+        with patch("scripts.question_bank_pipeline.urlopen", return_value=response) as mocked:
+            result = call_ask("https://example.test", "How many migration permits?")
+        request = mocked.call_args.args[0]
+        self.assertEqual(request.get_method(), "GET")
+        self.assertIn("/api/ask?q=How+many+migration+permits%3F", request.full_url)
+        self.assertEqual(result["payload"]["answer"], "ok")
 
     def test_source_join_normalization_uses_claim_lifecycle_and_fails_closed(self):
         linked = normalize_source_row({
