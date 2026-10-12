@@ -203,13 +203,23 @@ STOP_WORDS = {
     "how", "in", "is", "it", "of", "on", "or", "the", "to", "what", "when",
     "where", "which", "who", "why", "with", "do", "can", "could", "would",
     "should", "about", "according", "documented", "guide", "states", "state",
+    "update", "hot", "patch", "january", "february", "march", "april", "may",
+    "june", "july", "august", "september", "october", "november", "december",
+    "2025", "2026",
 }
 
 
 def content_tokens(value) -> set[str]:
     """Small deterministic token set for triage only, never a semantic verdict."""
+    text = str(value or "").lower()
+    text = re.sub(
+        r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
+        r"jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|"
+        r"dec(?:ember)?)\s+\d{1,2}\b", " ", text
+    )
+    text = re.sub(r"\b(?:19|20)\d{2}\b", " ", text)
     return {
-        token for token in re.findall(r"[a-z0-9]+", str(value or "").lower())
+        token for token in re.findall(r"[a-z0-9]+", text)
         if len(token) > 1 and token not in STOP_WORDS
     }
 
