@@ -171,12 +171,13 @@ def export_training(rows: list[dict], output: Path) -> int:
 
 
 def call_ask(api_url: str, question: str, timeout: int = 25) -> dict:
-    payload = json.dumps({"question": question}, ensure_ascii=False).encode("utf-8")
+    # The deployed player ask route is GET /api/ask?q=... .
+    # POST /api/ask is not implemented by the current HTTP handler.
+    url = api_url.rstrip("/") + "/api/ask?" + urlencode({"q": question})
     req = Request(
-        api_url.rstrip("/") + "/api/ask",
-        data=payload,
-        headers={"Content-Type": "application/json", "Accept": "application/json"},
-        method="POST",
+        url,
+        headers={"Accept": "application/json"},
+        method="GET",
     )
     with urlopen(req, timeout=timeout) as response:
         body = response.read().decode("utf-8")
