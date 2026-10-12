@@ -54,6 +54,8 @@ PROPERTY_ALIASES={
  "requirement":["require","requires","need","needed","prerequisite","before","condition","unlock"],
  "cost":["cost","costs","price","spend","resources","resource"],
  "effect":["effect","does","gives","boost","bonus","increase","changes"],
+ "numeric_effect":["attribute bonus","attribute bonuses","stat bonus","extra damage","how much damage","quantity","amount"],
+ "sequence":["order","sequence","left-to-right","left to right","activation order","activate in the order"],
  "comparison":["difference","different","versus","vs","compare","compared","better than","worse than","better","worse","prefer","preferred","worth","value","instead of","rather than","disagree","disagreement","conflict","conflicts","trust","official evidence","youtube disagree"],
  "opponent":["opponent","opponents","opposing guild","enemy","enemies","fight against","attack against"],
  "counter":["counter","counters","against","beats","advantage"],
@@ -71,7 +73,8 @@ QUESTION_TYPES={
  "effect":["what happens","what does","what do","effect","benefit","bonus"],
  "opponent":["who do we fight","whom do we fight","who are the opponents","who are we fighting","opponent","opponents","enemies","enemy","opposing guild"],
  "counter":["what counters","which counters","counter","against"],
- "numeric":["how many","how much","how long","percentage","percent","cost","maximum","max","cap"],
+ "numeric":["how many","how much","how long","percentage","percent","cost","maximum","max","cap","quantity","amount","number of","item and quantity"],
+ "sequence":["in what order","what order","order do","activation order","left-to-right","left to right","sequence"],
  "definition":["what is","what are"],
  "update":["what changed","hot update","patch update","patch notes","update changes","sep 22","september 22","22 sep","2026-09-22","epoch of fusion seed","fusion seed prerequisite","combat craft modification"],
  "event_schedule":["which day","what day","weekday","schedule","calendar","monday","tuesday","wednesday","thursday","friday","saturday","sunday"],
@@ -282,10 +285,12 @@ class QuestionParser:
    qtype="comparison"
   elif any(p in ql for p in QUESTION_TYPES["strategy"]):
    qtype="strategy"
+  elif any(p in ql for p in QUESTION_TYPES["sequence"]):
+   qtype="sequence"
   elif any(p in ql for p in QUESTION_TYPES["numeric"]):
    # Numeric intent wins only when the user is actually asking for a value,
    # not when a value/cost is merely mentioned inside a strategy question.
-   if re.search(r"\b(?:how many|how much|how long|what is the maximum|what is the max|what is the cap|what percentage|what percent)\b", ql):
+   if re.search(r"\b(?:how many|how much|how long|what is the maximum|what is the max|what is the cap|what percentage|what percent|quantity|amount|number of|item and quantity)\b", ql):
     qtype="numeric"
    else:
     qtype="generic"
@@ -305,7 +310,10 @@ class QuestionParser:
    "source":["get","obtain","source","farm","drop"],
    "requirement":["require","need","prerequisite","before","condition"],
    "cost":["cost","price","spend"],"comparison":["difference","different","versus","compare"],
-   "counter":["counter","against","beats"],"effect":["effect","bonus","boost","change","happen"],
+   "counter":["counter","against","beats"],
+   "numeric_effect":["attribute bonus","attribute bonuses","stat bonus","extra damage","how much damage","quantity","amount"],
+   "sequence":["order","sequence","left-to-right","left to right","activation order","activate in the order"],
+   "effect":["effect","bonus","boost","change","happen"],
    "upgrade":["upgrade","empowerment","power up"],
    "duplicate":["duplicate","duplicates","dupe","dupes","same champion"],
    "reward":["reward","prize","shop"],
@@ -365,6 +373,8 @@ class KnowledgeQueryEngine:
   blob=_blob(c)
   contracts={
    "opponent":(("opponent","opposing","enemy","enemies","fight against","attack against","guild members"),),
+   "sequence":(("order","left to right","left-to-right","sequence","activate"),),
+   "numeric_effect":(("bonus","attribute","damage","grants","give","increase","percent","%"),),
    "counter":(("counter","counters","countered","beats","advantage against","weak against"),),
    "cost":(("cost","costs","price","spend","requires","credits","crystals","resources"),),
    "source":(("obtain","obtained","source","drops","drop","earn","farm","available from","purchase"),),
@@ -388,6 +398,14 @@ class KnowledgeQueryEngine:
   for c,blob,claim_tokens,claim_grams in self._index:
    if str(c.get("Status",c.get("status",""))).lower() in ("rejected","superseded"): continue
    score=3.5*_similarity_index(p.raw,blob,claim_tokens,claim_grams)+self._entity_score(p,c)+self._property_score(p,c)+self._relation_score(p,c)+self._intent_relation_score(p,c)+.65*_authority(c)
+   # A number in the question is a constraint, not decorative vocabulary.
+   # Ignore years and day-of-month numbers used only as date context.
+   ql=p.raw.lower()
+   numeric_query=re.sub(r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+\d{1,2}\b"," ",ql)
+   numeric_query=re.sub(r"\b(?:19|20)\d{2}\b"," ",numeric_query)
+   query_numbers=re.findall(r"\b\d+(?:\.\d+)?%?\b",numeric_query)
+   if query_numbers:
+    score += 4.0 if all(n.rstrip('%') in blob for n in query_numbers) else -5.0
    if p.qualifier: score += 2 if p.qualifier in _blob(c) else -.5
    if p.question_type in ("level_threshold","numeric") and not re.search(r"\b(?:level|lvl|core)\b|\b\d+(?:\.\d+)?%?\b",_blob(c)): score-=4
    results.append((c,score))
@@ -754,17 +772,49 @@ class KnowledgeQueryEngine:
   for i in range(len(unique)):
    answer+=f" [E{i+1}]"
   return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(evidence)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":"knowledge_abstention","uncertainty":note or "No sufficiently relevant evidence was found.","quality_gate":{"passes":True,"uses_relevant_evidence":bool(evidence),"reason":"Evidence-safe abstention with partial provenance." if evidence else "Evidence-safe abstention."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(evidence)}}
+ def _intent_evidence_matches(self,p,c):
+  """Reject adjacent facts that fail the question's entity/relation constraints."""
+  blob=_blob(c)
+  if p.property=="opponent" and not any(x in blob for x in ("opponent","opposing","enemy","enemies","fight against","attack against","guild members")):
+   return False
+  if p.property=="counter" and not any(x in blob for x in ("counter","countered","advantage against","weak against")):
+   return False
+  if p.property=="sequence" and not any(x in blob for x in ("order","left to right","left-to-right","sequence","activate")):
+   return False
+  if p.property=="numeric_effect" and not any(x in blob for x in ("bonus","attribute","damage","grant","give","increase","%")):
+   return False
+  ql=p.raw.lower()
+  numeric_query=re.sub(r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+\d{1,2}\b"," ",ql)
+  numeric_query=re.sub(r"\b(?:19|20)\d{2}\b"," ",numeric_query)
+  query_numbers=re.findall(r"\b\d+(?:\.\d+)?%?\b",numeric_query)
+  if query_numbers and not all(n.rstrip('%') in blob for n in query_numbers):
+   return False
+  qtokens=set(p.terms)
+  qtokens-={"2025","2026","january","february","march","april","may","june","july","august","september","october","november","december"}
+  ctokens=set(_norm_tokens(blob))
+  overlap=len(qtokens & ctokens)
+  if p.question_type=="numeric" and not re.search(r"\b\d+(?:\.\d+)?%?\b",blob):
+   return False
+  return overlap>=2 or _similarity(p.raw,blob)>=0.25
+
  def _answer(self,p,text,claims,mode):
   unique=[];seen=set()
   for c in claims:
    k=_text(c).strip()
    if k and k not in seen: seen.add(k);unique.append(c)
+  # The final generic answer path must have at least one claim that satisfies
+  # the parsed entity/relation/numeric constraints. Otherwise abstain rather
+  # than claiming success merely because retrieval returned something.
+  if mode=="direct":
+   unique=[c for c in unique if self._intent_evidence_matches(p,c)]
+   if not unique:
+    return self._empty(p,"The current evidence does not directly establish the requested detail; I will not substitute a nearby fact.",mode="semantic_quality_abstention")
   answer=text.strip()
   for i in range(len(unique)):
    if f"[E{i+1}]" not in answer: answer+=f" [E{i+1}]"
   evidence=[{"id":f"E{i+1}","claim":_text(c),"tier":c.get("Evidence Tier",c.get("tier","")),"status":c.get("Status",c.get("status","")),"source":c.get("Source",c.get("source","")),"category":c.get("Category",c.get("category",""))} for i,c in enumerate(unique)]
   answer_type="knowledge_query" if unique else "knowledge_policy"
-  return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(unique)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":answer_type,"uncertainty":"","quality_gate":{"passes":True,"uses_relevant_evidence":bool(unique),"reason":"Direct answer composed from ranked evidence." if unique else "System governance/policy response; no game-claim evidence asserted."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(unique)}}
+  return {"answer":answer,"evidence":evidence,"evidence_used":list(range(1,len(unique)+1)),"model":"fgf-v6-knowledge-query-engine","answer_type":answer_type,"uncertainty":"","quality_gate":{"passes":bool(unique) or answer_type=="knowledge_policy","uses_relevant_evidence":bool(unique),"reason":"Direct answer composed from evidence that satisfies the parsed intent contract." if unique else "No game-claim evidence asserted."},"query":p.as_dict(),"reasoning":{"mode":mode,"entity":p.entity,"property":p.property,"question_type":p.question_type,"evidence_count":len(evidence)}}
  def compose(self,q,limit=8):
   p=self.parse(q); ranked=self.rank(p,limit); rel=[(c,s) for c,s in ranked if s>=5]
   # Update questions are anchored to explicit dated/versioned corpus claims.
@@ -1189,11 +1239,14 @@ class KnowledgeQueryEngine:
    return self._answer(p,text,[top],"direct_component")
   support=[]
   top_authority=_authority(top)
-  for c,s in rel[1:4]:
+  for c,s in rel[1:12]:
    ss=self._direct_sentences(p,c)
-   # Do not append low-tier/noisy context to a direct high-tier answer.
-   if ss and _authority(c) >= top_authority-1.0:
+   # Supporting claims must independently match the asked relation and topic.
+   # Shared event dates, generic Champion mentions, or other numeric claims are
+   # not sufficient relevance by themselves.
+   if ss and self._intent_evidence_matches(p,c) and _authority(c) >= top_authority-1.0:
     support.append((c,ss[0]))
+   if len(support)>=2: break
   if support:text+=" "+" ".join(x[1] for x in support[:2])
   return self._answer(p,text,[top]+[x[0] for x in support[:2]],"direct")
 
