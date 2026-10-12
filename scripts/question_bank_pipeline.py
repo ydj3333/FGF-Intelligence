@@ -174,7 +174,36 @@ def export_training(rows: list[dict], output: Path) -> int:
     return len(records)
 
 
-def call_ask(api_url: str, question: str, timeout: int = 25) -> dict:
+def wait_for_api(api_url: str, timeout: int = 12, max_attempts: int = 7) -> dict:
+    """Warm the deployed service before a batch; fail once instead of logging 1,000 cold-start errors."""
+    url = api_url.rstrip("/") + "/api/health"
+    last_error = "health endpoint did not become ready"
+    for attempt in range(max_attempts):
+        req = Request(url, headers={"Accept": "application/json"}, method="GET")
+        try:
+            with urlopen(req, timeout=timeout) as response:
+                body = response.read().decode("utf-8")
+                try:
+                    payload = json.loads(body)
+                except json.JSONDecodeError:
+                    payload = {"raw_response": body[:1000]}
+                if 200 <= response.status < 300 and (
+                    not isinstance(payload, dict) or payload.get("ok", True)
+                ):
+                    return {"http_status": response.status, "payload": payload}
+                last_error = f"health endpoint returned HTTP {response.status}"
+        except HTTPError as exc:
+            last_error = f"health endpoint returned HTTP {exc.code}"
+            if exc.code not in {408, 425, 429, 500, 502, 503, 504}:
+                raise
+        except (URLError, TimeoutError, OSError) as exc:
+            last_error = f"{type(exc).__name__}: {exc}"
+        if attempt < max_attempts - 1:
+            time.sleep(min(12.0, 1.0 * (2 ** attempt)))
+    raise RuntimeError(f"FGF API did not become ready after {max_attempts} attempts: {last_error}")
+
+
+def call_ask(api_url: str, question: str, timeout: int = 25, retries: int = 2) -> dict:
     # The deployed player ask route is GET /api/ask?q=... .
     # POST /api/ask is not implemented by the current HTTP handler.
     url = api_url.rstrip("/") + "/api/ask?" + urlencode({"q": question})
@@ -183,13 +212,23 @@ def call_ask(api_url: str, question: str, timeout: int = 25) -> dict:
         headers={"Accept": "application/json"},
         method="GET",
     )
-    with urlopen(req, timeout=timeout) as response:
-        body = response.read().decode("utf-8")
+    for attempt in range(retries + 1):
         try:
-            parsed = json.loads(body)
-        except json.JSONDecodeError:
-            parsed = {"raw_response": body[:4000]}
-        return {"http_status": response.status, "payload": parsed}
+            with urlopen(req, timeout=timeout) as response:
+                body = response.read().decode("utf-8")
+                try:
+                    parsed = json.loads(body)
+                except json.JSONDecodeError:
+                    parsed = {"raw_response": body[:4000]}
+                return {"http_status": response.status, "payload": parsed}
+        except HTTPError as exc:
+            if exc.code not in {408, 425, 429, 500, 502, 503, 504} or attempt >= retries:
+                raise
+        except (URLError, TimeoutError, OSError):
+            if attempt >= retries:
+                raise
+        time.sleep(min(4.0, 1.0 * (2 ** attempt)))
+    raise RuntimeError("FGF ask endpoint exhausted transient retries")
 
 
 def flatten_text(value) -> str:
@@ -278,6 +317,9 @@ def evaluation_candidates(rows: list[dict], limit: int | None = None) -> list[di
 def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: float) -> dict:
     # Generated prompts are diagnostic probes, not gold labels. No lexical score
     # can approve a row or prove semantic correctness; it only prioritizes review.
+    # Render may sleep between sessions. Warm it once before a batch so a cold
+    # start does not become hundreds of misleading per-question failures.
+    wait_for_api(api_url)
     candidates = evaluation_candidates(rows, limit)
     report = []
     failures = 0
