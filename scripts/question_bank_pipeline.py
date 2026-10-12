@@ -221,6 +221,25 @@ def overlap_score(left, right) -> float:
     return len(a & b) / len(a | b)
 
 
+def score_evidence_items(source_claim: str, evidence_items: list) -> dict:
+    """Score each evidence claim separately so one good claim cannot hide noise."""
+    rows = []
+    for item in evidence_items or []:
+        claim = item.get("claim", "") if isinstance(item, dict) else str(item or "")
+        score = overlap_score(source_claim, claim)
+        rows.append({"claim": claim, "source_overlap_triage": round(score, 4)})
+    supported = any(row["source_overlap_triage"] >= 0.12 for row in rows)
+    irrelevant = [row for row in rows if row["source_overlap_triage"] < 0.12]
+    return {
+        "source_claim_supported_by_evidence": supported,
+        "best_evidence_source_overlap_triage": max(
+            (row["source_overlap_triage"] for row in rows), default=0.0
+        ),
+        "irrelevant_evidence_count_triage": len(irrelevant),
+        "evidence_item_scores": rows,
+    }
+
+
 def evaluation_candidates(rows: list[dict], limit: int | None = None) -> list[dict]:
     """Probe only current canonical claims and exclude 9,000 synthetic shell prompts."""
     candidates = [
@@ -265,19 +284,22 @@ def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: fl
             evidence_text = flatten_text(evidence)
             source_claim = row.get("source_claim_text") or row.get("ideal_answer") or ""
             answer_overlap = overlap_score(source_claim, answer_text)
-            evidence_overlap = overlap_score(source_claim, evidence_text)
+            evidence_triage = score_evidence_items(source_claim, evidence)
             record.update({
                 "http_status": result.get("http_status"),
                 "response_excerpt": answer_text[:1800],
                 "evidence_excerpt": evidence_text[:1800],
                 "answer_source_overlap_triage": round(answer_overlap, 4),
-                "evidence_source_overlap_triage": round(evidence_overlap, 4),
-                "evaluation_status": (
-                    "possible_relevance_failure"
-                    if result.get("http_status", 0) >= 400 or (answer_overlap < 0.12 and evidence_overlap < 0.12)
-                    else "lexical_signal_for_manual_semantic_review"
-                ),
+                **evidence_triage,
             })
+            if result.get("http_status", 0) >= 400 or (
+                answer_overlap < 0.12 and not evidence_triage["source_claim_supported_by_evidence"]
+            ):
+                record["evaluation_status"] = "possible_relevance_failure"
+            elif evidence_triage["irrelevant_evidence_count_triage"]:
+                record["evaluation_status"] = "answer_with_irrelevant_evidence_review"
+            else:
+                record["evaluation_status"] = "lexical_signal_for_manual_semantic_review"
             if record["evaluation_status"] == "possible_relevance_failure":
                 failures += 1
         except (HTTPError, URLError, TimeoutError, OSError, ValueError, RuntimeError) as exc:
