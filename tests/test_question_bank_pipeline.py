@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from scripts.question_bank_pipeline import audit, call_ask, content_tokens, evaluation_candidates, is_safe_training_example, normalize_source_row, overlap_score, score_evidence_items
+from scripts.question_bank_pipeline import audit, call_ask, content_tokens, evaluation_candidates, is_safe_training_example, normalize_source_row, overlap_score, score_evidence_items, wait_for_api
 
 
 def row(**overrides):
@@ -52,6 +52,36 @@ class QuestionBankGovernanceTests(unittest.TestCase):
         self.assertEqual(request.get_method(), "GET")
         self.assertIn("/api/ask?q=How+many+migration+permits%3F", request.full_url)
         self.assertEqual(result["payload"]["answer"], "ok")
+
+    def test_live_probe_retries_transient_503(self):
+        from urllib.error import HTTPError
+
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = b'{"answer":"ok"}'
+        response.__enter__.return_value = response
+        transient = HTTPError("https://example.test", 503, "Service Unavailable", {}, None)
+        with patch("scripts.question_bank_pipeline.urlopen", side_effect=[transient, response]) as mocked, \
+             patch("scripts.question_bank_pipeline.time.sleep") as sleep:
+            result = call_ask("https://example.test", "How many migration permits?")
+        self.assertEqual(result["http_status"], 200)
+        self.assertEqual(mocked.call_count, 2)
+        sleep.assert_called_once()
+
+    def test_health_warmup_retries_cold_start_once_before_batch(self):
+        from urllib.error import HTTPError
+
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = b'{"ok":true,"version":"test"}'
+        response.__enter__.return_value = response
+        transient = HTTPError("https://example.test/api/health", 503, "Waking", {}, None)
+        with patch("scripts.question_bank_pipeline.urlopen", side_effect=[transient, response]) as mocked, \
+             patch("scripts.question_bank_pipeline.time.sleep") as sleep:
+            result = wait_for_api("https://example.test", max_attempts=3)
+        self.assertEqual(result["payload"]["ok"], True)
+        self.assertEqual(mocked.call_count, 2)
+        sleep.assert_called_once()
 
     def test_source_join_normalization_uses_claim_lifecycle_and_fails_closed(self):
         linked = normalize_source_row({
