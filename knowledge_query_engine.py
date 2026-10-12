@@ -799,6 +799,15 @@ class KnowledgeQueryEngine:
    return False
   # Date/version overlap must not make unrelated items from the same patch relevant.
   if p.question_type=="update":
+   # When a patch question names specific entities/items, require every named
+   # anchor in the supporting claim. A shared date or the word "update" is not
+   # evidence that another patch note answers this question.
+   anchors=[
+    token.lower() for token in re.findall(r"\b[A-Z][A-Za-z0-9]+\b",p.raw)
+    if token.lower() not in {"what","which","how","when","where","why","who","did","does","do","were","was","are","is","the","in","on","after","for","and","with","from","to","september","october","november","december","january","february","march","april","may","june","july","august"}
+   ]
+   if len(anchors)>=2:
+    return all(anchor in blob for anchor in anchors)
    return overlap>=2
   return overlap>=2 or _similarity(p.raw,blob)>=0.25
 
