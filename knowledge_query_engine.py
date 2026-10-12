@@ -1234,6 +1234,12 @@ class KnowledgeQueryEngine:
     [c for c,_ in rel[:3]],
     "comparison_no_direct_pair",
    )
+  # Before composing a generic response, remove candidates that fail the same
+  # intent contract used by the answer validator. A relevant claim lower in the
+  # ranking must win over an irrelevant top-ranked claim.
+  rel=[(c,s) for c,s in rel if self._intent_evidence_matches(p,c)]
+  if not rel:
+   return self._empty(p,"The current evidence does not directly establish the requested detail; I will not substitute a nearby fact.",mode="semantic_quality_abstention")
   top,_=rel[0]; direct=self._direct_sentences(p,top); text=direct[0] if direct else _text(top)
   if re.search(r"\bwhich\s+(?:type\s+of\s+)?components?\b", p.raw.lower()) and direct:
    return self._answer(p,text,[top],"direct_component")
