@@ -59,6 +59,20 @@ def _headers() -> dict[str, str]:
     return headers
 
 
+def normalize_source_row(row: dict) -> dict:
+    """Copy linked claim lifecycle/provenance into explicit fields; fail closed."""
+    source = row.get("source_claim")
+    if isinstance(source, list):
+        source = source[0] if source else None
+    source = source if isinstance(source, dict) else {}
+    row["source_status"] = source.get("status")
+    row["source_canonical"] = source.get("canonical") is True
+    row["source_claim_text"] = source.get("claim")
+    row["source_claim_tier"] = source.get("tier")
+    row["source_claim_version"] = source.get("version")
+    return row
+
+
 def fetch_rows(page_size: int = 1000) -> list[dict]:
     """Fetch the complete bank using PostgREST range pagination."""
     rows: list[dict] = []
@@ -75,16 +89,7 @@ def fetch_rows(page_size: int = 1000) -> list[dict]:
         if not isinstance(page, list):
             raise RuntimeError("Supabase returned an unexpected question-bank payload.")
         for row in page:
-            # Normalize the FK-joined source claim. Missing provenance fails closed.
-            source = row.get("source_claim")
-            if isinstance(source, list):
-                source = source[0] if source else None
-            source = source if isinstance(source, dict) else {}
-            row["source_status"] = source.get("status")
-            row["source_canonical"] = source.get("canonical") is True
-            row["source_claim_text"] = source.get("claim")
-            row["source_claim_tier"] = source.get("tier")
-            row["source_claim_version"] = source.get("version")
+            normalize_source_row(row)
         rows.extend(page)
         if len(page) < page_size:
             break
@@ -112,11 +117,20 @@ def audit(rows: list[dict]) -> dict:
     by_intent = collections.Counter(str(r.get("intent_type") or "missing") for r in rows)
     by_generation = collections.Counter(str(r.get("generation_method") or "missing") for r in rows)
     eligible = [r for r in rows if is_safe_training_example(r)]
+    probe_rows = evaluation_candidates(rows)
+    source_status_counts = collections.Counter(
+        str(r.get("source_status") or "missing") for r in rows
+    )
     return {
         "total_rows": len(rows),
         "distinct_questions": len({str(r.get("question") or "").strip() for r in rows}),
         "distinct_source_claims": len({r.get("source_claim_id") for r in rows if r.get("source_claim_id")}),
         "training_eligible_rows": len(eligible),
+        "current_canonical_non_shell_probe_rows": len(probe_rows),
+        "current_canonical_non_shell_source_claims": len({
+            r.get("source_claim_id") for r in probe_rows if r.get("source_claim_id")
+        }),
+        "source_status_counts": dict(source_status_counts),
         "review_status_counts": dict(by_review),
         "intent_counts": dict(by_intent),
         "generation_method_counts": dict(by_generation),
