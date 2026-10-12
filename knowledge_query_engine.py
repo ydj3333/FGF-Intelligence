@@ -909,6 +909,8 @@ class KnowledgeQueryEngine:
   if p.question_type=="update":
    update_terms=("hot update","sep 22","september 22","22 sep","2026-09-22","patch","epoch of fusion seed","fusion seed prerequisite","combat craft modification")
    cand=[(c,s) for c,s in rel if any(x in _blob(c) for x in update_terms)]
+   # An update date is not enough to make every change in that update relevant.
+   cand=[(c,s) for c,s in cand if self._intent_evidence_matches(p,c)]
    if cand:
     cand.sort(key=lambda x:(x[1],_authority(x[0])),reverse=True)
     top=cand[:4]
