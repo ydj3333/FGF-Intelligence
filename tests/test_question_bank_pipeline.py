@@ -79,7 +79,16 @@ class QuestionBankGovernanceTests(unittest.TestCase):
             row(id="noncanonical", source_canonical=False),
             row(id="missing_claim_text", source_claim_text=""),
         ]
-        self.assertEqual([r["id"] for r in evaluation_candidates(rows)], ["good"])
+        self.assertEqual([r["id"] for r in evaluation_candidates(rows)], ["good", "noncanonical"])
+
+    def test_noncanonical_source_rows_are_exploratory_not_gold(self):
+        rows = [
+            row(id="noncanonical", source_canonical=False, generation_method="verified_claim_template_v3_subject_aware"),
+            row(id="curated", generation_method="expert_curated_source_grounded_v1"),
+        ]
+        candidates = evaluation_candidates(rows)
+        self.assertEqual([r["id"] for r in candidates], ["curated", "noncanonical"])
+        self.assertFalse(any(r.get("training_eligible") for r in candidates))
 
     def test_evidence_scoring_does_not_let_one_good_claim_hide_noise(self):
         result = score_evidence_items(
