@@ -338,8 +338,17 @@ def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: fl
         if pause and index < len(candidates):
             time.sleep(pause)
     write_jsonl(output, report)
+    status_counts = collections.Counter(
+        str(row.get("evaluation_status") or "missing") for row in report
+    )
+    source_class_counts = collections.Counter(
+        str(row.get("source_authority_class") or "missing") for row in report
+    )
     return {
         "candidate_questions": len(candidates),
+        "canonical_source_probe_count": source_class_counts.get("canonical_source", 0),
+        "exploratory_noncanonical_probe_count": source_class_counts.get("exploratory_noncanonical_source", 0),
+        "evaluation_status_counts": dict(status_counts),
         "needs_review_or_request_error": failures,
         "report_path": str(output),
         "warning": (
