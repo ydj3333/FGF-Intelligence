@@ -118,6 +118,8 @@ def audit(rows: list[dict]) -> dict:
     by_generation = collections.Counter(str(r.get("generation_method") or "missing") for r in rows)
     eligible = [r for r in rows if is_safe_training_example(r)]
     probe_rows = evaluation_candidates(rows)
+    canonical_probe_rows = [r for r in probe_rows if r.get("source_canonical") is True]
+    exploratory_probe_rows = [r for r in probe_rows if r.get("source_canonical") is not True]
     source_status_counts = collections.Counter(
         str(r.get("source_status") or "missing") for r in rows
     )
@@ -126,10 +128,12 @@ def audit(rows: list[dict]) -> dict:
         "distinct_questions": len({str(r.get("question") or "").strip() for r in rows}),
         "distinct_source_claims": len({r.get("source_claim_id") for r in rows if r.get("source_claim_id")}),
         "training_eligible_rows": len(eligible),
-        "current_canonical_non_shell_probe_rows": len(probe_rows),
+        "current_canonical_non_shell_probe_rows": len(canonical_probe_rows),
         "current_canonical_non_shell_source_claims": len({
-            r.get("source_claim_id") for r in probe_rows if r.get("source_claim_id")
+            r.get("source_claim_id") for r in canonical_probe_rows if r.get("source_claim_id")
         }),
+        "current_noncanonical_non_shell_exploratory_rows": len(exploratory_probe_rows),
+        "total_current_non_shell_probe_rows": len(probe_rows),
         "source_status_counts": dict(source_status_counts),
         "review_status_counts": dict(by_review),
         "intent_counts": dict(by_intent),
@@ -251,17 +255,23 @@ def score_evidence_items(source_claim: str, evidence_items: list) -> dict:
 
 
 def evaluation_candidates(rows: list[dict], limit: int | None = None) -> list[dict]:
-    """Probe only current canonical claims and exclude 9,000 synthetic shell prompts."""
+    """Probe current source-linked prompts; canonical claims first, other tiers exploratory."""
     candidates = [
         r for r in rows
-        if r.get("source_canonical") is True
-        and str(r.get("source_status") or "").strip().lower() in {"confirmed", "current", "verified"}
+        if str(r.get("source_status") or "").strip().lower() in {"confirmed", "current", "verified"}
         and r.get("source_claim_id")
         and str(r.get("source_claim_text") or "").strip()
         and str(r.get("question") or "").strip()
         and str(r.get("ideal_answer") or "").strip()
         and "paraphrase_shell" not in str(r.get("generation_method") or "")
     ]
+    # Curated canonical prompts first, then other canonical prompts, then noncanonical
+    # source probes. Noncanonical evidence is exploratory only and never a gold label.
+    candidates.sort(key=lambda r: (
+        0 if r.get("source_canonical") is True and r.get("generation_method") == "expert_curated_source_grounded_v1"
+        else 1 if r.get("source_canonical") is True
+        else 2
+    ))
     return candidates if limit is None else candidates[:max(0, limit)]
 
 
@@ -281,7 +291,8 @@ def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: fl
             "intent_type": row.get("intent_type"),
             "generation_method": row.get("generation_method"),
             "review_status": row.get("review_status"),
-            "evaluation_is_gold": False,
+            "source_authority_class": "canonical_source" if row.get("source_canonical") is True else "exploratory_noncanonical_source",
+            "question_gold_label": False,
         }
         try:
             result = call_ask(api_url, row["question"])
@@ -302,16 +313,24 @@ def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: fl
                 "answer_source_overlap_triage": round(answer_overlap, 4),
                 **evidence_triage,
             })
-            if result.get("http_status", 0) >= 400 or (
-                answer_overlap < 0.12 and not evidence_triage["source_claim_supported_by_evidence"]
-            ):
+            if result.get("http_status", 0) >= 400:
+                record["evaluation_status"] = "request_error"
+                failures += 1
+            elif row.get("source_canonical") is not True:
+                # Noncanonical Experience/community claims can expose coverage gaps,
+                # but cannot be treated as the expected truth or a model failure.
+                record["evaluation_status"] = (
+                    "exploratory_answer_with_irrelevant_evidence_review"
+                    if evidence_triage["irrelevant_evidence_count_triage"]
+                    else "exploratory_only_not_gold"
+                )
+            elif answer_overlap < 0.12 and not evidence_triage["source_claim_supported_by_evidence"]:
                 record["evaluation_status"] = "possible_relevance_failure"
+                failures += 1
             elif evidence_triage["irrelevant_evidence_count_triage"]:
                 record["evaluation_status"] = "answer_with_irrelevant_evidence_review"
             else:
                 record["evaluation_status"] = "lexical_signal_for_manual_semantic_review"
-            if record["evaluation_status"] == "possible_relevance_failure":
-                failures += 1
         except (HTTPError, URLError, TimeoutError, OSError, ValueError, RuntimeError) as exc:
             record.update({"evaluation_status": "request_error", "error": str(exc)[:500]})
             failures += 1
