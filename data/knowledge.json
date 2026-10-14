@@ -91411,6 +91411,469 @@
           "season_scope": "Interstellar Migration / 2026 guide"
         }
       }
+    },
+    {
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "The Android version will use Vulkan as its primary rendering API to improve the gaming experience; rendering styles of some buildings will also be optimized.",
+      "Category": "technical",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "platform_update",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "platform_update",
+      "claim_key": "announcement_2026_10_14_android_vulkan",
+      "supabase_id": "13817adc-0893-4735-bb23-45441691221d",
+      "metadata": {
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "The Guild Member list will support searching by member name.",
+      "Category": "ui",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "quality_of_life",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "quality_of_life",
+      "claim_key": "announcement_2026_10_14_guild_member_search",
+      "supabase_id": "2001a59d-c75c-4b68-9c6a-e76263df1719",
+      "metadata": {
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "start_date": "not stated",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "Dominion Warzone is coming to Season 2 servers; players draw lots to determine matchups, fight through elimination rounds, and compete for a higher season ranking for their server.",
+      "Category": "event",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "announcement_2026_10_14_dominion_warzone_s2",
+      "supabase_id": "2f32356a-6b0f-48df-a279-a80bfb280b80",
+      "metadata": {
+        "source": "in-game announcement",
+        "start_date": "not stated",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "effective_date": "2026-10-15",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "Foundation: Galactic Frontier will undergo maintenance on October 15, 2026, from 06:00 to 09:00 UTC; the actual end time may vary, and maintenance may finish earlier or be extended.",
+      "Category": "maintenance",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-15-maintenance",
+      "Evidence Type": "schedule",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "schedule",
+      "claim_key": "announcement_2026_10_14_maintenance_window",
+      "supabase_id": "3b39b1fb-4d73-4b9a-afa7-81d18136584c",
+      "metadata": {
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "effective_date": "2026-10-15",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-15-maintenance"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "timing": "coming soon; exact dates not stated",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "The Astral Alignment Party is coming soon; the notice describes Port celebrations, anniversary salutes, and rewards, events, and surprises.",
+      "Category": "event",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "announcement",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "announcement",
+      "claim_key": "announcement_2026_10_14_astral_alignment_party",
+      "supabase_id": "508d83df-9f9c-449a-88d6-1a09f183f9aa",
+      "metadata": {
+        "source": "in-game announcement",
+        "timing": "coming soon; exact dates not stated",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "scope": "certain Trader Commissions; exact commissions not listed",
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "In the Season 2 Aromabloom Trade War event, analysis progress for chests obtained from certain Trader Commissions will be doubled.",
+      "Category": "event",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "progression_update",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "progression_update",
+      "claim_key": "announcement_2026_10_14_aromabloom_chest_analysis",
+      "supabase_id": "51aaf1dc-e1e0-42aa-a45c-a176a837baca",
+      "metadata": {
+        "scope": "certain Trader Commissions; exact commissions not listed",
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "exact_times": "not stated",
+      "verified_on": "2026-10-14",
+      "server_scope": "1001-1016",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "Amusement Park Defense is a new ground-combat event that alternates with “Kaboom, robots!” from Sunday to Monday; initial testing is on servers 1001–1016.",
+      "Category": "event",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "schedule",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "schedule",
+      "claim_key": "announcement_2026_10_14_amusement_park_defense",
+      "supabase_id": "5f9967ac-271c-47c2-9fbb-4143f734d047",
+      "metadata": {
+        "source": "in-game announcement",
+        "exact_times": "not stated",
+        "verified_on": "2026-10-14",
+        "server_scope": "1001-1016",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "server_scope": "1001-1016",
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "details": "individual fixes not enumerated",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "The update includes other optimizations and bug fixes related to Season 2.",
+      "Category": "release",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "patch_summary",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "patch_summary",
+      "claim_key": "announcement_2026_10_14_s2_general_fixes",
+      "supabase_id": "62f273c7-eb51-4be7-a1cf-497be21b8459",
+      "metadata": {
+        "source": "in-game announcement",
+        "details": "individual fixes not enumerated",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "compensation_amount": "not stated",
+      "Claim": "The notice says compensation will be sent once maintenance is complete.",
+      "Category": "maintenance",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-15-maintenance",
+      "Evidence Type": "compensation",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "compensation",
+      "claim_key": "announcement_2026_10_14_maintenance_compensation",
+      "supabase_id": "93d42e82-118e-4818-9341-67d4bdcdf3f1",
+      "metadata": {
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "compensation_amount": "not stated",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-15-maintenance"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "The display of in-game red-dot notifications will be optimized.",
+      "Category": "ui",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "notification_update",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "notification_update",
+      "claim_key": "announcement_2026_10_14_red_dot_notifications",
+      "supabase_id": "9c27e53d-d84e-4264-be32-6386783e5d31",
+      "metadata": {
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "level_range": "31-35",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "Level indicators for Flagships at levels 31–35 will be optimized.",
+      "Category": "ui",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "display_update",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "display_update",
+      "claim_key": "announcement_2026_10_14_flagship_level_indicators",
+      "supabase_id": "ac8f79f7-0dc1-48ac-aefa-8ee17937a5b5",
+      "metadata": {
+        "source": "in-game announcement",
+        "level_range": "31-35",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "exact_reward_formula": "not stated",
+      "Claim": "A new Sunday stage, Stand Down, is being introduced to the Commerce Guild Duel; designated quests grant rewards based on losses sustained by the player’s Commerce Guild combat craft during Duel Day.",
+      "Category": "event",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "mechanic",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "mechanic",
+      "claim_key": "announcement_2026_10_14_commerce_guild_duel_stand_down",
+      "supabase_id": "aedb9df9-fdbf-4eb8-8929-d82d0c29be33",
+      "metadata": {
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "exact_reward_formula": "not stated",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
+    },
+    {
+      "source": "in-game announcement",
+      "verified_on": "2026-10-14",
+      "review_status": "verified_from_user_provided_in_game_announcement",
+      "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+      "Claim": "Leaderboards will include rankings for Champion Weapons.",
+      "Category": "ui",
+      "Source": "",
+      "Season/Version": "S2 / 2026-10-14",
+      "Evidence Type": "leaderboard_update",
+      "Evidence Tier": "T1",
+      "Confidence": "high",
+      "Status": "confirmed",
+      "Verification Status": "Unknown",
+      "Timestamp": "",
+      "Notes": "",
+      "Claim Type": "leaderboard_update",
+      "claim_key": "announcement_2026_10_14_champion_weapon_leaderboards",
+      "supabase_id": "f81d7385-d6c6-46cf-8782-52efbe9a0057",
+      "metadata": {
+        "source": "in-game announcement",
+        "verified_on": "2026-10-14",
+        "review_status": "verified_from_user_provided_in_game_announcement",
+        "visibility_note": "Official in-game notice; direct in-game evidence classified T1, stronger than T2 official external information. Scope and dates limited to the notice.",
+        "lifecycle": {
+          "state": "current",
+          "legacy_status": "confirmed",
+          "tier": 6
+        },
+        "temporal": {
+          "season_scope": "S2 / 2026-10-14"
+        }
+      }
     }
   ],
   "conflicts": [
@@ -91477,6 +91940,6 @@
     "tier1_claims": 492,
     "tier2_claims": 237,
     "tier3_strong_community_claims": 381,
-    "total_claims": 1593
+    "total_claims": 1606
   }
 }
