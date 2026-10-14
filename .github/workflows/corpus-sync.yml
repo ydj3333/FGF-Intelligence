@@ -119,26 +119,6 @@ jobs:
             exit 1
           fi
 
-      - name: Trigger Render deployment for synchronized corpus
-        if: steps.commit.outputs.changed == 'true'
-        env:
-          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-        run: |
-          set -euo pipefail
-          test -n "$RENDER_DEPLOY_HOOK_URL"
-          curl --fail --show-error --silent --request POST "$RENDER_DEPLOY_HOOK_URL"
-
-      - name: Verify production health after deployment
-        if: steps.commit.outputs.changed == 'true'
-        run: |
-          set -euo pipefail
-          for i in {1..30}; do
-            code=$(curl -s -o /tmp/health.json -w "%{http_code}" https://fgf-intelligence.onrender.com/api/health || true)
-            if [ "$code" = "200" ]; then
-              cat /tmp/health.json
-              exit 0
-            fi
-            sleep 10
-          done
-          echo "::error::Render did not become healthy within the wait window."
-          exit 1
+      # Deployment is owned by .github/workflows/render-deploy.yml. A successful
+      # push to main already triggers that workflow. Do not POST the same Render
+      # deploy hook here: duplicate concurrent deploy requests caused HTTP 500.
