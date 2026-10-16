@@ -4,7 +4,7 @@ import logging
 import unittest
 from unittest.mock import patch
 
-from observability.logging_levels import emit, level_catalog, timed_event, set_correlation_id, reset_correlation_id
+from observability.logging_levels import emit, level_catalog, timed_event, set_correlation_id, reset_correlation_id, logging_status
 
 
 class LoggingLevelsTests(unittest.TestCase):
@@ -27,6 +27,14 @@ class LoggingLevelsTests(unittest.TestCase):
             self.assertTrue(all(json.loads(line)["schema"] == "fgf.logging.v1" for line in lines))
         finally:
             logger.removeHandler(handler)
+
+    def test_health_status_reports_all_emitted_levels(self):
+        for level in level_catalog():
+            emit(level, "health_counter_test")
+        status = logging_status()
+        self.assertTrue(status["all_levels_observed"])
+        self.assertEqual(set(status["observed_levels"]), set(level_catalog()))
+        self.assertTrue(all(status["event_counts"][level] > 0 for level in level_catalog()))
 
     def test_secret_like_fields_are_redacted(self):
         record = emit("L6", "redaction_test", api_key="not-a-real-key", token="do-not-log", path="/api/ask", duration_ms=12.5)
