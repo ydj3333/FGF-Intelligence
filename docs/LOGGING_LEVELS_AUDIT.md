@@ -18,6 +18,7 @@ Status date: 2026-10-16. This document defines required event semantics; it is n
 
 - observability/logging_levels.py provides JSON-lines structured events with stable level codes, timestamps, release/service metadata, status, duration and bounded correlation identifiers.
 - agent.py emits L0 startup/health events, L1 observation-route events, L2 evidence summaries, L3 observation-learning handoff events, L4 answer completion events, L5 benchmark-route events and L6 request lifecycle events.
+- The health response exposes a process-local logging registry, per-level event counters, last event names, and an all-levels-observed flag. These counters reset on restart and must be verified on the deployed release after exercising each route.
 - tests/test_logging_levels.py verifies the complete level registry, structured output, redaction, invalid-level rejection and timed success/failure events.
 - Secret-like fields are redacted; request bodies, credentials, screenshots and raw video must never be logged.
 
