@@ -27,20 +27,40 @@ def get_json(path: str, timeout: int = 45) -> tuple[int, dict]:
         return 0, {"error": str(exc.reason)[:300]}
 
 
+def commit_is_ancestor(expected: str, deployed: str) -> bool:
+    if not expected:
+        return True
+    if expected == deployed:
+        return True
+    url = "https://api.github.com/repos/ydj3333/FGF-Intelligence/compare/" + expected + "..." + deployed
+    request = Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "fgf-runtime-logging-verifier"})
+    try:
+        with urlopen(request, timeout=15) as response:
+            comparison = json.loads(response.read().decode("utf-8"))
+        return comparison.get("status") in ("ahead", "identical")
+    except Exception:
+        return False
+
+
 def wait_for_deployed_logging() -> dict:
     deadline = time.monotonic() + DEADLINE_SECONDS
     expected_commit = os.getenv("FGF_EXPECTED_DEPLOY_COMMIT", os.getenv("GITHUB_SHA", "")).lower()
     last_error = None
+    last_compared_commit = None
+    last_commit_matches = False
     while time.monotonic() < deadline:
         status, body = get_json("/api/health", timeout=20)
         deployed_commit = str(body.get("deployment_commit", "")).lower()
-        commit_matches = not expected_commit or deployed_commit == expected_commit
+        if deployed_commit and deployed_commit != last_compared_commit:
+            last_commit_matches = commit_is_ancestor(expected_commit, deployed_commit)
+            last_compared_commit = deployed_commit
+        commit_matches = not expected_commit or last_commit_matches
         if status == 200 and isinstance(body.get("logging"), dict) and commit_matches:
             print("logging-aware deployment verified: commit=" + (deployed_commit or "unknown"))
             return body
         last_error = {"http_status": status, "expected_commit": expected_commit,
-                      "deployed_commit": deployed_commit, "response_keys": sorted(body.keys()),
-                      "error": body.get("error")}
+                      "deployed_commit": deployed_commit, "expected_is_ancestor": commit_matches,
+                      "response_keys": sorted(body.keys()), "error": body.get("error")}
         time.sleep(10)
     raise RuntimeError("Timed out waiting for the expected deployed commit: " + json.dumps(last_error))
 
