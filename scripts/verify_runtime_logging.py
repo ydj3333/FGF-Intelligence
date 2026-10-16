@@ -42,6 +42,18 @@ def commit_is_ancestor(expected: str, deployed: str) -> bool:
         return False
 
 
+def get_json_retry(path: str, *, timeout: int = 60, attempts: int = 5) -> tuple[int, dict]:
+    last = (0, {"error": "not_attempted"})
+    for attempt in range(attempts):
+        last = get_json(path, timeout=timeout)
+        status, _ = last
+        if status not in (0, 502, 503, 504):
+            return last
+        if attempt + 1 < attempts:
+            time.sleep(min(5 * (attempt + 1), 20))
+    return last
+
+
 def wait_for_deployed_logging() -> dict:
     deadline = time.monotonic() + DEADLINE_SECONDS
     expected_commit = os.getenv("FGF_EXPECTED_DEPLOY_COMMIT", os.getenv("GITHUB_SHA", "")).lower()
@@ -71,24 +83,24 @@ def main() -> int:
     print("release=" + str(initial.get("version", "unknown")))
 
     # L2/L4/L6: safe read-only evidence-backed answer request.
-    status, body = get_json("/api/ask?q=energy%20types", timeout=90)
+    status, body = get_json_retry("/api/ask?q=energy%20types", timeout=60, attempts=5)
     if status != 200 or not body.get("answer"):
         raise RuntimeError("Ask API smoke test failed: " + json.dumps({"status": status, "keys": sorted(body.keys())}))
 
     # L5/L6: small deterministic benchmark smoke test, not a substitute for the 50Q gate.
-    status, body = get_json("/api/benchmarks/quality", timeout=90)
+    status, body = get_json_retry("/api/benchmarks/quality", timeout=60, attempts=5)
     if status != 200:
         raise RuntimeError("Quality benchmark smoke test failed: " + json.dumps({"status": status, "keys": sorted(body.keys())}))
 
     # L1/L3/L6: an unauthenticated status request must be rejected before
     # returning observer state. This exercises logging without mutating data.
-    observation_status, _ = get_json("/api/v63/live/status", timeout=30)
+    observation_status, _ = get_json_retry("/api/v63/live/status", timeout=30, attempts=3)
     if observation_status not in (401, 403):
         raise RuntimeError("Unauthenticated observer status was not blocked: " + str(observation_status))
 
     # Health response is sampled after all routes have emitted their events.
     time.sleep(1)
-    status, final = get_json("/api/health", timeout=30)
+    status, final = get_json_retry("/api/health", timeout=30, attempts=3)
     if status != 200 or not isinstance(final.get("logging"), dict):
         raise RuntimeError("Final health/logging status unavailable")
     logging_status = final["logging"]
