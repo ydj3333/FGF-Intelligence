@@ -24,6 +24,7 @@ _LEVELS = {
     "L6": "operations",
 }
 _ALLOWED = set(_LEVELS)
+_correlation_context: ContextVar[str | None] = ContextVar("fgf_log_correlation_id", default=None)
 _logger = logging.getLogger("fgf.runtime")
 _logger.setLevel(logging.INFO)
 _logger.propagate = False
@@ -48,7 +49,7 @@ def emit(level: str, event: str, *, status: str = "ok", correlation_id: str | No
         "status": str(status)[:32],
         "service": os.getenv("RENDER_SERVICE_NAME", "fgf-intelligence"),
         "release": os.getenv("RENDER_GIT_COMMIT", os.getenv("FGF_RELEASE", "unknown")),
-        "correlation_id": correlation_id or str(uuid.uuid4()),
+        "correlation_id": correlation_id or _correlation_context.get() or str(uuid.uuid4()),
     }
     if duration_ms is not None:
         record["duration_ms"] = round(max(0.0, float(duration_ms)), 3)
@@ -92,6 +93,16 @@ def timed_event(level: str, event: str, **fields: Any):
             emit(level, event, status="ok", correlation_id=correlation_id,
                  duration_ms=(time.perf_counter() - started) * 1000, **fields)
     return _timer()
+
+
+def set_correlation_id(correlation_id: str) -> Token:
+    """Bind a request correlation ID for all events in the current execution context."""
+    return _correlation_context.set(str(correlation_id))
+
+
+def reset_correlation_id(token: Token) -> None:
+    """Restore the previous request correlation context."""
+    _correlation_context.reset(token)
 
 
 def level_catalog() -> dict[str, str]:
