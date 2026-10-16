@@ -18,6 +18,6 @@ jobs:
       - name: Wait for Render and verify all seven runtime levels
         env:
           FGF_PUBLIC_BASE_URL: https://fgf-intelligence.onrender.com
-          FGF_EXPECTED_DEPLOY_COMMIT: ${{ github.sha }}
+          FGF_EXPECTED_DEPLOY_COMMIT: 92cca1de97ae0733c0ef6066a3fdf077f6592466
           FGF_DEPLOY_WAIT_SECONDS: '600'
         run: python scripts/verify_runtime_logging.py
