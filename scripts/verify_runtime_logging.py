@@ -60,23 +60,11 @@ def main() -> int:
     if status != 200:
         raise RuntimeError("Quality benchmark smoke test failed: " + json.dumps({"status": status, "keys": sorted(body.keys())}))
 
-    # L1/L3/L6: deliberately unauthenticated session-start request; expected
-    # to be rejected before creating a session or modifying knowledge.
-    req = Request(
-        BASE_URL + "/api/v63/live/session/start",
-        data=b"{}",
-        headers={"Content-Type": "application/json", "Accept": "application/json"},
-        method="POST",
-    )
-    try:
-        with urlopen(req, timeout=30) as response:
-            observation_status = response.status
-            observation_body = response.read().decode("utf-8", "replace")
-    except HTTPError as exc:
-        observation_status = exc.code
-        observation_body = exc.read().decode("utf-8", "replace")
-    if observation_status not in (400, 401, 403):
-        raise RuntimeError("Unauthenticated observer probe was not safely rejected: " + str(observation_status))
+    # L1/L3/L6: an unauthenticated status request must be rejected before
+    # returning observer state. This exercises logging without mutating data.
+    observation_status, _ = get_json("/api/v63/live/status", timeout=30)
+    if observation_status not in (401, 403):
+        raise RuntimeError("Unauthenticated observer status was not blocked: " + str(observation_status))
 
     # Health response is sampled after all routes have emitted their events.
     time.sleep(1)
@@ -92,7 +80,7 @@ def main() -> int:
         "required_levels": sorted(required),
         "observed_levels": sorted(observed),
         "event_counts": counts,
-        "observer_session_probe_http_status": observation_status,
+        "observer_status_probe_http_status": observation_status,
         "all_levels_observed": logging_status.get("all_levels_observed"),
         "counter_scope": logging_status.get("counter_scope"),
     }, indent=2))
