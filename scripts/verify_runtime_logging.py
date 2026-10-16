@@ -55,11 +55,10 @@ def main() -> int:
     if status != 200:
         raise RuntimeError("Quality benchmark smoke test failed: " + json.dumps({"status": status, "keys": sorted(body.keys())}))
 
-    # L1/L3/L6: deliberately unauthenticated request; expected to be rejected
-    # before any observation is persisted. This proves rejection-path logging
-    # without creating a session or modifying knowledge.
+    # L1/L3/L6: deliberately unauthenticated session-start request; expected
+    # to be rejected before creating a session or modifying knowledge.
     req = Request(
-        BASE_URL + "/api/v63/live/observe",
+        BASE_URL + "/api/v63/live/session/start",
         data=b"{}",
         headers={"Content-Type": "application/json", "Accept": "application/json"},
         method="POST",
@@ -88,7 +87,7 @@ def main() -> int:
         "required_levels": sorted(required),
         "observed_levels": sorted(observed),
         "event_counts": counts,
-        "observation_probe_http_status": observation_status,
+        "observer_session_probe_http_status": observation_status,
         "all_levels_observed": logging_status.get("all_levels_observed"),
         "counter_scope": logging_status.get("counter_scope"),
     }, indent=2))
