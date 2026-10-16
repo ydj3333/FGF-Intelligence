@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import sys
+import threading
 import time
 import uuid
 from contextvars import ContextVar, Token
@@ -26,6 +27,9 @@ _LEVELS = {
 }
 _ALLOWED = set(_LEVELS)
 _correlation_context: ContextVar[str | None] = ContextVar("fgf_log_correlation_id", default=None)
+_event_lock = threading.Lock()
+_event_counts = {level: 0 for level in _LEVELS}
+_last_events: dict[str, str | None] = {level: None for level in _LEVELS}
 _logger = logging.getLogger("fgf.runtime")
 _logger.setLevel(logging.INFO)
 _logger.propagate = False
@@ -71,6 +75,9 @@ def emit(level: str, event: str, *, status: str = "ok", correlation_id: str | No
         else:
             safe[k] = type(value).__name__
     record.update(safe)
+    with _event_lock:
+        _event_counts[code] += 1
+        _last_events[code] = str(event)[:160]
     _logger.info(json.dumps(record, ensure_ascii=False, separators=(",", ":"), default=str))
     return record
 
@@ -104,6 +111,23 @@ def set_correlation_id(correlation_id: str) -> Token:
 def reset_correlation_id(token: Token) -> None:
     """Restore the previous request correlation context."""
     _correlation_context.reset(token)
+
+
+def logging_status() -> dict[str, Any]:
+    """Return process-local instrumentation counters for health diagnostics."""
+    with _event_lock:
+        counts = dict(_event_counts)
+        last = dict(_last_events)
+    observed = [level for level, count in counts.items() if count > 0]
+    return {
+        "schema": "fgf.logging.v1",
+        "required_levels": level_catalog(),
+        "event_counts": counts,
+        "last_events": last,
+        "observed_levels": observed,
+        "all_levels_observed": len(observed) == len(_LEVELS),
+        "counter_scope": "current_process_only_resets_on_restart",
+    }
 
 
 def level_catalog() -> dict[str, str]:
