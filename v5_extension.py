@@ -159,5 +159,13 @@ if __name__=="__main__":
         agent.LLM_HEALTH.update(agent.verify_llm_runtime())
     else:
         agent.LLM_HEALTH.update({"status":"disabled_optional_enhancement","authentication":"not_required","structured_output":"not_required"})
-    port=int(os.getenv("PORT","8000")); print("FGF V5 intelligence extension running",port)
+    port=int(os.getenv("PORT","8000"))
+    agent._log_event("L0", "runtime_starting", release=agent.RELEASE,
+                     logging_levels=agent._log_level_catalog(), port=port,
+                     entrypoint="v5_extension.py")
+    agent._log_event("L0", "runtime_health_checked",
+                     llm_status=agent.LLM_HEALTH.get("status"),
+                     api_reachable=agent.LLM_HEALTH.get("api_reachable"),
+                     release=agent.RELEASE)
+    print("FGF V5 intelligence extension running",port)
     ThreadingHTTPServer(("0.0.0.0",port),agent.H).serve_forever()
