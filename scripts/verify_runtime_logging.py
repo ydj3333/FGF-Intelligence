@@ -29,15 +29,20 @@ def get_json(path: str, timeout: int = 45) -> tuple[int, dict]:
 
 def wait_for_deployed_logging() -> dict:
     deadline = time.monotonic() + DEADLINE_SECONDS
+    expected_commit = os.getenv("FGF_EXPECTED_DEPLOY_COMMIT", os.getenv("GITHUB_SHA", "")).lower()
     last_error = None
     while time.monotonic() < deadline:
         status, body = get_json("/api/health", timeout=20)
-        if status == 200 and isinstance(body.get("logging"), dict):
-            print("logging-aware health endpoint is deployed")
+        deployed_commit = str(body.get("deployment_commit", "")).lower()
+        commit_matches = not expected_commit or deployed_commit == expected_commit
+        if status == 200 and isinstance(body.get("logging"), dict) and commit_matches:
+            print("logging-aware deployment verified: commit=" + (deployed_commit or "unknown"))
             return body
-        last_error = {"http_status": status, "response_keys": sorted(body.keys()), "error": body.get("error")}
+        last_error = {"http_status": status, "expected_commit": expected_commit,
+                      "deployed_commit": deployed_commit, "response_keys": sorted(body.keys()),
+                      "error": body.get("error")}
         time.sleep(10)
-    raise RuntimeError("Timed out waiting for logging-aware deployment: " + json.dumps(last_error))
+    raise RuntimeError("Timed out waiting for the expected deployed commit: " + json.dumps(last_error))
 
 
 def main() -> int:
