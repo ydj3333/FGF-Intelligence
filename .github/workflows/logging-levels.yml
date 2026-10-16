@@ -1,0 +1,20 @@
+name: L0-L6 Logging Contract
+
+on:
+  push:
+    branches: [main, 'feature/l0-l6-runtime-logging']
+  pull_request:
+    branches: [main]
+
+jobs:
+  logging-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run logging contract tests
+        run: python -m unittest discover -s tests -p 'test_logging_levels.py' -v
