@@ -83,6 +83,12 @@ except Exception:
 
 def _observer_authorized(handler):
     if not OBSERVER_TOKEN:
+        # Reverse proxies can make a public request appear to originate from
+        # loopback. Never treat loopback alone as proof of a local client in a
+        # hosted deployment. Local development may opt in explicitly.
+        hosted = any(os.getenv(name) for name in ('RENDER', 'RENDER_SERVICE_ID', 'RENDER_INSTANCE_ID'))
+        if hosted or os.getenv('FGF_ALLOW_LOCAL_OBSERVER_WITHOUT_TOKEN', 'true').lower() not in ('1', 'true', 'yes', 'on'):
+            return False
         host=str((handler.client_address or ('',0))[0])
         return host in ('127.0.0.1','::1','localhost')
     supplied=handler.headers.get('X-FGF-Observer-Token','').strip()
@@ -1589,19 +1595,24 @@ def _fgf_log_request(method):
             _log_event(stage_level, stage_name + "_finished",
                        status="ok" if request_ok else "error",
                        correlation_id=correlation_id, path=path, http_status=http_status)
-            if path == "/api/v63/live/observe":
+            normalized_path = path.rstrip("/") or "/"
+            if normalized_path == "/api/v63/live/observe":
                 _log_event("L3", "learning_input_handled" if request_ok else "learning_input_rejected",
                            status="ok" if request_ok else "error", correlation_id=correlation_id,
                            input_kind="live_observation", pipeline="observation_to_validation",
                            http_status=http_status)
-            elif path == "/api/v63/live/session/start":
+            elif normalized_path == "/api/v63/live/session/start":
                 _log_event("L3", "learning_session_started" if request_ok else "learning_session_start_rejected",
                            status="ok" if request_ok else "error", correlation_id=correlation_id,
                            input_kind="live_observation_session", http_status=http_status)
-            elif path == "/api/v63/live/session/stop":
+            elif normalized_path == "/api/v63/live/session/stop":
                 _log_event("L3", "learning_session_closed" if request_ok else "learning_session_close_rejected",
                            status="ok" if request_ok else "error", correlation_id=correlation_id,
                            input_kind="live_observation_session", http_status=http_status)
+            elif normalized_path.startswith("/api/v63/live/"):
+                _log_event("L3", "learning_pipeline_route_handled",
+                           status="ok" if request_ok else "error", correlation_id=correlation_id,
+                           route=normalized_path, http_status=http_status)
             elif path.startswith("/api/benchmarks/") or path.startswith("/api/benchmark"):
                 _log_event("L5", "benchmark_execution_handled", status="ok" if request_ok else "error",
                            correlation_id=correlation_id, benchmark_route=path, http_status=http_status,
