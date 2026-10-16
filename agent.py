@@ -1,4 +1,4 @@
-import json,re,os,time
+import json,re,os,time,uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 from pathlib import Path
@@ -14,6 +14,7 @@ from operational_intelligence import build_operational_output
 from youtube_evidence_provider import YouTubeEvidenceProvider
 from knowledge_query_engine import QuestionParser
 from constraint_extractor import extract_constraints as extract_player_constraints
+from observability.logging_levels import emit as _log_event, level_catalog as _log_level_catalog, set_correlation_id as _set_log_correlation, reset_correlation_id as _reset_log_correlation, logging_status as _logging_status
 from visual_answers import build_visual_answer
 
 ROOT=Path(__file__).parent
@@ -1301,7 +1302,7 @@ class H(BaseHTTPRequestHandler):
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
             avg=(sum(LLM_HEALTH['latencies_ms'])/len(LLM_HEALTH['latencies_ms'])) if LLM_HEALTH['latencies_ms'] else None
             synthesis={**LLM_HEALTH,'configured':configured,'model':LLM_MODEL,'average_latency_ms':round(avg,1) if avg is not None else None}
-            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'canonical_vocabulary':CANONICAL_VOCABULARY_AUDIT,'knowledge_generated':DATA.get('generated')})
+            return self._json({'ok':True,'version':RELEASE,'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'canonical_vocabulary':CANONICAL_VOCABULARY_AUDIT,'knowledge_generated':DATA.get('generated'),'logging':_logging_status()})
         if u.path=='/api/v63/live/status':
             if not _observer_authorized(self):
                 return self._json({'ok':False,'error':'Observer authorization required'},401)
@@ -1539,6 +1540,82 @@ class H(BaseHTTPRequestHandler):
 
     def log_message(self,*a):pass
 
+# L0-L6 runtime instrumentation. These wrappers preserve the existing handlers
+# and emit metadata only (never request bodies, credentials, or screen content).
+_original_send_response = H.send_response
+def _fgf_capture_http_status(self, code, message=None):
+    self._fgf_http_status = int(code)
+    return _original_send_response(self, code, message)
+H.send_response = _fgf_capture_http_status
+
+def _fgf_log_request(method):
+    original = getattr(H, method)
+    def wrapped(self):
+        started = time.perf_counter()
+        self._fgf_http_status = None
+        path = urlparse(getattr(self, "path", "/")).path
+        correlation_id = str(uuid.uuid4())
+        self._fgf_correlation_id = correlation_id
+        _correlation_token = _set_log_correlation(correlation_id)
+        if path.startswith("/api/v63/live/"):
+            stage_level, stage_name = "L1", "observation_request"
+        elif path.startswith("/api/benchmarks/") or path.startswith("/api/benchmark"):
+            stage_level, stage_name = "L5", "benchmark_request"
+        elif path.startswith("/api/ask") or path.startswith("/api/query"):
+            stage_level, stage_name = "L4", "answer_request"
+        elif path.startswith("/api/player/profile"):
+            stage_level, stage_name = "L3", "player_learning_context_request"
+        elif path.startswith("/api/conflicts/"):
+            stage_level, stage_name = "L2", "evidence_governance_request"
+        else:
+            stage_level, stage_name = "L6", "http_request"
+        _log_event("L6", "http_request_started", correlation_id=correlation_id,
+                   method=method.replace("do_", ""), path=path, route_stage=stage_name)
+        _log_event(stage_level, stage_name + "_started", correlation_id=correlation_id,
+                   method=method.replace("do_", ""), path=path)
+        try:
+            result = original(self)
+        except Exception as exc:
+            _log_event(stage_level, stage_name + "_failed", status="error",
+                       correlation_id=correlation_id, error_type=type(exc).__name__, path=path)
+            _log_event("L6", "http_request_failed", status="error",
+                       correlation_id=correlation_id, duration_ms=(time.perf_counter()-started)*1000,
+                       method=method.replace("do_", ""), path=path, error_type=type(exc).__name__)
+            _reset_log_correlation(_correlation_token)
+            raise
+        else:
+            http_status = getattr(self, "_fgf_http_status", None)
+            request_ok = http_status is None or 200 <= http_status < 300
+            _log_event(stage_level, stage_name + "_finished",
+                       status="ok" if request_ok else "error",
+                       correlation_id=correlation_id, path=path, http_status=http_status)
+            if path == "/api/v63/live/observe":
+                _log_event("L3", "learning_input_handled" if request_ok else "learning_input_rejected",
+                           status="ok" if request_ok else "error", correlation_id=correlation_id,
+                           input_kind="live_observation", pipeline="observation_to_validation",
+                           http_status=http_status)
+            elif path == "/api/v63/live/session/start":
+                _log_event("L3", "learning_session_started" if request_ok else "learning_session_start_rejected",
+                           status="ok" if request_ok else "error", correlation_id=correlation_id,
+                           input_kind="live_observation_session", http_status=http_status)
+            elif path == "/api/v63/live/session/stop":
+                _log_event("L3", "learning_session_closed" if request_ok else "learning_session_close_rejected",
+                           status="ok" if request_ok else "error", correlation_id=correlation_id,
+                           input_kind="live_observation_session", http_status=http_status)
+            elif path.startswith("/api/benchmarks/") or path.startswith("/api/benchmark"):
+                _log_event("L5", "benchmark_execution_handled", status="ok" if request_ok else "error",
+                           correlation_id=correlation_id, benchmark_route=path, http_status=http_status,
+                           evaluation_result="inspect_response_for_pass_fail")
+            _log_event("L6", "http_request_finished", status="ok" if request_ok else "error",
+                       correlation_id=correlation_id, duration_ms=(time.perf_counter()-started)*1000,
+                       method=method.replace("do_", ""), path=path, http_status=http_status)
+            _reset_log_correlation(_correlation_token)
+            return result
+    return wrapped
+
+H.do_GET = _fgf_log_request("do_GET")
+H.do_POST = _fgf_log_request("do_POST")
+
 # v6 Knowledge Query Engine is the production answer path.
 # Canonical corpus synchronization is applied from the durable Supabase claim store.
 try:
@@ -1624,11 +1701,25 @@ try:
         except Exception as exc:
             merged['visual'] = None
             merged['visual_warning'] = 'Visual answer renderer unavailable: ' + type(exc).__name__
+        _log_event("L2", "answer_evidence_summary",
+                   evidence_count=len(merged.get("evidence", [])) if isinstance(merged.get("evidence"), list) else 0,
+                   evidence_state=str(merged.get("evidence_state") or "unknown"),
+                   branch=str(merged.get("orchestration_branch") or "core"),
+                   warning_count=len(merged.get("orchestration_warnings", [])) if isinstance(merged.get("orchestration_warnings"), list) else 0)
+        _log_event("L4", "answer_reasoning_completed",
+                   status="abstained" if not str(merged.get("answer") or "").strip() else "ok",
+                   answer_type=str(merged.get("answer_type") or "unspecified"),
+                   evidence_state=str(merged.get("evidence_state") or "unknown"),
+                   orchestration_branch=str(merged.get("orchestration_branch") or "core"),
+                   has_uncertainty=bool(merged.get("uncertainty")),
+                   warning_count=len(merged.get("orchestration_warnings", [])) if isinstance(merged.get("orchestration_warnings"), list) else 0)
         return merged
 
 except Exception:
     pass
 
 if __name__=='__main__':
+    _log_event('L0', 'runtime_starting', release=RELEASE, logging_levels=_log_level_catalog(), port=int(os.getenv('PORT','8000')))
     LLM_HEALTH.update(verify_llm_runtime())
+    _log_event('L0', 'runtime_health_checked', llm_status=LLM_HEALTH.get('status'), api_reachable=LLM_HEALTH.get('api_reachable'), release=RELEASE)
     port=int(os.getenv('PORT','8000'));print(f'FGF Intelligence running on http://127.0.0.1:{port}');ThreadingHTTPServer(('0.0.0.0',port),H).serve_forever()
