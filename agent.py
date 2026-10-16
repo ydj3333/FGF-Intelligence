@@ -1542,10 +1542,17 @@ class H(BaseHTTPRequestHandler):
 
 # L0-L6 runtime instrumentation. These wrappers preserve the existing handlers
 # and emit metadata only (never request bodies, credentials, or screen content).
+_original_send_response = H.send_response
+def _fgf_capture_http_status(self, code, message=None):
+    self._fgf_http_status = int(code)
+    return _original_send_response(self, code, message)
+H.send_response = _fgf_capture_http_status
+
 def _fgf_log_request(method):
     original = getattr(H, method)
     def wrapped(self):
         started = time.perf_counter()
+        self._fgf_http_status = None
         path = urlparse(getattr(self, "path", "/")).path
         correlation_id = str(uuid.uuid4())
         self._fgf_correlation_id = correlation_id
@@ -1577,24 +1584,31 @@ def _fgf_log_request(method):
             _reset_log_correlation(_correlation_token)
             raise
         else:
-            _log_event(stage_level, stage_name + "_finished", correlation_id=correlation_id,
-                       path=path)
+            http_status = getattr(self, "_fgf_http_status", None)
+            request_ok = http_status is None or 200 <= http_status < 300
+            _log_event(stage_level, stage_name + "_finished",
+                       status="ok" if request_ok else "error",
+                       correlation_id=correlation_id, path=path, http_status=http_status)
             if path == "/api/v63/live/observe":
-                _log_event("L3", "learning_input_handled", correlation_id=correlation_id,
+                _log_event("L3", "learning_input_handled" if request_ok else "learning_input_rejected",
+                           status="ok" if request_ok else "error", correlation_id=correlation_id,
                            input_kind="live_observation", pipeline="observation_to_validation",
-                           persistence="runtime_result_returned")
+                           http_status=http_status)
             elif path == "/api/v63/live/session/start":
-                _log_event("L3", "learning_session_started", correlation_id=correlation_id,
-                           input_kind="live_observation_session")
+                _log_event("L3", "learning_session_started" if request_ok else "learning_session_start_rejected",
+                           status="ok" if request_ok else "error", correlation_id=correlation_id,
+                           input_kind="live_observation_session", http_status=http_status)
             elif path == "/api/v63/live/session/stop":
-                _log_event("L3", "learning_session_closed", correlation_id=correlation_id,
-                           input_kind="live_observation_session")
+                _log_event("L3", "learning_session_closed" if request_ok else "learning_session_close_rejected",
+                           status="ok" if request_ok else "error", correlation_id=correlation_id,
+                           input_kind="live_observation_session", http_status=http_status)
             elif path.startswith("/api/benchmarks/") or path.startswith("/api/benchmark"):
-                _log_event("L5", "benchmark_execution_handled", correlation_id=correlation_id,
-                           benchmark_route=path, evaluation_result="inspect_response_for_pass_fail")
-            _log_event("L6", "http_request_finished", correlation_id=correlation_id,
-                       duration_ms=(time.perf_counter()-started)*1000,
-                       method=method.replace("do_", ""), path=path)
+                _log_event("L5", "benchmark_execution_handled", status="ok" if request_ok else "error",
+                           correlation_id=correlation_id, benchmark_route=path, http_status=http_status,
+                           evaluation_result="inspect_response_for_pass_fail")
+            _log_event("L6", "http_request_finished", status="ok" if request_ok else "error",
+                       correlation_id=correlation_id, duration_ms=(time.perf_counter()-started)*1000,
+                       method=method.replace("do_", ""), path=path, http_status=http_status)
             _reset_log_correlation(_correlation_token)
             return result
     return wrapped
