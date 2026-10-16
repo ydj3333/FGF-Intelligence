@@ -1577,6 +1577,19 @@ def _fgf_log_request(method):
         else:
             _log_event(stage_level, stage_name + "_finished", correlation_id=correlation_id,
                        path=path)
+            if path == "/api/v63/live/observe":
+                _log_event("L3", "learning_input_handled", correlation_id=correlation_id,
+                           input_kind="live_observation", pipeline="observation_to_validation",
+                           persistence="runtime_result_returned")
+            elif path == "/api/v63/live/session/start":
+                _log_event("L3", "learning_session_started", correlation_id=correlation_id,
+                           input_kind="live_observation_session")
+            elif path == "/api/v63/live/session/stop":
+                _log_event("L3", "learning_session_closed", correlation_id=correlation_id,
+                           input_kind="live_observation_session")
+            elif path.startswith("/api/benchmarks/") or path.startswith("/api/benchmark"):
+                _log_event("L5", "benchmark_execution_handled", correlation_id=correlation_id,
+                           benchmark_route=path, evaluation_result="inspect_response_for_pass_fail")
             _log_event("L6", "http_request_finished", correlation_id=correlation_id,
                        duration_ms=(time.perf_counter()-started)*1000,
                        method=method.replace("do_", ""), path=path)
