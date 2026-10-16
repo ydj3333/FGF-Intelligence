@@ -4,7 +4,7 @@ import logging
 import unittest
 from unittest.mock import patch
 
-from observability.logging_levels import emit, level_catalog, timed_event
+from observability.logging_levels import emit, level_catalog, timed_event, set_correlation_id, reset_correlation_id
 
 
 class LoggingLevelsTests(unittest.TestCase):
@@ -34,6 +34,14 @@ class LoggingLevelsTests(unittest.TestCase):
         self.assertEqual(record["token"], "[REDACTED]")
         self.assertEqual(record["path"], "/api/ask")
         self.assertEqual(record["duration_ms"], 12.5)
+
+    def test_correlation_context_is_propagated(self):
+        token = set_correlation_id("request-123")
+        try:
+            record = emit("L4", "reasoning_test")
+            self.assertEqual(record["correlation_id"], "request-123")
+        finally:
+            reset_correlation_id(token)
 
     def test_unknown_level_is_rejected(self):
         with self.assertRaises(ValueError):
