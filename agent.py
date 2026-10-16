@@ -14,7 +14,7 @@ from operational_intelligence import build_operational_output
 from youtube_evidence_provider import YouTubeEvidenceProvider
 from knowledge_query_engine import QuestionParser
 from constraint_extractor import extract_constraints as extract_player_constraints
-from observability.logging_levels import emit as _log_event, level_catalog as _log_level_catalog
+from observability.logging_levels import emit as _log_event, level_catalog as _log_level_catalog, set_correlation_id as _set_log_correlation, reset_correlation_id as _reset_log_correlation
 from visual_answers import build_visual_answer
 
 ROOT=Path(__file__).parent
@@ -1549,6 +1549,7 @@ def _fgf_log_request(method):
         path = urlparse(getattr(self, "path", "/")).path
         correlation_id = str(uuid.uuid4())
         self._fgf_correlation_id = correlation_id
+        _correlation_token = _set_log_correlation(correlation_id)
         if path.startswith("/api/v63/live/"):
             stage_level, stage_name = "L1", "observation_request"
         elif path.startswith("/api/benchmarks/") or path.startswith("/api/benchmark"):
@@ -1573,6 +1574,7 @@ def _fgf_log_request(method):
             _log_event("L6", "http_request_failed", status="error",
                        correlation_id=correlation_id, duration_ms=(time.perf_counter()-started)*1000,
                        method=method.replace("do_", ""), path=path, error_type=type(exc).__name__)
+            _reset_log_correlation(_correlation_token)
             raise
         else:
             _log_event(stage_level, stage_name + "_finished", correlation_id=correlation_id,
@@ -1593,6 +1595,7 @@ def _fgf_log_request(method):
             _log_event("L6", "http_request_finished", correlation_id=correlation_id,
                        duration_ms=(time.perf_counter()-started)*1000,
                        method=method.replace("do_", ""), path=path)
+            _reset_log_correlation(_correlation_token)
             return result
     return wrapped
 
