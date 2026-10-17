@@ -22,3 +22,7 @@ jobs:
         env:
           PYTHONPATH: .
         run: python -m unittest tests/test_visual_answers.py -v
+      - name: Run question-bank pipeline tests
+        env:
+          PYTHONPATH: .
+        run: python -m unittest tests/test_question_bank_pipeline.py -v
