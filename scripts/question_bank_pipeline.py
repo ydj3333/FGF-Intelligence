@@ -1,0 +1,434 @@
+#!/usr/bin/env python3
+"""Governed pipeline for the FGF 10k question bank.
+
+This is deliberately not a model-weight trainer. It:
+  * audits the Supabase question bank,
+  * exports only explicitly approved, training-eligible, source-grounded rows,
+  * optionally probes the live /api/ask route and writes an evidence-review report.
+
+Generated wording variants remain review-gated. They must never be promoted to
+canonical game truth or silently used as supervised labels.
+"""
+from __future__ import annotations
+
+import argparse
+import collections
+import json
+import os
+import re
+import sys
+import time
+from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+
+DEFAULT_SUPABASE_URL = os.getenv(
+    "FGF_SUPABASE_URL", "https://qdoixzfkkmvzjfkhzups.supabase.co"
+).rstrip("/")
+TABLE = "fgf_question_bank"
+# Use the linked claims row as source of truth; question-bank lifecycle fields are snapshots.
+FIELDS = (
+    "id,question_key,question,ideal_answer,source_claim_id,category,claim_type,"
+    "intent_type,source_tier,season,version,generation_method,review_status,"
+    "training_eligible,expected_claim_ids,metadata,topic_label,"
+    "source_claim:claims!fgf_question_bank_source_claim_id_fkey(id,claim,status,canonical,tier,season,version)"
+)
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _secret() -> str:
+    return (
+        os.getenv("FGF_SUPABASE_SECRET_KEY")
+        or os.getenv("FGF_SUPABASE_SERVICE_ROLE_KEY")
+        or os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        or ""
+    ).strip()
+
+
+def _headers() -> dict[str, str]:
+    key = _secret()
+    if not key:
+        raise RuntimeError(
+            "Set FGF_SUPABASE_SECRET_KEY or FGF_SUPABASE_SERVICE_ROLE_KEY. "
+            "Never place a service key in source control."
+        )
+    headers = {"apikey": key, "Accept": "application/json"}
+    if not key.startswith("sb_"):
+        headers["Authorization"] = "Bearer " + key
+    return headers
+
+
+def normalize_source_row(row: dict) -> dict:
+    """Copy linked claim lifecycle/provenance into explicit fields; fail closed."""
+    source = row.get("source_claim")
+    if isinstance(source, list):
+        source = source[0] if source else None
+    source = source if isinstance(source, dict) else {}
+    row["source_status"] = source.get("status")
+    row["source_canonical"] = source.get("canonical") is True
+    row["source_claim_text"] = source.get("claim")
+    row["source_claim_tier"] = source.get("tier")
+    row["source_claim_version"] = source.get("version")
+    return row
+
+
+def fetch_rows(page_size: int = 1000) -> list[dict]:
+    """Fetch the complete bank using PostgREST range pagination."""
+    rows: list[dict] = []
+    offset = 0
+    headers = _headers()
+    while True:
+        query = urlencode({"select": FIELDS, "order": "created_at.asc"})
+        req = Request(
+            f"{DEFAULT_SUPABASE_URL}/rest/v1/{TABLE}?{query}",
+            headers={**headers, "Range-Unit": "items", "Range": f"{offset}-{offset + page_size - 1}"},
+        )
+        with urlopen(req, timeout=30) as response:
+            page = json.loads(response.read().decode("utf-8") or "[]")
+        if not isinstance(page, list):
+            raise RuntimeError("Supabase returned an unexpected question-bank payload.")
+        for row in page:
+            normalize_source_row(row)
+        rows.extend(page)
+        if len(page) < page_size:
+            break
+        offset += len(page)
+    return rows
+
+
+def is_safe_training_example(row: dict) -> bool:
+    """Require explicit approval plus a current canonical source and provenance."""
+    status = str(row.get("source_status") or "").strip().lower()
+    return bool(
+        row.get("review_status") == "approved"
+        and row.get("training_eligible") is True
+        and row.get("source_canonical") is True
+        and status in {"confirmed", "current", "verified"}
+        and row.get("source_claim_id")
+        and str(row.get("question") or "").strip()
+        and str(row.get("ideal_answer") or "").strip()
+        and "paraphrase_shell" not in str(row.get("generation_method") or "")
+    )
+
+
+def audit(rows: list[dict]) -> dict:
+    by_review = collections.Counter(str(r.get("review_status") or "missing") for r in rows)
+    by_intent = collections.Counter(str(r.get("intent_type") or "missing") for r in rows)
+    by_generation = collections.Counter(str(r.get("generation_method") or "missing") for r in rows)
+    eligible = [r for r in rows if is_safe_training_example(r)]
+    probe_rows = evaluation_candidates(rows)
+    canonical_probe_rows = [r for r in probe_rows if r.get("source_canonical") is True]
+    exploratory_probe_rows = [r for r in probe_rows if r.get("source_canonical") is not True]
+    source_status_counts = collections.Counter(
+        str(r.get("source_status") or "missing") for r in rows
+    )
+    return {
+        "total_rows": len(rows),
+        "distinct_questions": len({str(r.get("question") or "").strip() for r in rows}),
+        "distinct_source_claims": len({r.get("source_claim_id") for r in rows if r.get("source_claim_id")}),
+        "training_eligible_rows": len(eligible),
+        "current_canonical_non_shell_probe_rows": len(canonical_probe_rows),
+        "current_canonical_non_shell_source_claims": len({
+            r.get("source_claim_id") for r in canonical_probe_rows if r.get("source_claim_id")
+        }),
+        "current_noncanonical_non_shell_exploratory_rows": len(exploratory_probe_rows),
+        "total_current_non_shell_probe_rows": len(probe_rows),
+        "source_status_counts": dict(source_status_counts),
+        "review_status_counts": dict(by_review),
+        "intent_counts": dict(by_intent),
+        "generation_method_counts": dict(by_generation),
+        "synthetic_shell_variants": by_generation.get("verified_claim_template_v4_paraphrase_shell", 0),
+        "canonical_training_rows": len(eligible),
+        "note": (
+            "A large row count is not model training. Only approved source-grounded examples "
+            "are exported; generated variants are not treated as verified semantic paraphrases."
+        ),
+    }
+
+
+def write_jsonl(path: Path, rows: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+
+
+def export_training(rows: list[dict], output: Path) -> int:
+    safe = [r for r in rows if is_safe_training_example(r)]
+    records = [
+        {
+            "question": r["question"],
+            "answer": r["ideal_answer"],
+            "source_claim_id": r["source_claim_id"],
+            "expected_claim_ids": r.get("expected_claim_ids") or [r["source_claim_id"]],
+            "intent_type": r.get("intent_type"),
+            "category": r.get("category"),
+            "season": r.get("season"),
+            "version": r.get("version"),
+            "source_tier": r.get("source_tier"),
+        }
+        for r in safe
+    ]
+    write_jsonl(output, records)
+    return len(records)
+
+
+def wait_for_api(api_url: str, timeout: int = 12, max_attempts: int = 7) -> dict:
+    """Warm the deployed service before a batch; fail once instead of logging 1,000 cold-start errors."""
+    url = api_url.rstrip("/") + "/api/health"
+    last_error = "health endpoint did not become ready"
+    for attempt in range(max_attempts):
+        req = Request(url, headers={"Accept": "application/json"}, method="GET")
+        try:
+            with urlopen(req, timeout=timeout) as response:
+                body = response.read().decode("utf-8")
+                try:
+                    payload = json.loads(body)
+                except json.JSONDecodeError:
+                    payload = {"raw_response": body[:1000]}
+                if 200 <= response.status < 300 and (
+                    not isinstance(payload, dict) or payload.get("ok", True)
+                ):
+                    return {"http_status": response.status, "payload": payload}
+                last_error = f"health endpoint returned HTTP {response.status}"
+        except HTTPError as exc:
+            last_error = f"health endpoint returned HTTP {exc.code}"
+            if exc.code not in {408, 425, 429, 500, 502, 503, 504}:
+                raise
+        except (URLError, TimeoutError, OSError) as exc:
+            last_error = f"{type(exc).__name__}: {exc}"
+        if attempt < max_attempts - 1:
+            time.sleep(min(12.0, 1.0 * (2 ** attempt)))
+    raise RuntimeError(f"FGF API did not become ready after {max_attempts} attempts: {last_error}")
+
+
+def call_ask(api_url: str, question: str, timeout: int = 25, retries: int = 2) -> dict:
+    # The deployed player ask route is GET /api/ask?q=... .
+    # POST /api/ask is not implemented by the current HTTP handler.
+    url = api_url.rstrip("/") + "/api/ask?" + urlencode({"q": question})
+    req = Request(
+        url,
+        headers={"Accept": "application/json"},
+        method="GET",
+    )
+    for attempt in range(retries + 1):
+        try:
+            with urlopen(req, timeout=timeout) as response:
+                body = response.read().decode("utf-8")
+                try:
+                    parsed = json.loads(body)
+                except json.JSONDecodeError:
+                    parsed = {"raw_response": body[:4000]}
+                return {"http_status": response.status, "payload": parsed}
+        except HTTPError as exc:
+            if exc.code not in {408, 425, 429, 500, 502, 503, 504} or attempt >= retries:
+                raise
+        except (URLError, TimeoutError, OSError):
+            if attempt >= retries:
+                raise
+        time.sleep(min(4.0, 1.0 * (2 ** attempt)))
+    raise RuntimeError("FGF ask endpoint exhausted transient retries")
+
+
+def flatten_text(value) -> str:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        return " ".join(flatten_text(v) for v in value.values())
+    if isinstance(value, list):
+        return " ".join(flatten_text(v) for v in value)
+    return ""
+
+
+STOP_WORDS = {
+    "a", "an", "and", "are", "as", "at", "be", "by", "does", "for", "from",
+    "how", "in", "is", "it", "of", "on", "or", "the", "to", "what", "when",
+    "where", "which", "who", "why", "with", "do", "can", "could", "would",
+    "should", "about", "according", "documented", "guide", "states", "state",
+    "update", "hot", "patch", "january", "february", "march", "april", "may",
+    "june", "july", "august", "september", "october", "november", "december",
+    "2025", "2026",
+}
+
+
+def content_tokens(value) -> set[str]:
+    """Small deterministic token set for triage only, never a semantic verdict."""
+    text = str(value or "").lower()
+    text = re.sub(
+        r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
+        r"jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|"
+        r"dec(?:ember)?)\s+\d{1,2}\b", " ", text
+    )
+    text = re.sub(r"\b(?:19|20)\d{2}\b", " ", text)
+    return {
+        token for token in re.findall(r"[a-z0-9]+", text)
+        if len(token) > 1 and token not in STOP_WORDS
+    }
+
+
+def overlap_score(left, right) -> float:
+    a, b = content_tokens(left), content_tokens(right)
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def score_evidence_items(source_claim: str, evidence_items: list) -> dict:
+    """Score each evidence claim separately so one good claim cannot hide noise."""
+    rows = []
+    for item in evidence_items or []:
+        claim = item.get("claim", "") if isinstance(item, dict) else str(item or "")
+        score = overlap_score(source_claim, claim)
+        rows.append({"claim": claim, "source_overlap_triage": round(score, 4)})
+    supported = any(row["source_overlap_triage"] >= 0.12 for row in rows)
+    irrelevant = [row for row in rows if row["source_overlap_triage"] < 0.12]
+    return {
+        "source_claim_supported_by_evidence": supported,
+        "best_evidence_source_overlap_triage": max(
+            (row["source_overlap_triage"] for row in rows), default=0.0
+        ),
+        "irrelevant_evidence_count_triage": len(irrelevant),
+        "evidence_item_scores": rows,
+    }
+
+
+def evaluation_candidates(rows: list[dict], limit: int | None = None) -> list[dict]:
+    """Probe current source-linked prompts; canonical claims first, other tiers exploratory."""
+    candidates = [
+        r for r in rows
+        if str(r.get("source_status") or "").strip().lower() in {"confirmed", "current", "verified"}
+        and r.get("source_claim_id")
+        and str(r.get("source_claim_text") or "").strip()
+        and str(r.get("question") or "").strip()
+        and str(r.get("ideal_answer") or "").strip()
+        and "paraphrase_shell" not in str(r.get("generation_method") or "")
+    ]
+    # Curated canonical prompts first, then other canonical prompts, then noncanonical
+    # source probes. Noncanonical evidence is exploratory only and never a gold label.
+    candidates.sort(key=lambda r: (
+        0 if r.get("source_canonical") is True and r.get("generation_method") == "expert_curated_source_grounded_v1"
+        else 1 if r.get("source_canonical") is True
+        else 2
+    ))
+    return candidates if limit is None else candidates[:max(0, limit)]
+
+
+def evaluate(rows: list[dict], api_url: str, output: Path, limit: int, pause: float) -> dict:
+    # Generated prompts are diagnostic probes, not gold labels. No lexical score
+    # can approve a row or prove semantic correctness; it only prioritizes review.
+    # Render may sleep between sessions. Warm it once before a batch so a cold
+    # start does not become hundreds of misleading per-question failures.
+    wait_for_api(api_url)
+    candidates = evaluation_candidates(rows, limit)
+    report = []
+    failures = 0
+    for index, row in enumerate(candidates, 1):
+        record = {
+            "question_bank_id": row.get("id"),
+            "question": row["question"],
+            "expected_answer": row["ideal_answer"],
+            "expected_claim_id": row["source_claim_id"],
+            "expected_source_claim": row.get("source_claim_text"),
+            "intent_type": row.get("intent_type"),
+            "generation_method": row.get("generation_method"),
+            "review_status": row.get("review_status"),
+            "source_authority_class": "canonical_source" if row.get("source_canonical") is True else "exploratory_noncanonical_source",
+            "question_gold_label": False,
+        }
+        try:
+            result = call_ask(api_url, row["question"])
+            payload = result.get("payload", {})
+            answer_text = flatten_text(
+                payload.get("answer", payload.get("response", payload.get("text", payload)))
+                if isinstance(payload, dict) else payload
+            )
+            evidence = payload.get("evidence", []) if isinstance(payload, dict) else []
+            evidence_text = flatten_text(evidence)
+            source_claim = row.get("source_claim_text") or row.get("ideal_answer") or ""
+            answer_overlap = overlap_score(source_claim, answer_text)
+            evidence_triage = score_evidence_items(source_claim, evidence)
+            record.update({
+                "http_status": result.get("http_status"),
+                "response_excerpt": answer_text[:1800],
+                "evidence_excerpt": evidence_text[:1800],
+                "answer_source_overlap_triage": round(answer_overlap, 4),
+                **evidence_triage,
+            })
+            if result.get("http_status", 0) >= 400:
+                record["evaluation_status"] = "request_error"
+                failures += 1
+            elif row.get("source_canonical") is not True:
+                # Noncanonical Experience/community claims can expose coverage gaps,
+                # but cannot be treated as the expected truth or a model failure.
+                record["evaluation_status"] = (
+                    "exploratory_answer_with_irrelevant_evidence_review"
+                    if evidence_triage["irrelevant_evidence_count_triage"]
+                    else "exploratory_only_not_gold"
+                )
+            elif answer_overlap < 0.12 and not evidence_triage["source_claim_supported_by_evidence"]:
+                record["evaluation_status"] = "possible_relevance_failure"
+                failures += 1
+            elif evidence_triage["irrelevant_evidence_count_triage"]:
+                record["evaluation_status"] = "answer_with_irrelevant_evidence_review"
+            else:
+                record["evaluation_status"] = "lexical_signal_for_manual_semantic_review"
+        except (HTTPError, URLError, TimeoutError, OSError, ValueError, RuntimeError) as exc:
+            record.update({"evaluation_status": "request_error", "error": str(exc)[:500]})
+            failures += 1
+        report.append(record)
+        if pause and index < len(candidates):
+            time.sleep(pause)
+    write_jsonl(output, report)
+    status_counts = collections.Counter(
+        str(row.get("evaluation_status") or "missing") for row in report
+    )
+    source_class_counts = collections.Counter(
+        str(row.get("source_authority_class") or "missing") for row in report
+    )
+    return {
+        "candidate_questions": len(candidates),
+        "canonical_source_probe_count": source_class_counts.get("canonical_source", 0),
+        "exploratory_noncanonical_probe_count": source_class_counts.get("exploratory_noncanonical_source", 0),
+        "evaluation_status_counts": dict(status_counts),
+        "needs_review_or_request_error": failures,
+        "report_path": str(output),
+        "warning": (
+            "Token overlap is triage only, not semantic proof. Generated prompts remain "
+            "unreviewed; no rows were approved, promoted, or used to change canonical truth."
+        ),
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("command", choices=("audit", "export-training", "evaluate"))
+    parser.add_argument("--output", default="artifacts/fgf_question_bank_report.jsonl")
+    parser.add_argument("--api-url", default=os.getenv("FGF_API_URL", "https://fgf-intelligence.onrender.com"))
+    parser.add_argument("--limit", type=int, default=100, help="Maximum live API questions to probe")
+    parser.add_argument("--pause", type=float, default=0.15, help="Seconds between live API calls")
+    args = parser.parse_args()
+    try:
+        rows = fetch_rows()
+        if args.command == "audit":
+            print(json.dumps(audit(rows), indent=2, ensure_ascii=False))
+            return 0
+        output = Path(args.output)
+        if args.command == "export-training":
+            count = export_training(rows, output)
+            print(json.dumps({
+                "exported_approved_examples": count,
+                "output": str(output),
+                "note": "This exports governed examples; it does not train model weights or deploy code.",
+            }, indent=2))
+            return 0
+        result = evaluate(rows, args.api_url, output, max(0, args.limit), max(0.0, args.pause))
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+    except Exception as exc:
+        print(f"question-bank pipeline failed safely: {type(exc).__name__}: {exc}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
