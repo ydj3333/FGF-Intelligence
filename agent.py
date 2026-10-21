@@ -932,7 +932,20 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
     if intent=='Fleet Damage/Repair':
         result['addresses_question']=any(x in low for x in ('repair','damage','recover','repair bay','repair cabin','repair module'))
         if 'F2P' in constraints:
-            result['respects_constraints']=any(x in low for x in ('free','without repair modules','without spending','no-cost','no cost','no-repair-module','no repair module'))
+            # A free option mentioned somewhere in the answer does not excuse
+            # recommending a paid route. Reject affirmative paid-path language.
+            paid_path_phrases = (
+                'buy the pack', 'purchase the pack', 'paid pack', 'premium pack',
+                'buy premium', 'make a purchase', 'spend real money',
+                'paid option is recommended', 'use paid currency',
+                'purchase with real money', 'buy it with money'
+            )
+            recommends_paid_path = any(phrase in low for phrase in paid_path_phrases)
+            states_free_path = any(x in low for x in (
+                'free', 'without repair modules', 'without spending',
+                'no-cost', 'no cost', 'no-repair-module', 'no repair module'
+            ))
+            result['respects_constraints'] = states_free_path and not recommends_paid_path
         else:
             result['respects_constraints']=True
         # CP is not a repair answer unless the answer also clearly explains it
@@ -956,7 +969,7 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
             'cannot establish','not available in the evidence'
         ))
         numeric_core_claim=any(
-            re.search(r'\\b\\d{1,3}(?:,\\d{3})*\\b', c.get('Claim',''))
+            re.search(r'\b\d{1,3}(?:,\d{3})*\b', c.get('Claim',''))
             and any(x in c.get('Claim','').lower() for x in ('fusion seed','fusion seeds','core 35','core level'))
             for c in used_claims
         )
@@ -965,8 +978,14 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
             result['no_unrelated_substitution']=False
         result['respects_constraints']=True
 
-    # A topic gate is mandatory for all high-risk questions.
-    if requirements and not any(claim_relevance(q,c) for c in claims):
+    # A topic gate is mandatory for high-risk answers, but a safe explicit
+    # abstention is the correct result when the corpus has no supporting claim.
+    exact_cost_abstention = exact_cost_question(q) and any(x in low for x in (
+        'not established', 'does not establish', 'do not have the exact',
+        "don't have the exact", 'not in my evidence', 'insufficient evidence',
+        'cannot establish', 'not available in the evidence'
+    ))
+    if requirements and not any(claim_relevance(q,c) for c in claims) and not exact_cost_abstention:
         result['uses_relevant_evidence']=False
 
     result['passes']=all(v for k,v in result.items() if k!='passes')
