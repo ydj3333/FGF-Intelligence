@@ -95,6 +95,39 @@ class Interface50QuestionMatrix(unittest.TestCase):
                     gaps.append(item["id"] + " /api/v5/evidence returned no matching evidence")
         self.assertFalse(gaps, "\n".join(gaps))
 
+    def test_migration_permit_answer_is_evidence_anchored(self):
+        payload = self.get_json("/api/ask", {
+            "q": "how many migration permits are required for server migration"
+        })
+        answer = str(payload.get("answer") or "").lower()
+        evidence = payload.get("evidence") or []
+        self.assertIn("10 migration permits", answer)
+        self.assertTrue(any(
+            "10 migration permits" in str(item.get("claim") or "").lower()
+            for item in evidence
+        ), "the exact number must be supported by a directly matching evidence claim")
+        visual = payload.get("visual") or {}
+        if visual:
+            self.assertEqual(str(visual.get("headline") or ""), "10")
+
+    def test_commerce_guild_duel_opponent_question_does_not_route_to_weapon_counter(self):
+        questions = [
+            "commerce guild duel - whom do we fight against",
+            "who are the opponents in Commerce Guild Duel League",
+        ]
+        for question in questions:
+            with self.subTest(question=question):
+                payload = self.get_json("/api/ask", {"q": question})
+                answer = str(payload.get("answer") or "").lower()
+                evidence = payload.get("evidence") or []
+                self.assertIn("opposing guild members", answer)
+                self.assertTrue(any(
+                    "commerce guild duel" in str(item.get("claim") or "").lower()
+                    and "opposing guild members" in str(item.get("claim") or "").lower()
+                    for item in evidence
+                ), "answer must cite the event-specific opponent evidence")
+                self.assertNotIn("damage against a countered style is increased by 5%", answer)
+
     def test_player_interface_supporting_routes(self):
         checks = [
             ("/api/health", {}),

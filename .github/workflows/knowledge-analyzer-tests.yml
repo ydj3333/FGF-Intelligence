@@ -19,7 +19,7 @@ jobs:
       - name: Compile response engine
         run: python -m py_compile agent.py v5_extension.py knowledge_query_engine.py evidence_graph.py visual_answers.py
       - name: Run Knowledge Analyzer tests
-        run: python -m unittest tests/test_knowledge_analyzer.py tests/test_claim_lifecycle.py tests/test_sync_corpus.py -v
+        run: python -m unittest tests/test_knowledge_analyzer.py tests/test_claim_lifecycle.py tests/test_sync_corpus.py tests/test_semantic_intent_contract.py -v
       - name: Analyze full repository corpus
         run: python scripts/run_knowledge_quality.py
       - name: Run FGF agent smoke tests
