@@ -51,21 +51,47 @@ GitHub repo → **Actions** → **Publish FGF app** → **Run workflow**. It tak
 
 The **FGF Source Harvest** workflow runs every 6 hours and needs the same `GEMINI_API_KEY`, plus the Supabase key your corpus sync already uses. On each run it:
 
-1. Reads the sources in `data/harvest_sources.json`: official news and patches, the official portal, Steam update notes, the FGF wiki (opened in a real browser, because it needs JavaScript), the Fandom wiki and Reddit.
-2. Skips pages that haven't changed since last time.
-3. Has the free AI pull out individual game facts from each new or changed page.
-4. **Keeps a fact only if its quoted sentence appears on the page and every number in it appears there too.** Invented or garbled facts are rejected.
+1. Reads every source in `data/harvest_sources.json` **and every web source already registered in your Supabase `sources` table** (inactive rows are skipped, and nothing is read twice).
+2. Skips pages, posts and videos it has already processed.
+3. Has the free AI pull out individual game facts from each new or changed item.
+4. **Keeps a fact only if its quoted sentence appears in the source and every number in it appears there too.** Invented or garbled facts are rejected.
 5. Skips facts the database already has. A fact that **contradicts** Tier 1/2 evidence (e.g. "12 permits" when the official fact says 10) is saved as **disputed** for your review and never overwrites anything.
-6. Adds new facts to the database: official sources as Tier 2, wikis and Reddit as Tier 3. Nothing is ever made Tier 1 or canonical automatically. Each fact keeps its source link, quote and date.
+6. Adds the new facts. Nothing is ever made Tier 1 or canonical automatically. Each fact keeps its source link, quote and date.
 7. If anything new was added, it starts the database sync straight away. The app republishes a few minutes later.
 
-The YouTube pipeline also switches to the free Gemini key automatically once `GEMINI_API_KEY` is set.
+The 6-hourly activity also stops a free Supabase project from being paused for inactivity.
 
+### What is covered
+| Source | How it's read | Enters as |
+|---|---|---|
+| foundation.game news and patches, official portal | automatically | Tier 2, live |
+| Steam update notes | automatically | Tier 2, live |
+| FGF wiki, Fandom wiki, Reddit | automatically | Tier 3, live |
+| **Official YouTube channel** | automatically: the video description is read, and **Gemini watches each new video** | description facts Tier 2, live; facts from watching the video Tier 2 *Under Review* with a link to the exact minute |
+| **YouTube playlists** (e.g. PLhETODnD1CQ9UEHk7NDJVeifZo-Bz3oDv) | automatically: Gemini watches each video | Tier 3 *Under Review* |
+| **Discord** announcements | automatically once you set up the bot (below) | Tier 2, live; text in posted images is read too |
+| **Instagram, Facebook, X** and in-game screens | screenshot inbox (below): these sites block automatic reading without a login | Tier 2 / Tier 1 *Under Review* / Tier 3 |
+| Any other site in your `sources` table | automatically | the tier set in that row (2 or 3) |
+
+Videos your old transcript pipeline has already turned into candidates are not watched again. Gemini's free tier allows about 8 hours of YouTube video a day. The harvester watches at most 3 new videos per source per run, which keeps it well inside that limit. Only public videos can be watched. Video facts always stay *Under Review*, because YouTube is supporting evidence and not canonical truth (core objectives). This replaces the manual "run the PC acquisition" step for new videos.
+
+### Discord (optional, 5 minutes)
+A bot can only read servers it has been added to, so the free route is to follow the official announcements into **your own** server:
+1. In the official FGF Discord, open the announcements channel. If it shows **Follow**, click it and choose a channel in your own server (create a free server if you don't have one). If there's no Follow button, use the screenshot inbox for Discord posts instead.
+2. Go to **discord.com/developers/applications** → **New Application** → **Bot** → **Reset Token** and copy the token. On the same page, turn on **Message Content Intent**.
+3. **OAuth2 → URL Generator**: tick **bot**, then the permissions **View Channels** and **Read Message History**. Open the generated link and add the bot to your server.
+4. In Discord: **Settings → Advanced → Developer Mode** on. Right-click the channel that receives the announcements → **Copy Channel ID**. Right-click your server → **Copy Server ID**.
+5. In GitHub: add a secret `DISCORD_BOT_TOKEN` (the token) and variables `FGF_DISCORD_CHANNEL_IDS` (the channel ID; separate several with commas) and `FGF_DISCORD_GUILD_ID` (the server ID).
+
+The first run reads the newest 15 posts, and later runs read only new ones. Until the bot is set up, the run summary shows Discord as *not configured*. That is not an error.
+
+### Screenshot inbox (Instagram, Facebook, X, in-game)
+Upload screenshots to the `inbox/` folder of the repository: from the GitHub phone app or github.com, open `inbox/official`, `inbox/ingame` or `inbox/community` → **Add file → Upload files** → **Commit changes**. The **FGF Screenshot Inbox** workflow reads the text in each image, keeps only facts whose words and numbers appear in it, and moves the image to `inbox/processed/` as evidence. In-game screenshots enter as Tier 1 *Under Review*, so you confirm them before they count as Tier 1. See `inbox/README.md`.
+
+### Checking and trying it
 Each run's summary (GitHub → Actions → FGF Source Harvest) lists every new fact, every disputed fact and every source that couldn't be read. To try it safely first, run it manually with **dry run** ticked: it reports what it would add without writing anything.
 
-Sources that can't be read automatically for free: X, Instagram, Facebook and Discord, which all need a login. Add their announcements as screenshots or user evidence as before.
-
-To add a source, add an entry to `data/harvest_sources.json`. The available adapters are `page`, `news_index`, `steam_news`, `sitemap`, `mediawiki_recent` and `reddit_new`.
+To add a source, either add a row to the Supabase `sources` table (a web address, a name, and a tier of 2 or 3), or add an entry to `data/harvest_sources.json`. The available adapters are `page`, `news_index`, `steam_news`, `sitemap`, `mediawiki_recent`, `reddit_new`, `youtube_channel`, `youtube_playlist` and `discord_channel`.
 
 ## Installing the app on a phone
 - **Android (Chrome):** open the link and tap **Install app** in the top bar, or use the menu (⋮) → **Install app**.
@@ -86,3 +112,6 @@ It opens full-screen with its own icon. Guides, facts and instant answers work o
 | `site/tests/` | engine tests, local test stack, end-to-end browser test |
 | `worker/` | the free AI proxy (Cloudflare Worker) and its tests |
 | `.github/workflows/publish-app.yml` | the automation |
+| `scripts/harvest_sources.py`, `data/harvest_sources.json` | the self-filling harvester and its source list |
+| `scripts/ingest_screenshots.py`, `inbox/` | the screenshot inbox |
+| `.github/workflows/fgf-source-harvest.yml`, `fgf-screenshot-inbox.yml` | their schedules |
