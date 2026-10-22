@@ -1,0 +1,350 @@
+<title>FGF Intelligence</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Ask anything about Foundation: Galactic Frontier and get fact-checked answers with sources.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500&family=Oxanium:wght@600;700&display=swap">
+<style>
+/* Layout: a bridge console. Slim sticky command bar; the conversation is the main column,
+   the player's account and the latest official notices sit in a right rail that stacks on phones. */
+:root {
+  --bg: #f3f5fa; --surface: #ffffff; --surface-2: #e9edf6; --line: #d3d9e7;
+  --fg: #141b2d; --muted: #556079; --accent: #a5650a; --accent-soft: #fbefd9; --on-accent: #ffffff;
+  --signal: #0d7a70; --signal-soft: #dcf2ef; --warn: #b23f1a; --warn-soft: #fbe6dd; --community: #6b4fa8; --community-soft: #eee8f8;
+  --focus: #1d5fd0;
+  --font-display: "Oxanium", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px; --r-lg: 16px;
+  --step--1: 0.875rem; --step-0: 1rem; --step-1: 1.125rem; --step-2: 1.375rem; --step-3: 1.875rem; --step-4: 2.5rem;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1020; --surface: #121a2e; --surface-2: #18223a; --line: #27334f;
+  --fg: #e7ebf4; --muted: #9ba7c1; --accent: #f2b544; --accent-soft: #2e2512; --on-accent: #1a1204;
+  --signal: #5fd4c8; --signal-soft: #10302f; --warn: #f39a73; --warn-soft: #3a1f15; --community: #b9a3ea; --community-soft: #241d3a;
+  --focus: #8cb4ff; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0b1020; --surface: #121a2e; --surface-2: #18223a; --line: #27334f;
+  --fg: #e7ebf4; --muted: #9ba7c1; --accent: #f2b544; --accent-soft: #2e2512; --on-accent: #1a1204;
+  --signal: #5fd4c8; --signal-soft: #10302f; --warn: #f39a73; --warn-soft: #3a1f15; --community: #b9a3ea; --community-soft: #241d3a;
+  --focus: #8cb4ff; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 var(--step-0)/1.6 var(--font-body); margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; margin: 0; letter-spacing: 0.01em; }
+a { color: var(--signal); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.skip { position: absolute; left: -9999px; }
+.skip:focus { left: 16px; top: 16px; z-index: 30; background: var(--surface); padding: 8px 12px; border-radius: var(--r); }
+.wrap { max-width: 1180px; margin: 0 auto; }
+.mono { font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.02em; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Command bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+.bar .wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; margin-right: auto; text-decoration: none; color: var(--fg); }
+.brand svg { flex: none; }
+.brand b { font-family: var(--font-display); font-size: var(--step-1); letter-spacing: 0.04em; }
+.brand span { display: block; font-size: 0.75rem; color: var(--muted); line-height: 1.2; }
+.tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 999px; }
+.tab { border: 0; background: transparent; padding: 7px 14px; border-radius: 999px; cursor: pointer; font-weight: 700; color: var(--muted); }
+.tab[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.mode { display: inline-flex; align-items: center; gap: 8px; font-size: var(--step--1); color: var(--muted); }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; }
+.mode[data-mode="ai"] .dot { background: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.mode[data-mode="instant"] .dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.mode[data-mode="offline"] .dot { background: var(--muted); box-shadow: 0 0 0 3px var(--surface-2); }
+.install { padding: 7px 14px; }
+.banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 14px;
+  background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: var(--r); padding: 10px 14px; }
+
+/* Ask view */
+.ask { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; margin-top: 28px; align-items: start; }
+.lead { display: grid; gap: 10px; margin-bottom: 18px; }
+.lead h1 { font-size: clamp(1.9rem, 4.2vw, var(--step-4)); }
+.lead h1 em { font-style: normal; color: var(--accent); }
+.lead p { margin: 0; color: var(--muted); max-width: 62ch; }
+.composer { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 10px; display: grid; gap: 8px; }
+.composer:focus-within { border-color: var(--focus); }
+.composer textarea { width: 100%; min-height: 56px; max-height: 220px; resize: vertical; border: 0; background: transparent; padding: 8px 10px; outline: none; line-height: 1.5; }
+.composer-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.composer-row .hint { margin-right: auto; font-size: var(--step--1); color: var(--muted); padding-left: 8px; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 9px 16px; border-radius: 999px; cursor: pointer; font-weight: 700; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn.ghost { background: transparent; }
+.starters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.starter { border: 1px dashed var(--line); background: transparent; border-radius: 999px; padding: 7px 13px; cursor: pointer; text-align: left; color: var(--fg); }
+.starter:hover { border-style: solid; border-color: var(--accent); }
+
+.chat-col { display: flex; flex-direction: column; min-width: 0; }
+.thread { display: grid; gap: 22px; margin-top: 26px; }
+.thread:empty { display: none; }
+.has-thread .lead p, .has-thread .starters { display: none; }
+.has-thread .lead { margin-bottom: 0; }
+.has-thread .lead h1 { font-size: var(--step-2); }
+.has-thread .thread { order: 2; margin-top: 20px; }
+.has-thread .composer { order: 3; position: sticky; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); margin-top: 22px; z-index: 5;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.18); }
+.tab .short { display: none; }
+.turn { display: grid; gap: 10px; }
+.q { justify-self: end; max-width: min(80%, 640px); background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  padding: 10px 14px; border-radius: 16px 16px 4px 16px; overflow-wrap: anywhere; }
+.a { background: var(--surface); border: 1px solid var(--line); border-radius: 4px 16px 16px 16px; padding: 16px 18px; min-width: 0; }
+.a-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.a-body { max-width: 72ch; overflow-wrap: anywhere; }
+.a-body p { margin: 0 0 10px; }
+.a-body ul, .a-body ol { margin: 4px 0 12px; padding-left: 22px; }
+.a-body li { margin: 4px 0; }
+.a-body h4 { font-size: var(--step-1); margin: 14px 0 6px; }
+.a-body code { font-family: var(--font-mono); font-size: 0.85em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.thinking { color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(0.5); opacity: 0.4; } }
+.cite { font-family: var(--font-mono); font-size: 0.7rem; border: 1px solid var(--signal); color: var(--signal); background: var(--signal-soft);
+  border-radius: 6px; padding: 0 5px; margin-left: 2px; cursor: pointer; vertical-align: 2px; line-height: 1.5; }
+.a-foot { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; border-radius: 999px; padding: 3px 10px; border: 1px solid var(--line); color: var(--muted); background: var(--surface-2); }
+.chip.ok { color: var(--signal); background: var(--signal-soft); border-color: transparent; }
+.chip.warn { color: var(--warn); background: var(--warn-soft); border-color: transparent; }
+.chip.t1, .chip.t2 { color: var(--signal); background: var(--signal-soft); border-color: transparent; }
+.chip.t3, .chip.t4 { color: var(--community); background: var(--community-soft); border-color: transparent; }
+.chip.plan { color: var(--accent); background: var(--accent-soft); border-color: transparent; }
+.sources { margin-top: 10px; }
+.sources summary { cursor: pointer; font-weight: 700; font-size: var(--step--1); color: var(--muted); }
+.src-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.src { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; padding: 10px; border-radius: var(--r); background: var(--surface-2); border: 1px solid transparent; }
+.src.hl { border-color: var(--signal); }
+.src .ref { font-family: var(--font-mono); font-size: 0.75rem; color: var(--signal); padding-top: 2px; }
+.src .meta { grid-column: 2; display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted); }
+.src p { margin: 0; overflow-wrap: anywhere; }
+.note { font-size: var(--step--1); color: var(--muted); margin: 10px 0 0; }
+.note.warn { color: var(--warn); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+/* Rail */
+.rail { display: grid; gap: 18px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 76px); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel h2 { font-size: var(--step-1); }
+.field { display: grid; gap: 4px; }
+.field label, .field legend { font-size: var(--step--1); font-weight: 700; }
+.field select, .field input[type="number"], .field input[type="text"] { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 8px 10px; width: 100%; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg label { display: inline-flex; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-size: var(--step--1); }
+.seg input:checked + span { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.seg input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+.champs { display: flex; flex-wrap: wrap; gap: 6px; }
+.champ { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer; }
+.champ[aria-pressed="true"] { background: var(--signal-soft); border-color: var(--signal); color: var(--signal); font-weight: 700; }
+.saved { font-size: 0.78rem; color: var(--muted); min-height: 1.2em; }
+.news { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.news li { display: grid; gap: 2px; }
+.news time { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); }
+.news p { margin: 0; font-size: var(--step--1); overflow-wrap: anywhere; }
+details.account summary { cursor: pointer; font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+details.account summary::-webkit-details-marker { display: none; }
+details.account summary::after { content: "Edit"; font-family: var(--font-body); font-size: var(--step--1); color: var(--signal); font-weight: 700; }
+details.account[open] summary::after { content: "Done"; }
+details.account .acc-body { display: grid; gap: 12px; margin-top: 12px; }
+.acc-summary { font-size: var(--step--1); color: var(--muted); margin: 0; }
+
+/* Guides */
+.page-head { margin: 28px 0 18px; display: grid; gap: 8px; }
+.page-head h1 { font-size: clamp(1.7rem, 3.6vw, 2.2rem); }
+.page-head p { margin: 0; color: var(--muted); max-width: 70ch; }
+.guide-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.guide { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px; margin-bottom: 18px; display: grid; gap: 12px; min-width: 0; scroll-margin-top: 90px; }
+.guide h2 { font-size: var(--step-2); }
+.guide p { margin: 0; max-width: 80ch; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: var(--step--1); }
+th, td { text-align: left; vertical-align: top; padding: 9px 11px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 700; white-space: nowrap; }
+.a-body table { min-width: 420px; }
+
+/* Facts */
+.filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
+.filters .field { flex: 1 1 220px; }
+.filters .field.small { flex: 0 1 200px; }
+.check { display: inline-flex; gap: 8px; align-items: center; font-size: var(--step--1); padding-bottom: 9px; }
+.count { color: var(--muted); font-size: var(--step--1); margin: 0 0 10px; }
+.fact-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.fact { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 6px; min-width: 0; }
+.fact p { margin: 0; overflow-wrap: anywhere; }
+.fact .meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 0.78rem; color: var(--muted); }
+.legend { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: var(--step--1); color: var(--muted); margin-bottom: 12px; }
+footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--step--1); display: grid; gap: 6px; }
+
+@media (max-width: 920px) {
+  .ask { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; order: -1; }
+  .rail .news-panel { display: none; }
+  .ask.has-thread .rail .news-panel { display: none; }
+}
+@media (max-width: 560px) {
+  .bar .wrap { gap: 10px; }
+  .tabs { order: 3; width: 100%; justify-content: space-between; }
+  .tab { flex: 1; padding: 7px 8px; }
+  .tab .full { display: none; }
+  .tab .short { display: inline; }
+  .mode .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .guide .table-scroll { border: 0; overflow: visible; }
+  .guide table, .guide thead, .guide tbody, .guide tr, .guide td { display: block; min-width: 0; width: 100%; }
+  .guide thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .guide tr { border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; margin-bottom: 10px; background: var(--bg); }
+  .guide td { border: 0; padding: 4px 0; white-space: normal; }
+  .guide td::before { content: attr(data-label); display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .guide td:first-child { font-family: var(--font-display); font-size: var(--step-1); }
+  .guide td:first-child::before { display: none; }
+  .row2 { grid-template-columns: 1fr; }
+  .q { max-width: 92%; }
+  .has-thread .composer .hint { display: none; }
+  .a { padding: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#ask" aria-label="FGF Intelligence home">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="17" cy="17" r="15" fill="none" stroke="var(--line)" stroke-width="2"/>
+        <ellipse cx="17" cy="17" rx="15" ry="6" fill="none" stroke="var(--accent)" stroke-width="2" transform="rotate(-24 17 17)"/>
+        <circle cx="17" cy="17" r="4.5" fill="var(--signal)"/>
+        <circle cx="29.2" cy="11.6" r="2.4" fill="var(--accent)"/>
+      </svg>
+      <div><b>FGF INTELLIGENCE</b><span>Foundation: Galactic Frontier companion</span></div>
+    </a>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-ask" aria-controls="view-ask" data-view="ask">Ask</button>
+      <button class="tab" role="tab" id="tab-guides" aria-controls="view-guides" data-view="guides" aria-label="Event guides"><span class="full">Event guides</span><span class="short" aria-hidden="true">Guides</span></button>
+      <button class="tab" role="tab" id="tab-facts" aria-controls="view-facts" data-view="facts" aria-label="Fact library"><span class="full">Fact library</span><span class="short" aria-hidden="true">Facts</span></button>
+    </nav>
+    <span class="mode" id="mode" data-mode="pending" role="status"><span class="dot"></span><span class="label" id="mode-label">Connecting…</span></span>
+    <button type="button" class="btn primary install" id="install" hidden>Install app</button>
+  </div>
+</header>
+<div class="wrap">
+  <div class="banner" id="ios-tip" role="note" hidden>
+    <span><strong>Get the app:</strong> tap <span aria-label="Share">Share</span> in Safari, then <strong>Add to Home Screen</strong>.</span>
+    <button type="button" class="btn ghost" id="ios-tip-close" aria-label="Dismiss">Got it</button>
+  </div>
+  <div class="banner" id="update-tip" role="status" hidden>
+    <span>A new version with fresh game data is ready.</span>
+    <button type="button" class="btn primary" id="update-reload">Update now</button>
+  </div>
+</div>
+
+<main id="main" class="wrap">
+  <!-- ASK -->
+  <section id="view-ask" role="tabpanel" aria-labelledby="tab-ask">
+    <div class="ask" id="ask-grid">
+      <div class="chat-col">
+        <div class="lead">
+          <span class="eyebrow" id="freshness">Knowledge base</span>
+          <h1>Ask anything about <em>Foundation: Galactic Frontier</em></h1>
+          <p>Answers come only from the game's knowledge base: official notices, in-game screens, the wiki and tested community guides. Every claim is cited and every number is checked against its source.</p>
+        </div>
+        <form class="composer" id="composer" autocomplete="off">
+          <label for="question" class="sr">Your question</label>
+          <textarea id="question" name="question" rows="2" placeholder="e.g. I'm F2P at Core 28. What should I prioritise this week?"></textarea>
+          <div class="composer-row">
+            <span class="hint" id="composer-hint">Enter to send · Shift+Enter for a new line</span>
+            <button type="button" class="btn ghost" id="new-chat" hidden>New chat</button>
+            <button type="button" class="btn" id="stop" hidden>Stop</button>
+            <button type="submit" class="btn primary" id="send">Ask</button>
+          </div>
+        </form>
+        <div class="starters" id="starters" aria-label="Example questions"></div>
+        <div class="thread" id="thread" aria-label="Conversation"></div>
+        <p class="sr" id="announcer" aria-live="polite"></p>
+      </div>
+
+      <aside class="rail" aria-label="Your account and latest notices">
+        <div class="panel">
+          <details class="account" id="account">
+            <summary>Your account</summary>
+            <p class="acc-summary" id="acc-summary"></p>
+            <div class="acc-body">
+              <div class="row2">
+                <div class="field"><label for="p-season">Season</label>
+                  <select id="p-season"><option value="">Not set</option><option>S1</option><option>S2</option><option>S3</option></select></div>
+                <div class="field"><label for="p-core">Energy Core level</label>
+                  <input id="p-core" type="number" min="1" max="35" inputmode="numeric" placeholder="1–35"></div>
+              </div>
+              <fieldset class="field"><legend>Spending</legend>
+                <div class="seg" id="p-spending">
+                  <label><input type="radio" name="spending" value="" id="sp-none"><span>Not set</span></label>
+                  <label><input type="radio" name="spending" value="F2P (no spending)" id="sp-f2p"><span>F2P</span></label>
+                  <label><input type="radio" name="spending" value="Light spender" id="sp-light"><span>Light spender</span></label>
+                  <label><input type="radio" name="spending" value="Spender" id="sp-spender"><span>Spender</span></label>
+                </div></fieldset>
+              <fieldset class="field"><legend>Champions you own</legend>
+                <div class="champs" id="p-champs"></div></fieldset>
+              <div class="field"><label for="p-server">Server (optional)</label>
+                <input id="p-server" type="text" maxlength="20" placeholder="e.g. 1004"></div>
+              <span class="saved" id="saved" aria-live="polite"></span>
+            </div>
+          </details>
+        </div>
+        <div class="panel news-panel">
+          <h2>Latest official notices</h2>
+          <ul class="news" id="news"></ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- GUIDES -->
+  <section id="view-guides" role="tabpanel" aria-labelledby="tab-guides" hidden>
+    <div class="page-head">
+      <span class="eyebrow">Curated by the FGF team</span>
+      <h1>Event guides</h1>
+      <p>Hand-built plans for the events that decide your season. Each row says what to spend, what to save and what to avoid, and how strong the evidence behind it is.</p>
+    </div>
+    <nav class="guide-nav" id="guide-nav" aria-label="Guides"></nav>
+    <div id="guides"></div>
+  </section>
+
+  <!-- FACTS -->
+  <section id="view-facts" role="tabpanel" aria-labelledby="tab-facts" hidden>
+    <div class="page-head">
+      <span class="eyebrow" id="facts-eyebrow">Knowledge base</span>
+      <h1>Fact library</h1>
+      <p>Search every fact the assistant can use. Tier 1 comes from in-game screens and official notices, Tier 2 from the wiki and tested guides, Tier 3 from community reports.</p>
+    </div>
+    <form class="filters" id="fact-filters" role="search">
+      <div class="field"><label for="f-q">Search facts</label><input id="f-q" type="text" placeholder="e.g. migration permits, Kaboom, Fusion Seed"></div>
+      <div class="field small"><label for="f-cat">Category</label><select id="f-cat"><option value="">All categories</option></select></div>
+      <label class="check"><input type="checkbox" id="f-official"> Official &amp; tested only</label>
+    </form>
+    <div class="legend"><span class="chip t1">Tier 1 · official</span><span class="chip t2">Tier 2 · wiki/tested</span><span class="chip t3">Tier 3 · community</span></div>
+    <p class="count" id="f-count" aria-live="polite"></p>
+    <ul class="fact-list" id="f-list"></ul>
+  </section>
+
+  <footer>
+    <span id="foot-data"></span>
+    <span>Fan-made companion, not affiliated with the game's publisher. Always confirm costs and timers in-game before spending.</span>
+  </footer>
+</main>
+
+<script type="application/json" id="fgf-config">{{CONFIG}}</script>
+<script type="application/json" id="fgf-data">{{DATA}}</script>
+<script>{{ENGINE}}</script>
+<script>{{APP}}</script>
