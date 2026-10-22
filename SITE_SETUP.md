@@ -47,6 +47,26 @@ GitHub repo → **Actions** → **Publish FGF app** → **Run workflow**. It tak
 
 ---
 
+## Automatic data collection (the database fills itself)
+
+The **FGF Source Harvest** workflow runs every 6 hours and needs the same `GEMINI_API_KEY`, plus the Supabase key your corpus sync already uses. On each run it:
+
+1. Reads the sources in `data/harvest_sources.json`: official news and patches, the official portal, Steam update notes, the FGF wiki (opened in a real browser, because it needs JavaScript), the Fandom wiki and Reddit.
+2. Skips pages that haven't changed since last time.
+3. Has the free AI pull out individual game facts from each new or changed page.
+4. **Keeps a fact only if its quoted sentence appears on the page and every number in it appears there too.** Invented or garbled facts are rejected.
+5. Skips facts the database already has. A fact that **contradicts** Tier 1/2 evidence (e.g. "12 permits" when the official fact says 10) is saved as **disputed** for your review and never overwrites anything.
+6. Adds new facts to the database: official sources as Tier 2, wikis and Reddit as Tier 3. Nothing is ever made Tier 1 or canonical automatically. Each fact keeps its source link, quote and date.
+7. If anything new was added, it starts the database sync straight away. The app republishes a few minutes later.
+
+The YouTube pipeline also switches to the free Gemini key automatically once `GEMINI_API_KEY` is set.
+
+Each run's summary (GitHub → Actions → FGF Source Harvest) lists every new fact, every disputed fact and every source that couldn't be read. To try it safely first, run it manually with **dry run** ticked: it reports what it would add without writing anything.
+
+Sources that can't be read automatically for free: X, Instagram, Facebook and Discord, which all need a login. Add their announcements as screenshots or user evidence as before.
+
+To add a source, add an entry to `data/harvest_sources.json`. The available adapters are `page`, `news_index`, `steam_news`, `sitemap`, `mediawiki_recent` and `reddit_new`.
+
 ## Installing the app on a phone
 - **Android (Chrome):** open the link and tap **Install app** in the top bar, or use the menu (⋮) → **Install app**.
 - **iPhone (Safari):** open the link → **Share** → **Add to Home Screen**.
