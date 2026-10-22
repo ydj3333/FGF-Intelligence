@@ -7,10 +7,13 @@ Governance:
   additional data and remains a candidate.
 - Contradictions are preserved for evaluation; nothing is overwritten.
 """
-import argparse, json, re
+import argparse, json, re, sys
 from pathlib import Path
 from difflib import SequenceMatcher
 
+# Works both as `python scripts/cross_reference_claims.py` and as
+# `from scripts.cross_reference_claims import ...` (tests).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from youtube_evidence_governance import classify_against_existing
 
 
