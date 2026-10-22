@@ -10,7 +10,10 @@ class V4IntentFirstTests(unittest.TestCase):
         hits=retrieve(q,10)
         self.assertTrue(hits)
         text="Repair methods: Minor Damage can recover without Repair Modules; Major Damage requires Repair Modules."
-        gate=answer_quality_gate(q,text,hits)
+        # The gate now requires answers to declare the evidence they used
+        # (uncited answers are only accepted as explicit abstentions).
+        repair_refs=[i+1 for i,c in enumerate(hits) if 'repair' in c.get('Claim','').lower() or 'damage' in c.get('Claim','').lower()][:2]
+        gate=answer_quality_gate(q,text,hits,repair_refs)
         self.assertTrue(gate["passes"])
         self.assertFalse("command point" in text.lower())
 

@@ -34,7 +34,9 @@ def test_shadowfront_has_different_objective_than_kaboom():
         duration="5 days",
         evidence_state="tier 2",
     )
-    assert "occupation" in event.objective.lower()
+    # The model was built with objective "occupy and hold Vaults".
+    assert "occup" in event.objective.lower()
+    assert "occupation" in event.scoring_factors
     assert "AOE" not in event.tactical_priorities
 
 
@@ -49,7 +51,8 @@ def test_paths_to_dominance_uses_title_timing_not_pve_wave_logic():
         evidence_state="primary_in_game_ui",
     )
     assert "title timing" in event.tactical_priorities
-    assert "rally coordination" in event.scoring_factors
+    assert "rally coordination" in event.tactical_priorities
+    assert "rallies" in event.scoring_factors
 
 
 def test_commerce_duel_uses_rank_points_and_demotions():

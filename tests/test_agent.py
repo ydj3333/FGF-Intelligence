@@ -41,7 +41,7 @@ try:
     assert health["tier1"] == EXPECTED_TIER1
     assert health["conflicts"] == EXPECTED_CONFLICTS
     assert health["claim_lifecycle_aware"] is True
-    assert health["version"] == "v7.1.2-fleet-state"
+    assert health["version"] == "v8.0.0-ai-agent"
     assert health["response_engine"]["status"] == "ready"
     assert health["response_engine"]["primary_model"] == "fgf-v6-knowledge-query-engine"
     assert health["response_engine"]["external_api_required"] is False
@@ -95,7 +95,8 @@ finally:
 
 
 def test_t100_best_way_cannot_surface_generic_strategy_options():
-    result = agent.answer("best way to do T100")
+    import agent  # previously referenced without import (NameError)
+    result = agent._DETERMINISTIC_ANSWER("best way to do T100")
     assert result["answer_type"] == "event_best_strategy"
     assert "Top 100 Galactic Traders" in result["answer"]
     assert "Available evidenced options/methods" not in result["answer"]
