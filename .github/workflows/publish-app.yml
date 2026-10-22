@@ -15,6 +15,8 @@ name: Publish FGF app
 #     CLOUDFLARE_API_TOKEN    Cloudflare token with "Edit Cloudflare Workers" permission
 #     CLOUDFLARE_ACCOUNT_ID   from the Cloudflare dashboard
 #     GROQ_API_KEY            optional backup AI (free Groq key)
+#     FGF_SUPABASE_PUBLISHABLE_KEY  optional: lets the proxy store player feedback with insert-only rights
+#                                   (otherwise the existing Supabase secret key is used)
 #   Variables (optional): FGF_SITE_ORIGIN for a custom domain, FGF_AI_ENDPOINT to use an existing proxy.
 
 on:
@@ -89,7 +91,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
-          command: deploy --var ALLOWED_ORIGINS:${{ steps.setup.outputs.origins }}
+          command: deploy --var ALLOWED_ORIGINS:${{ steps.setup.outputs.origins }} --var SUPABASE_URL:${{ secrets.FGF_SUPABASE_URL || vars.FGF_SUPABASE_URL || 'https://qdoixzfkkmvzjfkhzups.supabase.co' }}
 
       - name: Store AI keys in the proxy (never in the site)
         if: steps.setup.outputs.ready == 'true'
@@ -99,9 +101,13 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          # Player feedback (learning loop): the publishable key is preferred, because the
+          # app_feedback policy lets it insert only. Falls back to the secret key.
+          FEEDBACK_KEY: ${{ secrets.FGF_SUPABASE_PUBLISHABLE_KEY || secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           if [ -n "$GEMINI_API_KEY" ]; then printf '%s' "$GEMINI_API_KEY" | npx --yes wrangler@3 secret put GEMINI_API_KEY; fi
           if [ -n "$GROQ_API_KEY" ]; then printf '%s' "$GROQ_API_KEY" | npx --yes wrangler@3 secret put GROQ_API_KEY; fi
+          if [ -n "$FEEDBACK_KEY" ]; then printf '%s' "$FEEDBACK_KEY" | npx --yes wrangler@3 secret put SUPABASE_KEY; fi
 
       - name: Find the proxy address
         id: url
@@ -140,6 +146,11 @@ jobs:
           node-version: "22"
       - name: Install icon tool
         run: python -m pip install --quiet pillow
+      - name: Add the YouTube evidence (creator videos, unverified)
+        env:
+          FGF_SUPABASE_URL: ${{ secrets.FGF_SUPABASE_URL || vars.FGF_SUPABASE_URL || 'https://qdoixzfkkmvzjfkhzups.supabase.co' }}
+          FGF_SUPABASE_SECRET_KEY: ${{ secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/export_video_evidence.py
       - name: Build the app from the live knowledge data
         env:
           FGF_AI_ENDPOINT: ${{ needs.ai-proxy.outputs.url }}

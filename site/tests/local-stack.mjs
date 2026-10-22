@@ -7,16 +7,19 @@ import { handle } from "../../worker/src/index.js";
 
 const [UP, PROXY, SITE] = [8961, 8962, 8963];
 const DIST = path.resolve(process.argv[2] || "site/dist");
-const counts = { upstream: 0 };
+const counts = { upstream: 0, feedback: [] };
 
 http.createServer((req, res) => {
   let b = ""; req.on("data", (c) => (b += c)); req.on("end", () => {
-    const body = JSON.parse(b); counts.upstream++;
+    const body = JSON.parse(b);
+    if (req.url === "/rest/v1/app_feedback") { counts.feedback.push(body); res.writeHead(201); return res.end(); }   // mock Supabase
+    counts.upstream++;
     if (body.model === "busy") { res.writeHead(429); return res.end("{}"); }
     const last = body.messages[body.messages.length - 1].content;
     const ref = (last.match(/\[(E\d+)\] \(Tier [12]/) || [, "E1"])[1];
     const fact = ((last.split("[" + ref + "]")[1] || "").split("\n")[0] || "").replace(/^ \([^)]*\) /, "");
-    const answer = `**Short answer:** ${fact} [${ref}]\n\n- Answered by the free AI through the FGF proxy.\n- Follow-ups remember this conversation.`;
+    const answer = /wobblequark/.test(last) ? "The sources don't cover that yet. Check the in-game help screen.\n[[GAP]]"
+      : `**Short answer:** ${fact} [${ref}]\n\n- Answered by the free AI through the FGF proxy.\n- Follow-ups remember this conversation.`;
     res.writeHead(200, { "Content-Type": "text/event-stream" });
     for (const piece of answer.match(/.{1,30}/gs)) res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: piece } }] })}\n\n`);
     res.write(`data: ${JSON.stringify({ choices: [{ delta: {}, finish_reason: "stop" }] })}\n\ndata: [DONE]\n\n`); res.end();
@@ -24,7 +27,7 @@ http.createServer((req, res) => {
 }).listen(UP);
 
 const env = { GEMINI_API_KEY: "test", GEMINI_BASE_URL: `http://127.0.0.1:${UP}`, GEMINI_MODELS: "busy,gemini-test",
-  ALLOWED_ORIGINS: `http://127.0.0.1:${SITE}` };
+  ALLOWED_ORIGINS: `http://127.0.0.1:${SITE}`, SUPABASE_URL: `http://127.0.0.1:${UP}`, SUPABASE_KEY: "sb_publishable_test" };
 http.createServer(async (req, res) => {
   if (req.url === "/__counts") { res.writeHead(200); return res.end(JSON.stringify(counts)); }
   const chunks = []; for await (const c of req) chunks.push(c);

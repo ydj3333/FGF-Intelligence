@@ -212,7 +212,8 @@
     const when = d && !isNaN(d) ? fmtDate(d) : "recently";
     $("#freshness").textContent = `${m.facts.toLocaleString()} facts · ${m.official.toLocaleString()} official or tested · updated ${when}`;
     $("#facts-eyebrow").textContent = `${m.facts.toLocaleString()} facts · updated ${when}`;
-    $("#foot-data").textContent = `Knowledge base synced ${when} from the FGF Intelligence evidence store: ${m.facts.toLocaleString()} facts, ${m.tier1} Tier 1, ${m.plans} curated event plans.`;
+    $("#foot-data").textContent = `Knowledge base synced ${when} from the FGF Intelligence evidence store: ${m.facts.toLocaleString()} facts, ${m.tier1} Tier 1, ${m.video ? m.video.toLocaleString() + " from creator videos (unverified), " : ""}${m.plans} curated event plans.`;
+    $("#foot-learning").hidden = !feedbackOn();
   }
   function renderStarters() {
     const box = $("#starters"); box.innerHTML = "";
@@ -263,13 +264,57 @@
     };
   }
 
+  // -------------------------------------------------------------- learning
+  // Ratings, corrections and unanswered questions go (anonymously) to the proxy's /feedback,
+  // which stores them for the daily learning run. Only available with the free AI proxy.
+  function feedbackOn() { return !!CONFIG.aiEndpoint; }
+  async function sendFeedback(payload) {
+    if (!feedbackOn() || navigator.onLine === false) return false;
+    try {
+      const r = await fetch(CONFIG.aiEndpoint.replace(/\/+$/, "") + "/feedback", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, app_version: String(CONFIG.version || "").slice(0, 40) }),
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+  function feedbackRow(el, question, answer, used) {
+    if (!feedbackOn()) return;
+    el._fb = { question: question.slice(0, 500), answer_excerpt: String(answer || "").slice(0, 1500),
+               cited_facts: used.filter((e) => e.kind === "fact").map((e) => String(e.text).slice(0, 400)).slice(0, 8) };
+    $(".a", el).insertAdjacentHTML("beforeend",
+      `<div class="fb" role="group" aria-label="Rate this answer"><span>Was this helpful?</span>` +
+      `<button type="button" class="btn ghost fb-up" aria-label="Helpful">👍 Yes</button>` +
+      `<button type="button" class="btn ghost fb-down" aria-label="Not helpful">👎 No</button>` +
+      `<button type="button" class="btn ghost fb-fix">Correct this</button></div>`);
+  }
+  function feedbackForm(el, lead) {
+    if ($(".fb-form", el)) { $(".fb-form textarea", el).focus(); return; }
+    $(".fb", el).insertAdjacentHTML("afterend",
+      `<form class="fb-form"><p class="note" style="margin:0">${F.esc(lead)}</p>` +
+      `<label>What's wrong or missing?<textarea name="correction" maxlength="1000" required placeholder="e.g. The event now starts on Saturday, not Friday."></textarea></label>` +
+      `<label>Link to proof (optional: official post, video or wiki page)<input name="source_url" type="url" maxlength="500" placeholder="https://"></label>` +
+      `<div class="row"><button type="submit" class="btn primary">Send</button><button type="button" class="btn ghost fb-cancel">Cancel</button></div></form>`);
+    const form = $(".fb-form", el);
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const correction = form.correction.value.trim(), url = form.source_url.value.trim();
+      if (!correction) return;
+      const btn = $("button[type=submit]", form); btn.disabled = true; btn.textContent = "Sending…";
+      const ok = await sendFeedback({ ...el._fb, kind: "correction", correction: correction.slice(0, 1000), source_url: /^https?:\/\//.test(url) ? url.slice(0, 500) : null });
+      form.outerHTML = `<p class="note">${ok ? "Thanks! Your correction will be checked against the sources before anything changes." : "Couldn't send right now. Please try again later."}</p>`;
+    });
+    $(".fb-cancel", form).addEventListener("click", () => form.remove());
+    $("textarea", form).focus();
+  }
+
   // ---------------------------------------------------------------- render
   function tierChip(t) { return `<span class="chip t${t}">${F.esc(F.TIER_LABEL[t] || "Unverified")}</span>`; }
   function sourceItem(e) {
     const link = e.source && /^https?:\/\//.test(e.source) ? ` · <a href="${F.esc(e.source)}" target="_blank" rel="noopener noreferrer">source</a>` : "";
     const meta = e.kind === "plan"
       ? `<span class="chip plan">Curated event plan</span> <span>${F.esc(e.title)}</span>`
-      : `${tierChip(e.tier)}<span>${F.esc(e.category || "")}</span>${e.season ? `<span>${F.esc(e.season)}</span>` : ""}${e.state === "candidate" ? "<span>not yet verified</span>" : ""}${link}`;
+      : `${tierChip(e.tier)}<span>${F.esc(e.category || "")}</span>${e.season ? `<span>${F.esc(e.season)}</span>` : ""}${e.video ? "<span>creator video</span>" : ""}${e.state === "candidate" ? "<span>not yet verified</span>" : ""}${e.state === "conflicting" ? '<span class="chip warn">disputed</span>' : ""}${link}`;
     const text = e.kind === "plan" ? `Hand-built plan. <button type="button" class="btn ghost open-guide" data-plan="${F.esc(e.planId)}">Open guide</button>` : F.esc(e.text);
     return `<li class="src" id="__ID__-${e.ref}"><span class="ref">${e.ref}</span><p>${text}</p><div class="meta">${meta}</div></li>`;
   }
@@ -293,6 +338,14 @@
       if (g) { show("guides"); const target = $("#guide-" + g.dataset.plan); if (target) target.scrollIntoView({ block: "start" }); }
       const r = ev.target.closest(".retry");
       if (r) { $("#question").value = r.dataset.q; ask(r.dataset.q); }
+      if (ev.target.closest(".fb-up, .fb-down") && el._fb && !el._fbRated) {
+        const up = !!ev.target.closest(".fb-up");
+        el._fbRated = true;
+        sendFeedback({ ...el._fb, kind: up ? "helpful" : "not_helpful" });
+        $(".fb", el).innerHTML = up ? "<span>Thanks for the feedback!</span>" : '<span>Thanks. What was wrong?</span><button type="button" class="btn ghost fb-fix">Correct this</button>';
+        if (!up) feedbackForm(el, "Tell us what was wrong or missing. Corrections are checked against the sources before anything changes.");
+      }
+      if (ev.target.closest(".fb-fix") && el._fb) feedbackForm(el, "Corrections are checked against the sources before anything changes.");
     });
   }
 
@@ -328,6 +381,7 @@
     $(".a", el).insertAdjacentHTML("beforeend",
       sourcesBlock(el.id, used, "Sources", false) +
       `<p class="note">${F.esc(note || defaultInstantNote())}</p>`);
+    feedbackRow(el, question, $(".a-body", el).textContent, used);
     $(".a", el).setAttribute("aria-busy", "false");
   }
 
@@ -370,6 +424,7 @@
     const { reg, plans } = gatherEvidence(question);
     const prevQuestion = state.lastQuestion;
     state.lastQuestion = question;
+    if (!reg.items.length && !plans.length) sendFeedback({ kind: "unanswered", question: question.slice(0, 500) });
 
     if (state.ai === undefined) {
       // Give the AI connection a moment before falling back.
@@ -394,7 +449,7 @@
     $(".thinking span:last-child", el).textContent = `Found ${reg.items.length} relevant source${reg.items.length === 1 ? "" : "s"}. Writing your answer…`;
     const profileTxt = F.profileText(state.profile);
     const turns = F.buildTurns({ question, history: state.history.slice(-MAX_HISTORY), registry: reg, profile: state.profile, today: todayText() });
-    const opts = { signal: ctl.signal, onText: ({ text }) => { body.innerHTML = F.renderMarkdown(text); } };
+    const opts = { signal: ctl.signal, onText: ({ text }) => { body.innerHTML = F.renderMarkdown(F.stripGap(text).replace(/\[\[G?A?P?\]?$/, "")); } };
     if (ai.toolsOK) opts.tools = [searchTool(reg)];
 
     let text = "", truncated = false, failure = null;
@@ -421,6 +476,8 @@
       return;
     }
 
+    if (F.hasGap(text) && reg.items.length) sendFeedback({ kind: "unanswered", question: question.slice(0, 500) });
+    text = F.stripGap(text);
     body.innerHTML = F.renderMarkdown(text);
     const check = F.factCheck(text, reg, [question, profileTxt, todayText(), prevQuestion].join(" "));
     const cited = check.refs.map((r) => reg.get(r)).filter(Boolean);
@@ -442,6 +499,7 @@
     const related = cited.length ? [] : reg.items.slice(0, 4);
     $(".a", el).insertAdjacentHTML("beforeend",
       sourcesBlock(el.id, cited.length ? cited : related, cited.length ? "Sources" : "Related facts", false) + foot);
+    if (!failure) feedbackRow(el, question, text, cited.length ? cited : related);
     $(".a", el).setAttribute("aria-busy", "false");
     $("#announcer").textContent = "Answer ready.";
 
@@ -500,7 +558,7 @@
   }
   function factItem(f) {
     const link = f.u && /^https?:\/\//.test(f.u) ? `<a href="${F.esc(f.u)}" target="_blank" rel="noopener noreferrer">source</a>` : (f.u ? `<span>${F.esc(f.u)}</span>` : "");
-    return `<li class="fact"><p>${F.esc(f.c)}</p><div class="meta">${tierChip(f.t)}<span>${F.esc(f.g)}</span>${f.v ? `<span>${F.esc(f.v)}</span>` : ""}${f.s === "candidate" ? "<span>not yet verified</span>" : ""}${f.s === "conflicting" ? '<span class="chip warn">disputed</span>' : ""}${link}</div></li>`;
+    return `<li class="fact"><p>${F.esc(f.c)}</p><div class="meta">${tierChip(f.t)}<span>${F.esc(f.g)}</span>${f.v ? `<span>${F.esc(f.v)}</span>` : ""}${f.y ? "<span>creator video</span>" : ""}${f.s === "candidate" ? "<span>not yet verified</span>" : ""}${f.s === "conflicting" ? '<span class="chip warn">disputed</span>' : ""}${link}</div></li>`;
   }
   let factTimer;
   function renderFacts() {

@@ -22,16 +22,36 @@ with sync_playwright() as p:
     r["ai_answer"] = pg.inner_text(".turn .a-body")[:140]
     r["ai_checked"] = pg.inner_text(".turn .a-head")
     pg.screenshot(path=SHOTS + "app-phone-ai.png")
+    # learning loop: rate the answer
+    r["learning_notice"] = pg.is_visible("#foot-learning")
+    pg.click(".turn >> nth=0 >> .fb-up")
+    pg.wait_for_selector(".turn >> nth=0 >> text=Thanks for the feedback")
     # follow-up
     pg.fill("#question", "and on day 2?"); pg.press("#question", "Enter")
     pg.wait_for_function("document.querySelectorAll('.turn .a[aria-busy=false]').length==2", timeout=20000)
     r["followup_ok"] = "free AI" in pg.inner_text(".turn:nth-child(2) .a-body")
+    # correction with a link
+    pg.click(".turn:nth-child(2) .fb-fix")
+    pg.fill(".turn:nth-child(2) .fb-form textarea", "Day 2 should save speedups for the build stage.")
+    pg.fill(".turn:nth-child(2) .fb-form input", "https://www.foundation.game/en/news/t100")
+    pg.click(".turn:nth-child(2) .fb-form button[type=submit]")
+    pg.wait_for_selector(".turn:nth-child(2) >> text=Your correction will be checked")
+    # a question the knowledge base can't answer is reported as a gap
+    pg.fill("#question", "what does the zzqv flurbix wobblequark do for my account overall"); pg.press("#question", "Enter")
+    pg.wait_for_function("document.querySelectorAll('.turn .a[aria-busy=false]').length==3", timeout=20000)
+    pg.wait_for_timeout(500)
+    import urllib.request
+    fbk = json.loads(urllib.request.urlopen("http://127.0.0.1:8962/__counts").read())["feedback"]
+    r["feedback_kinds"] = [x["kind"] for x in fbk]
+    r["gap_hidden"] = "[[GAP]]" not in pg.inner_text(".turn:nth-child(3) .a-body") and "don't cover" in pg.inner_text(".turn:nth-child(3) .a-body")
+    r["correction_row"] = next((x for x in fbk if x["kind"] == "correction"), {})
+    pg.screenshot(path=SHOTS + "app-phone-feedback.png", full_page=False)
     # offline
     ctx.set_offline(True); pg.evaluate("window.dispatchEvent(new Event('offline'))"); pg.wait_for_timeout(200)
     r["offline_mode"] = pg.inner_text("#mode-label")
     pg.fill("#question", "how do I repair major damage"); pg.press("#question", "Enter")
-    pg.wait_for_function("document.querySelectorAll('.turn .a[aria-busy=false]').length==3", timeout=10000)
-    r["offline_answer_note"] = pg.inner_text(".turn:nth-child(3) .note")
+    pg.wait_for_function("document.querySelectorAll('.turn .a[aria-busy=false]').length==4", timeout=10000)
+    r["offline_answer_note"] = pg.inner_text(".turn:nth-child(4) .note")
     ctx.set_offline(False); pg.evaluate("window.dispatchEvent(new Event('online'))"); pg.wait_for_timeout(300)
     r["back_online_mode"] = pg.inner_text("#mode-label")
     r["errors"] = errs

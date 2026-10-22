@@ -3,10 +3,14 @@ import http from "node:http";
 import { handle, _internal } from "../src/index.js";
 
 // Mock OpenAI-compatible upstream: model "busy" -> 429, "gone" -> 404, others stream SSE.
-const seen = [];
+const seen = [], stored = [];
 const upstream = http.createServer((req, res) => {
   let b = ""; req.on("data", (c) => (b += c)); req.on("end", () => {
-    const body = JSON.parse(b); seen.push({ model: body.model, auth: req.headers.authorization, stream: body.stream });
+    const body = JSON.parse(b);
+    if (req.url === "/rest/v1/app_feedback") {   // mock Supabase
+      if (req.headers.apikey !== "sb_publishable_x" || req.headers.prefer !== "return=minimal") { res.writeHead(401); return res.end("{}"); }
+      stored.push(body); res.writeHead(201); return res.end();
+    } seen.push({ model: body.model, auth: req.headers.authorization, stream: body.stream });
     if (body.model === "busy") { res.writeHead(429, { "Content-Type": "application/json" }); return res.end('{"error":{"message":"quota"}}'); }
     if (body.model === "gone") { res.writeHead(404); return res.end("{}"); }
     res.writeHead(200, { "Content-Type": "text/event-stream" });
@@ -20,12 +24,16 @@ const env = (extra = {}) => ({ GEMINI_API_KEY: "g-key", GEMINI_BASE_URL: base, G
 const req = (path, init = {}) => new Request("https://fgf-ai.example.workers.dev" + path, init);
 const chat = (messages, origin = "https://ydj3333.github.io", ip = "1.1.1.1") =>
   req("/chat", { method: "POST", headers: { "Content-Type": "application/json", Origin: origin, "CF-Connecting-IP": ip }, body: JSON.stringify({ messages }) });
-const reset = () => { _internal.visitors.clear(); _internal.skipped.clear(); seen.length = 0; };
+const reset = () => { _internal.visitors.clear(); _internal.feedbackVisitors.clear(); _internal.skipped.clear(); seen.length = 0; stored.length = 0; };
+const fb = (body, origin = "https://ydj3333.github.io", ip = "1.1.1.1") =>
+  req("/feedback", { method: "POST", headers: { "Content-Type": "application/json", Origin: origin, "CF-Connecting-IP": ip }, body: typeof body === "string" ? body : JSON.stringify(body) });
+const fbEnv = (extra = {}) => env({ SUPABASE_URL: base, SUPABASE_KEY: "sb_publishable_x", ...extra });
 let n = 0; const t = async (name, fn) => { reset(); await fn(); n++; console.log("ok -", name); };
 
 await t("health reports configured providers without secrets", async () => {
   const r = await handle(req("/health"), env()); const j = await r.json();
-  assert.deepStrictEqual(j, { ok: true, providers: ["gemini"], models: 3 });
+  assert.deepStrictEqual(j, { ok: true, providers: ["gemini"], models: 3, feedback: false });
+  assert.strictEqual((await (await handle(req("/health"), fbEnv())).json()).feedback, true);
   const r2 = await (await handle(req("/health"), {})).json(); assert.strictEqual(r2.ok, false);
 });
 await t("falls back across models and streams", async () => {
@@ -71,6 +79,33 @@ await t("per-visitor rate limit", async () => {
 await t("CORS preflight", async () => {
   const r = await handle(req("/chat", { method: "OPTIONS", headers: { Origin: "https://ydj3333.github.io" } }), env());
   assert.strictEqual(r.status, 204); assert.match(r.headers.get("Access-Control-Allow-Methods"), /POST/);
+});
+await t("feedback is cleaned and stored anonymously", async () => {
+  const r = await handle(fb({ kind: "correction", question: "  When does   Kaboom start? ", correction: "It starts Saturday now.", source_url: "https://www.foundation.game/en/news/kaboom",
+    cited_facts: ["Kaboom starts Friday.", 42, "x".repeat(900)], answer_excerpt: "Friday [E1]", app_version: "abc", ip: "should not be kept", extra: "dropped" }), fbEnv());
+  assert.strictEqual(r.status, 204);
+  assert.strictEqual(stored.length, 1);
+  const row = stored[0];
+  assert.deepStrictEqual(Object.keys(row).sort(), ["answer_excerpt", "app_version", "cited_facts", "correction", "kind", "question", "source_url"]);
+  assert.strictEqual(row.question, "When does Kaboom start?");
+  assert.strictEqual(row.cited_facts.length, 2); assert.strictEqual(row.cited_facts[1].length, 400);
+  assert.ok(!JSON.stringify(row).includes("1.1.1.1"));
+});
+await t("feedback validation, origin and limits", async () => {
+  const e = fbEnv();
+  for (const body of [{ kind: "spam", question: "hi there" }, { kind: "helpful", question: "" }, { kind: "correction", question: "q?", correction: "  " }, "{bad"]) {
+    assert.strictEqual((await handle(fb(body), e)).status, 400, JSON.stringify(body));
+  }
+  const js = await handle(fb({ kind: "correction", question: "q?", correction: "fix", source_url: "javascript:alert(1)" }), e);
+  assert.strictEqual(js.status, 204); assert.strictEqual(stored.at(-1).source_url, null);
+  assert.strictEqual((await handle(fb({ kind: "helpful", question: "q?" }, "https://evil.example"), e)).status, 403);
+  assert.strictEqual((await handle(fb({ kind: "helpful", question: "q?" }), env())).status, 503);
+  assert.strictEqual((await handle(fb({ kind: "helpful", question: "q?" }), fbEnv({ SUPABASE_KEY: "wrong" }))).status, 502);
+  _internal.feedbackVisitors.clear();
+  for (let i = 0; i < _internal.LIMITS.feedbackPer10Min; i++) assert.strictEqual((await handle(fb({ kind: "unanswered", question: "q" + i }, undefined, "7.7.7.7"), e)).status, 204);
+  assert.strictEqual((await handle(fb({ kind: "unanswered", question: "more" }, undefined, "7.7.7.7"), e)).status, 429);
+  // feedback does not use up the visitor's question allowance
+  assert.strictEqual((await handle(chat([{ role: "user", content: "still fine" }], undefined, "7.7.7.7"), env({ GEMINI_MODELS: "good-model" }))).status, 200);
 });
 upstream.close();
 console.log(`${n} passed`);

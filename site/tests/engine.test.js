@@ -18,6 +18,24 @@ t("plan matching", () => {
   assert.deepStrictEqual(FGF.matchPlans(data.plans, "GvG tips").map((p) => p.id), ["gvg"]);
   assert.deepStrictEqual(FGF.matchPlans(data.plans, "how do I repair"), []);
 });
+t("creator-video facts rank below core facts and are labelled for the AI", () => {
+  const facts = [
+    { c: "Kaboom robots lineup: Zora, Lily and Jodie work well together.", g: "Events", t: 3, s: "candidate", y: 1, n: "From the video “Kaboom guide”", u: "https://www.youtube.com/watch?v=AAAAAAAAAAA" },
+    { c: "Kaboom robots lineup: Zora and Lily are the recommended core.", g: "Events", t: 3, s: "candidate", n: "" },
+    { c: "A disputed Kaboom robots timer claim.", g: "Events", t: 3, s: "conflicting", n: "" },
+  ];
+  const small = FGF.buildIndex(facts);
+  const hits = small.search("kaboom robots lineup zora lily", { limit: 3 });
+  assert.ok(!hits[0].doc.y, "a core fact outranks an equally relevant video fact");
+  const reg = FGF.makeRegistry();
+  for (const h of small.search("kaboom robots", { limit: 3 })) reg.add("f" + h.doc.i, FGF.factEntry(h.doc));
+  const ev = FGF.formatEvidence(reg);
+  assert.match(ev, /from a creator's YouTube video; not yet verified\) Kaboom robots lineup: Zora, Lily and Jodie/);
+  assert.match(ev, /disputed\) A disputed Kaboom/);
+  assert.ok(FGF.hasGap("Not covered.\n[[GAP]]") && !FGF.hasGap("All good [E1]"));
+  assert.strictEqual(FGF.stripGap("Not covered.\n[[GAP]]\n"), "Not covered.");
+  assert.match(FGF.RULES, /return exactly that many/); assert.match(FGF.RULES, /Never invent Champion/);
+});
 t("registry + prompt", () => {
   const reg = FGF.makeRegistry();
   for (const h of idx.search("migration permits", { limit: 3 })) reg.add("f" + h.doc.i, FGF.factEntry(h.doc));

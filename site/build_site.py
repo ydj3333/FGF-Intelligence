@@ -98,6 +98,20 @@ def build_bundle(repo: Path) -> dict:
                 add({"Claim": text, "Category": g.get("title", "Guide"), "Evidence Tier": "Tier 2 — Official FGF Wiki",
                      "Status": "confirmed", "Confidence": "High", "Source": g.get("source", ""), "Notes": g.get("source_title", "")})
 
+        # YouTube candidate facts (exported by scripts/export_video_evidence.py): enrichment only,
+        # Tier 3+, always "not yet verified", ranked below core facts by the engine.
+        video_path = repo / "data/video_evidence.json"
+        videos = json.loads(video_path.read_text(encoding="utf-8")) if video_path.exists() else {}
+        n_video = 0
+        for v in (videos.get("candidates") or [])[:3000]:
+            before = len(facts)
+            add({"Claim": v.get("claim"), "Category": v.get("category"), "Evidence Tier": f"Tier {max(3, int(v.get('tier') or 3))} — Creator video",
+                 "Status": "candidate", "Confidence": str(v.get("confidence") or ""), "Source": v.get("url") or "",
+                 "Notes": ("From the video “" + str(v.get("video_title") or "") + "”" + (f" ({v['channel']})" if v.get("channel") else "")).strip()})
+            if len(facts) > before:
+                facts[-1]["y"] = 1
+                n_video += 1
+
         conflicts = [{k: clean(c.get(src), 400) for k, src in (
             ("id", "Conflict ID"), ("topic", "Topic"), ("official", "Tier-1 evidence"),
             ("other", "Existing / Tier-2 claim"), ("decision", "Decision"), ("notes", "Notes"))}
@@ -126,7 +140,7 @@ def build_bundle(repo: Path) -> dict:
     return {
         "meta": {"synced": manifest.get("synced_at_utc") or data.get("generated"), "source": manifest.get("source_of_truth", "knowledge.json"),
                  "facts": len(facts), "tier1": sum(1 for f in facts if f["t"] == 1),
-                 "official": sum(1 for f in facts if f["t"] <= 2), "conflicts": len(conflicts), "plans": len(plans)},
+                 "official": sum(1 for f in facts if f["t"] <= 2), "video": n_video, "conflicts": len(conflicts), "plans": len(plans)},
         "facts": facts, "conflicts": conflicts, "plans": plans,
     }
 

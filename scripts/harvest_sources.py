@@ -693,6 +693,7 @@ def build_row(claim: dict, src: dict, page: dict, decision: str, related: Option
             "conflict_status": "held_back" if held else "not_conflicting_with_tier1_2",
             "conflicts_with": related if held else None,
             "official": src["tier"] <= 2, "canonical_promotion": False, "pipeline": PIPELINE, "model": model,
+            **(src.get("extra_metadata") or {}),
         },
     }
 

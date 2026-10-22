@@ -10,9 +10,13 @@
  * Secrets (set by the GitHub workflow): GEMINI_API_KEY, optional GROQ_API_KEY.
  * Vars (wrangler.toml / workflow): ALLOWED_ORIGINS, GEMINI_MODELS, GROQ_MODELS.
  *
- * Routes:  GET /health  ->  {ok, providers, models}
- *          POST /chat   ->  body {messages:[{role:"user"|"assistant", content}]}
- *                          response: OpenAI-style server-sent events (text/event-stream)
+ * Routes:  GET /health    ->  {ok, providers, models, feedback}
+ *          POST /chat     ->  body {messages:[{role:"user"|"assistant", content}]}
+ *                            response: OpenAI-style server-sent events (text/event-stream)
+ *          POST /feedback ->  body {kind, question, answer_excerpt?, correction?, source_url?, cited_facts?, app_version?}
+ *                            stored anonymously in Supabase public.app_feedback (no IP, no account data)
+ *                            for the daily learning run. Needs SUPABASE_URL + SUPABASE_KEY (prefer the
+ *                            publishable key: the table's policy allows it to insert only, never read).
  */
 
 const DEFAULTS = {
@@ -27,10 +31,13 @@ const LIMITS = {
   maxContentChars: 120_000,
   maxOutputTokens: 1400,
   perVisitorPer10Min: 20,    // best effort, per worker instance
+  feedbackPer10Min: 15,
 };
+const FEEDBACK_KINDS = new Set(["helpful", "not_helpful", "correction", "unanswered"]);
 
 // Per-instance memory: visitor buckets and temporarily skipped models.
 const visitors = new Map();
+const feedbackVisitors = new Map();
 const skipped = new Map();   // "provider:model" -> until (ms)
 
 const list = (s) => String(s || "").split(",").map((x) => x.trim()).filter(Boolean);
@@ -66,13 +73,52 @@ function json(obj, status, headers) {
   return new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers } });
 }
 
-function rateLimited(ip, now) {
+function rateLimited(ip, now, map = visitors, max = LIMITS.perVisitorPer10Min) {
   const windowMs = 10 * 60 * 1000;
-  const hits = (visitors.get(ip) || []).filter((t) => now - t < windowMs);
-  if (hits.length >= LIMITS.perVisitorPer10Min) { visitors.set(ip, hits); return true; }
-  hits.push(now); visitors.set(ip, hits);
-  if (visitors.size > 5000) visitors.clear();   // keep memory bounded
+  const hits = (map.get(ip) || []).filter((t) => now - t < windowMs);
+  if (hits.length >= max) { map.set(ip, hits); return true; }
+  hits.push(now); map.set(ip, hits);
+  if (map.size > 5000) map.clear();   // keep memory bounded
   return false;
+}
+
+const str = (v, max) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
+
+function cleanFeedback(b) {
+  if (!b || typeof b !== "object" || !FEEDBACK_KINDS.has(b.kind)) return null;
+  const question = str(b.question, 500);
+  if (question.length < 2) return null;
+  const row = { kind: b.kind, question, answer_excerpt: str(b.answer_excerpt, 1500) || null,
+                correction: str(b.correction, 1000) || null, source_url: null, cited_facts: [],
+                app_version: str(b.app_version, 40) || null };
+  if (row.kind === "correction" && !row.correction) return null;
+  const u = str(b.source_url, 500);
+  if (/^https?:\/\/[^\s]+$/i.test(u)) row.source_url = u;
+  if (Array.isArray(b.cited_facts)) row.cited_facts = b.cited_facts.filter((x) => typeof x === "string").slice(0, 8).map((x) => str(x, 400));
+  return row;
+}
+
+async function storeFeedback(request, env, cors, now) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_KEY) return json({ error: "feedback not configured" }, 503, cors);
+  const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "anon";
+  if (rateLimited(ip, now, feedbackVisitors, LIMITS.feedbackPer10Min)) return json({ error: "Too much feedback in a short time." }, 429, cors);
+  const raw = await request.text();
+  if (raw.length > 8000) return json({ error: "request too large" }, 413, cors);
+  let body; try { body = JSON.parse(raw); } catch (e) { return json({ error: "invalid JSON" }, 400, cors); }
+  const row = cleanFeedback(body);
+  if (!row) return json({ error: "invalid feedback" }, 400, cors);
+  try {
+    const r = await fetch(env.SUPABASE_URL.replace(/\/+$/, "") + "/rest/v1/app_feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: env.SUPABASE_KEY, Authorization: "Bearer " + env.SUPABASE_KEY, Prefer: "return=minimal" },
+      body: JSON.stringify(row),
+    });
+    if (!r.ok) { console.log(JSON.stringify({ event: "feedback_store_failed", status: r.status })); return json({ error: "could not store feedback" }, 502, cors); }
+  } catch (e) {
+    return json({ error: "could not store feedback" }, 502, cors);
+  }
+  console.log(JSON.stringify({ event: "feedback_stored", kind: row.kind }));
+  return new Response(null, { status: 204, headers: cors });
 }
 
 function validate(body) {
@@ -98,7 +144,13 @@ export async function handle(request, env, now = Date.now()) {
 
   if (url.pathname === "/health" && request.method === "GET") {
     const c = candidates(env);
-    return json({ ok: c.length > 0, providers: [...new Set(c.map((x) => x.provider))], models: c.length }, 200, cors);
+    return json({ ok: c.length > 0, providers: [...new Set(c.map((x) => x.provider))], models: c.length,
+                  feedback: !!(env.SUPABASE_URL && env.SUPABASE_KEY) }, 200, cors);
+  }
+
+  if (url.pathname === "/feedback" && request.method === "POST") {
+    if (!allowedOrigin(origin, env)) return json({ error: "origin_not_allowed" }, 403, cors);
+    return storeFeedback(request, env, cors, now);
   }
 
   if (url.pathname !== "/chat" || request.method !== "POST") return json({ error: "not_found" }, 404, cors);
@@ -152,4 +204,4 @@ export async function handle(request, env, now = Date.now()) {
 export default { fetch: (request, env) => handle(request, env) };
 
 // Test hooks (not used by Cloudflare).
-export const _internal = { visitors, skipped, candidates, validate, LIMITS };
+export const _internal = { visitors, feedbackVisitors, skipped, candidates, validate, cleanFeedback, LIMITS };

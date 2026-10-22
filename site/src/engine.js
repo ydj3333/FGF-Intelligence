@@ -174,6 +174,7 @@
         s *= 0.6 + 0.8 * (matched.length / content.length);
         s *= ({ 1: 1.18, 2: 1.10, 3: 0.95 })[d.t] || 0.85;
         s *= d.s === "current" ? 1.05 : 0.92;
+        if (d.y) s *= 0.8;   // creator-video evidence is enrichment: core facts come first
         s *= 1 - 0.6 * d.noise;
         if (timeQuestion && dates[i] && newest) {
           const ageDays = (newest - dates[i]) / 864e5;
@@ -229,7 +230,7 @@
   const TIER_LABEL = { 1: "Tier 1 · in-game/official", 2: "Tier 2 · wiki/tested", 3: "Tier 3 · community report", 4: "Tier 4 · unverified" };
 
   function factEntry(d) {
-    return { kind: "fact", text: d.c, notes: d.n, tier: d.t, category: d.g, season: d.v, state: d.s, source: d.u, index: d.i };
+    return { kind: "fact", text: d.c, notes: d.n, tier: d.t, category: d.g, season: d.v, state: d.s, source: d.u, index: d.i, video: !!d.y };
   }
   function planEntry(p) {
     return { kind: "plan", text: planText(p), tier: 2, category: "Curated event plan", title: p.title, planId: p.id, source: "FGF curated plan" };
@@ -240,7 +241,8 @@
       if (e.kind === "plan") return `[${e.ref}] CURATED EVENT PLAN (hand-built by the FGF team from the evidence base):\n${e.text}`;
       const bits = [TIER_LABEL[e.tier] || "Tier ?", e.category];
       if (e.season) bits.push(e.season);
-      if (e.state && e.state !== "current") bits.push(e.state === "candidate" ? "not yet verified" : e.state);
+      if (e.video) bits.push("from a creator's YouTube video");
+      if (e.state && e.state !== "current") bits.push(e.state === "candidate" ? "not yet verified" : e.state === "conflicting" ? "disputed" : e.state);
       return `[${e.ref}] (${bits.join("; ")}) ${e.text}` + (e.notes && e.tier >= 3 ? `\n    note: ${e.notes}` : "");
     }).join("\n");
   }
@@ -257,6 +259,8 @@ How to answer:
 - Never invent numbers, costs, timers, rewards, schedules or requirements. Every number you write must appear in the evidence or the player's message. If an exact value is missing, say it isn't confirmed and where to check in-game.
 - Respect constraints strictly: for F2P players don't build the plan on paid packs; never build a lineup from Champions the player says they lack; when they list the Champions they own, use only those (a future target may be suggested, labelled as such).
 - Cite evidence inline with its ref right after the sentence it supports, like [E2] or [E1][E4]. Only cite refs that were supplied.
+- Facts marked "not yet verified" or "from a creator's YouTube video" are supporting evidence, not confirmed rules: use them for strategy and ideas, say they are unconfirmed when they matter, and never let them override a Tier 1/2 fact. Facts marked "disputed" have conflicting sources: give the higher-tier version and mention the dispute.
+- When the player asks for a number of options ("give me 5 lineups"), return exactly that many. Fill them with concrete options from the evidence first; if the evidence has fewer, complete the count with clearly labelled templates (e.g. "[a Champion with an AoE skill]") that depend on the player's roster, and say which ones are templates. Never invent Champion, item or event names to reach the count.
 - Today's date is {TODAY}. Events or maintenance dated before today are in the past; say so if the player asks about "the next" one and only past dates are known.
 
 Style:
@@ -264,6 +268,7 @@ Style:
 - Write for a player: no talk of "evidence packets", "claims" or "databases". Say "the game's official notice", "community guides", etc.
 - If the answer depends on something unknown (Core level, roster, server), give the best general answer, then ask one short follow-up question.
 - If the evidence really doesn't cover the question, say so in one sentence, share any related facts that help, and suggest where to check in-game.
+- Whenever the evidence does not answer the player's main question, end your reply with the tag [[GAP]] on its own line. It is hidden from the player and tells the team which facts are missing. Don't add it when the evidence answers the question.
 - Reply in the same language the player writes in.`;
 
   function profileText(p) {
@@ -288,6 +293,9 @@ Style:
   }
 
   // ------------------------------------------------------------ fact-check
+  const GAP_RE = /\s*\[\[GAP\]\]\s*/g;
+  const hasGap = (t) => /\[\[GAP\]\]/.test(String(t || ""));
+  const stripGap = (t) => String(t || "").replace(GAP_RE, "\n").replace(/\s+$/, "");
   const CITE_RE = /\[(E\d+(?:\s*[,;]\s*E?\d+)*)\]/g;
   function citedRefs(text) {
     const out = [];
@@ -377,7 +385,7 @@ Style:
       .sort((a, b) => b.d - a.d).slice(0, n || 6);
   }
 
-  const api = { tokenize, stem, glossaryExpand, noiseScore, buildIndex, matchPlans, planText, makeRegistry, factEntry, planEntry,
+  const api = { hasGap, stripGap, tokenize, stem, glossaryExpand, noiseScore, buildIndex, matchPlans, planText, makeRegistry, factEntry, planEntry,
     formatEvidence, buildTurns, profileText, citedRefs, factualNumbers, factCheck, renderMarkdown, esc, latestOfficial, factDate, TIER_LABEL, RULES };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.FGF = api;

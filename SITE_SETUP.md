@@ -93,6 +93,32 @@ Each run's summary (GitHub → Actions → FGF Source Harvest) lists every new f
 
 To add a source, either add a row to the Supabase `sources` table (a web address, a name, and a tier of 2 or 3), or add an entry to `data/harvest_sources.json`. The available adapters are `page`, `news_index`, `steam_news`, `sitemap`, `mediawiki_recent`, `reddit_new`, `youtube_channel`, `youtube_playlist` and `discord_channel`.
 
+## What the app knows
+Everything is built into the app, so it works offline too:
+- every fact in the database (official, wiki and community; unverified and disputed ones are labelled);
+- the YouTube facts from creator videos, labelled "creator video" and ranked below official facts;
+- the curated event guides.
+
+Every 6 hours, new facts flow in on their own: sources → database → app. The AI follows the project's rules:
+- official facts first;
+- no invented numbers;
+- unverified and video facts presented as unconfirmed;
+- "give me 5 options" returns exactly 5, using labelled templates instead of invented Champion names.
+
+## The app learns from players (one-time: 2 minutes)
+Under every answer, players can tap 👍 / 👎 or **Correct this** (with an optional link to proof). When the AI can't answer a question from the facts, the app notes that too. All of this is sent anonymously, with no account or device details.
+
+Every night the **FGF Learning** workflow:
+- **checks every link players send**: facts from that page or video go through the same checks as the harvester and enter *Under Review*. Players can point to evidence but never change facts directly.
+- **collects knowledge gaps** (questions asked often but not answered) in `data/knowledge_gaps.json`, and marks them *covered* once the facts arrive.
+- **flags facts** that keep appearing in unhelpful answers so you can re-check them.
+- writes everything to `data/learning_report.md`, and starts a database sync when new facts were found.
+
+To switch it on:
+1. In Supabase → **SQL Editor**, paste the contents of `sql/app_feedback.sql` and click **Run**. This creates the feedback table with security rules: the public key may only *add* feedback, never read it. No existing table is changed.
+2. Recommended: in Supabase → **Settings → API keys**, copy the **publishable** key and add it in GitHub as the secret `FGF_SUPABASE_PUBLISHABLE_KEY`. Without it, the existing Supabase secret key is used.
+3. Run **Publish FGF app** once, so the AI proxy gets the setting.
+
 ## Installing the app on a phone
 - **Android (Chrome):** open the link and tap **Install app** in the top bar, or use the menu (⋮) → **Install app**.
 - **iPhone (Safari):** open the link → **Share** → **Add to Home Screen**.
@@ -115,3 +141,6 @@ It opens full-screen with its own icon. Guides, facts and instant answers work o
 | `scripts/harvest_sources.py`, `data/harvest_sources.json` | the self-filling harvester and its source list |
 | `scripts/ingest_screenshots.py`, `inbox/` | the screenshot inbox |
 | `.github/workflows/fgf-source-harvest.yml`, `fgf-screenshot-inbox.yml` | their schedules |
+| `scripts/learn_from_players.py`, `.github/workflows/fgf-learning.yml`, `sql/app_feedback.sql` | the learning loop |
+| `scripts/export_video_evidence.py` | brings the YouTube facts into the app at each publish |
+| `data/knowledge_gaps.json`, `data/learning_report.md` | what players need that's missing, corrections waiting for review |
