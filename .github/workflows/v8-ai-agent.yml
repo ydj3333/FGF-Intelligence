@@ -2,7 +2,7 @@ name: v8 AI agent
 
 on:
   push:
-    branches: [main, "feature/fgf-v8-**"]
+    branches: [main, "feature/fgf-v8-**", "integration/fgf-v8"]
     paths: ["fgf_agent/**", "agent.py", "constraint_extractor.py", "operational_intelligence.py", "web/index.html", "tests/test_fgf_agent.py", "tests/test_constraint_extractor*.py", "scripts/run_v8_agent_benchmark.py", ".github/workflows/v8-ai-agent.yml"]
   pull_request:
     paths: ["fgf_agent/**", "agent.py", "constraint_extractor.py", "operational_intelligence.py", "web/index.html", "tests/test_fgf_agent.py", "tests/test_constraint_extractor*.py", "scripts/run_v8_agent_benchmark.py", ".github/workflows/v8-ai-agent.yml"]
