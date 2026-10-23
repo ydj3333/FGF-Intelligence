@@ -198,8 +198,10 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  // Other pages (e.g. the owner's review page) always come from the network and are never cached.
+  if (url.origin === location.origin && url.pathname.endsWith(".html") && !url.pathname.endsWith("/index.html")) return;
   // The app page: newest copy when online (fresh game data), cached copy when offline.
-  if (req.mode === "navigate" || (url.origin === location.origin && (url.pathname.endsWith("/") || url.pathname.endsWith("index.html")))) {
+  if (req.mode === "navigate" || (url.origin === location.origin && (url.pathname.endsWith("/") || url.pathname.endsWith("/index.html")))) {
     event.respondWith((async () => {
       try {
         const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), 4000);
@@ -289,6 +291,15 @@ def write_app(out: Path, bundle: dict, ai_endpoint: str) -> str:
     (out / "manifest.webmanifest").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     (out / ".nojekyll").write_text("", encoding="utf-8")
     make_icons(out)
+    # The owner's review page (same look; talks to the proxy's /admin API; never cached offline).
+    page = (HERE / "src/page.html").read_text(encoding="utf-8")
+    style = page.split("<style>", 1)[1].split("</style>", 1)[0]
+    admin = ((HERE / "src/admin.html").read_text(encoding="utf-8")
+             .replace("{{STYLE}}", style)
+             .replace("{{CONFIG}}", json.dumps({"aiEndpoint": ai_endpoint, "version": version}).replace("</", "<\\/"))
+             .replace("{{ADMIN}}", (HERE / "src/admin.js").read_text(encoding="utf-8").replace("</", "<\\/")))
+    assert "{{" not in admin, "unfilled placeholder in admin page"
+    (out / "admin.html").write_text(admin, encoding="utf-8")
     # Claude-hosted variant: same app, no install/offline features (that host provides AI via Claude).
     (out / "artifact.html").write_text(assemble(bundle, {"aiEndpoint": "", "pwa": False, "version": version}), encoding="utf-8")
     return version

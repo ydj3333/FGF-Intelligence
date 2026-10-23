@@ -110,7 +110,8 @@ Under every answer, players can tap 👍 / 👎 or **Correct this** (with an opt
 
 Every night the **FGF Learning** workflow:
 - **checks every link players send**: facts from that page or video go through the same checks as the harvester and enter *Under Review*. Players can point to evidence but never change facts directly.
-- **collects knowledge gaps** (questions asked often but not answered) in `data/knowledge_gaps.json`, and marks them *covered* once the facts arrive.
+- **collects knowledge gaps** (questions asked often but not answered) for your review page, and marks them *covered* once the facts arrive.
+- puts **corrections without a link** on your review page.
 - **flags facts** that keep appearing in unhelpful answers so you can re-check them.
 - writes everything to `data/learning_report.md`, and starts a database sync when new facts were found.
 
@@ -118,6 +119,27 @@ To switch it on:
 1. In Supabase → **SQL Editor**, paste the contents of `sql/app_feedback.sql` and click **Run**. This creates the feedback table with security rules: the public key may only *add* feedback, never read it. No existing table is changed.
 2. Recommended: in Supabase → **Settings → API keys**, copy the **publishable** key and add it in GitHub as the secret `FGF_SUPABASE_PUBLISHABLE_KEY`. Without it, the existing Supabase secret key is used.
 3. Run **Publish FGF app** once, so the AI proxy gets the setting.
+
+## Your review page (one-time: 3 minutes)
+Everything the system adds by itself waits for you on one private page, which works on a phone: **https://ydj3333.github.io/FGF-Intelligence/admin.html** (bookmark it; players don't see a link to it).
+
+| Tab | What's there | Your buttons |
+|---|---|---|
+| **To review** | new facts from the harvester, screenshots, watched videos and player links, with the quote and a link to the source | Approve · Approve as Tier 1 (needs your proof) · Reject. Tick several to approve or reject them together. Search and tier filter. |
+| **Disputes** | a new fact next to the official fact it contradicts | Keep current fact · Accept new, retire old |
+| **Player corrections** | corrections players sent without a link | Add as a fact · Done · Dismiss |
+| **Knowledge gaps** | questions players ask that the app can't answer, most asked first | Answer with a fact · Dismiss |
+| **+ Add a fact** | add something you've confirmed yourself | Save (exact duplicates are refused) |
+
+Approved changes reach players with the next sync (within 6 hours), or straight away with **Publish now**. Every decision is recorded with the date, your note and the previous state, both in the fact itself and in the `admin_audit` table. Tier 1 is only ever set by you, with proof.
+
+To switch it on:
+1. Run `sql/app_feedback.sql` in Supabase (the same script as the learning loop; re-running it is safe). It adds the gap and audit tables.
+2. In GitHub, add a secret `FGF_ADMIN_PASSWORD`: a password of **at least 12 characters** that you don't use anywhere else. Five wrong tries lock sign-in for 10 minutes, and a sign-in lasts 12 hours. To sign everyone out, change the password and run Publish FGF app.
+3. Optional, for **Publish now**: create a fine-grained token on GitHub (Settings → Developer settings → Fine-grained tokens) with access to this repository only and the permission *Actions: Read and write*. Add it as the secret `FGF_GITHUB_DISPATCH_TOKEN`.
+4. Run **Publish FGF app** once.
+
+The proxy gets the Supabase secret key only when the review password is set. The key stays in Cloudflare's encrypted secrets and is never in the app or in Git.
 
 ## Installing the app on a phone
 - **Android (Chrome):** open the link and tap **Install app** in the top bar, or use the menu (⋮) → **Install app**.
@@ -143,4 +165,5 @@ It opens full-screen with its own icon. Guides, facts and instant answers work o
 | `.github/workflows/fgf-source-harvest.yml`, `fgf-screenshot-inbox.yml` | their schedules |
 | `scripts/learn_from_players.py`, `.github/workflows/fgf-learning.yml`, `sql/app_feedback.sql` | the learning loop |
 | `scripts/export_video_evidence.py` | brings the YouTube facts into the app at each publish |
-| `data/knowledge_gaps.json`, `data/learning_report.md` | what players need that's missing, corrections waiting for review |
+| `data/knowledge_gaps.json`, `data/learning_report.md` | snapshot of knowledge gaps and fact votes; the nightly learning report |
+| `site/src/admin.html`, `site/src/admin.js`, `worker/src/admin.js` | your review page and its API |

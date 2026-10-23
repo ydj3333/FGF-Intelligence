@@ -8,8 +8,8 @@ Reads new rows from Supabase public.app_feedback (written by the app's AI proxy)
                          duplicates skipped; contradictions with Tier 1/2 held back as
                          "Conflicting"). Player-submitted evidence always enters "Under Review":
                          players can point to evidence, but never change facts directly.
-  correction, no link -> listed for the admin review (nothing changes).
-  unanswered / 👎     -> grouped into knowledge gaps (data/knowledge_gaps.json) with counts, so
+  correction, no link -> shown on the review page (status needs_review); nothing changes on its own.
+  unanswered / 👎     -> grouped into knowledge gaps (Supabase knowledge_gaps, shown on the review page) with counts, so
                          the team sees what players need; gaps are marked covered automatically
                          once the knowledge base has matching facts.
   👍 / 👎 on facts     -> facts that keep getting cited in unhelpful answers are flagged for re-checking.
@@ -122,7 +122,9 @@ def fetch_new(base: str, key: str) -> list:
 def mark(base: str, key: str, ids: list, status: str, result: dict = None):
     if not ids:
         return
-    body = {"status": status, "processed_at": NOW.isoformat()}
+    body = {"status": status}
+    if status in ("processed", "ignored"):
+        body["processed_at"] = NOW.isoformat()
     if result is not None:
         body["result"] = result
     H.sb_request("PATCH", f"{base}/rest/v1/app_feedback?id=in.({','.join(str(i) for i in ids)})", key, body)
@@ -162,20 +164,29 @@ def run(apply: bool) -> dict:
         if writing and res["action"] != "retry":
             mark(base, key, [r["id"]], "processed", res)
 
-    # 2) corrections without links: kept for the admin review (nothing changes on their own)
+    # 2) corrections without links: go to the review page (nothing changes on their own)
+    needs_review = [r for r in rows if r.get("kind") == "correction" and not r.get("source_url")]
+    for r in needs_review:
+        report["corrections_for_review"].append({"id": r["id"], "date": str(r.get("created_at") or NOW.isoformat())[:10],
+                                                 "question": r.get("question", "")[:160], "correction": r.get("correction", "")[:300],
+                                                 "about": (r.get("cited_facts") or [])[:3]})
+
+    # 3) knowledge gaps from unanswered questions and unhelpful answers.
+    #    Stored in Supabase knowledge_gaps (the review page reads and resolves them there);
+    #    data/knowledge_gaps.json keeps a snapshot plus the fact vote history.
     gaps = H.load_json(GAPS_PATH, {"gaps": {}})
     gaps.setdefault("gaps", {})
-    pending = gaps.setdefault("corrections_pending_review", [])
-    for r in [x for x in rows if x.get("kind") == "correction" and not x.get("source_url")]:
-        item = {"id": r["id"], "date": str(r.get("created_at") or NOW.isoformat())[:10], "question": r.get("question", "")[:160],
-                "correction": r.get("correction", "")[:300], "about": (r.get("cited_facts") or [])[:3]}
-        report["corrections_for_review"].append(item)
-        if not any(p.get("id") == r["id"] for p in pending):
-            pending.append(item)
-    gaps["corrections_pending_review"] = pending[-200:]
-    report["corrections_pending_total"] = len(gaps["corrections_pending_review"])
-
-    # 3) knowledge gaps from unanswered questions and unhelpful answers
+    gaps.pop("corrections_pending_review", None)
+    table_ok = True
+    try:
+        for g in H.sb_request("GET", f"{base}/rest/v1/knowledge_gaps?select=*&limit=5000", key, prefer="count=none") or []:
+            gaps["gaps"][g["gap_key"]] = {k: v for k, v in g.items() if k != "gap_key" and v is not None}
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise
+        table_ok = False
+        report["notes"].append("Table knowledge_gaps not found: re-run sql/app_feedback.sql so gaps appear on the review page.")
+    changed = set()
     for r in rows:
         if r.get("kind") not in ("unanswered", "not_helpful"):
             continue
@@ -187,15 +198,17 @@ def run(apply: bool) -> dict:
             report["gaps_new"] += 1
             g = gaps["gaps"][k] = {"example": r.get("question", "")[:300], "count": 0, "unanswered": 0, "not_helpful": 0,
                                    "first_seen": str(r.get("created_at") or NOW.isoformat())[:10], "status": "open"}
-        g["count"] += 1
-        g[r["kind"]] = g.get(r["kind"], 0) + 1
+        g["count"] = int(g.get("count") or 0) + 1
+        g[r["kind"]] = int(g.get(r["kind"]) or 0) + 1
         g["last_seen"] = str(r.get("created_at") or NOW.isoformat())[:10]
-        if g.get("status") == "covered":
-            g["status"] = "open"        # asked again after being covered: check it really is answerable
+        if g.get("status") in ("covered", "answered"):
+            g["status"] = "open"        # asked again after being answered: check the answer is really findable
+        changed.add(k)
     corpus_tokens = [{stem(x) for x in t} for _, t, _, _ in h.corpus.items]
     for k, g in gaps["gaps"].items():
         if g.get("status") == "open" and covered(k.split(), corpus_tokens):
             g["status"], g["covered_on"] = "covered", NOW.strftime("%Y-%m-%d")
+            changed.add(k)
     report["gaps_open"] = sum(1 for g in gaps["gaps"].values() if g.get("status") == "open")
     report["gaps_covered"] = sum(1 for g in gaps["gaps"].values() if g.get("status") == "covered")
     gaps["updated_utc"] = NOW.isoformat()
@@ -219,7 +232,13 @@ def run(apply: bool) -> dict:
     report["new_claims"] = h.report["new_claims"]
     if writing:
         GAPS_PATH.write_text(json.dumps(gaps, ensure_ascii=False, indent=1), encoding="utf-8")
-        handled = {x["id"] for x in report["links_checked"]} | retry_ids
+        if table_ok and changed:
+            cols = ("example", "count", "unanswered", "not_helpful", "first_seen", "last_seen", "status", "covered_on")
+            H.sb_request("POST", f"{base}/rest/v1/knowledge_gaps?on_conflict=gap_key", key,
+                         [{"gap_key": k, **{c: gaps["gaps"][k].get(c) for c in cols}, "updated_at": NOW.isoformat()} for k in sorted(changed)],
+                         prefer="resolution=merge-duplicates,return=minimal")
+        mark(base, key, [r["id"] for r in needs_review], "needs_review")
+        handled = {x["id"] for x in report["links_checked"]} | retry_ids | {r["id"] for r in needs_review}
         mark(base, key, [r["id"] for r in rows if r["id"] not in handled], "processed")
     report["top_gaps"] = sorted(([g["example"], g["count"], k] for k, g in gaps["gaps"].items() if g.get("status") == "open"),
                                 key=lambda x: -x[1])[:25]
@@ -240,7 +259,7 @@ def markdown(r: dict) -> str:
             out.append(f"| {x['id']} | {x['correction'].replace('|', '/')} | {x['url']} | {res} |")
         out.append("")
     if r["corrections_for_review"]:
-        out += [f"## New corrections without a link (admin review; {r.get('corrections_pending_total', 0)} pending in data/knowledge_gaps.json)", ""]
+        out += ["## New corrections without a link (now on the review page)", ""]
         out += [f"- #{x['id']} on “{x['question']}”: {x['correction']}" for x in r["corrections_for_review"]]
         out.append("")
     if r.get("top_gaps"):

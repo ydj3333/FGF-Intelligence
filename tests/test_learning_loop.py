@@ -27,7 +27,9 @@ NOTICE = ("<html><head><title>Kaboom schedule change</title></head><body><main><
 
 class Fake(BaseHTTPRequestHandler):
     feedback, patches, inserted, videos, cands = [], [], [], [], []
+    gap_table = {}
     missing_table = False
+    no_gap_table = False
 
     def _send(self, code, body, ctype="application/json"):
         raw = body.encode() if isinstance(body, str) else body
@@ -43,6 +45,10 @@ class Fake(BaseHTTPRequestHandler):
             return self._send(200, json.dumps(Fake.feedback))
         if p.startswith("/rest/v1/claims"):
             return self._send(200, "[]")
+        if p.startswith("/rest/v1/knowledge_gaps"):
+            if Fake.no_gap_table:
+                return self._send(404, '{"message":"relation does not exist"}')
+            return self._send(200, json.dumps([{"gap_key": k, **v} for k, v in Fake.gap_table.items()]))
         if p.startswith("/rest/v1/video_database"):
             return self._send(200, json.dumps(Fake.videos))
         if p.startswith("/rest/v1/video_claim_candidates"):
@@ -62,6 +68,11 @@ class Fake(BaseHTTPRequestHandler):
         if self.path.startswith("/rest/v1/claims"):
             Fake.inserted.extend(body)
             return self._send(201, "")
+        if self.path.startswith("/rest/v1/knowledge_gaps?on_conflict=gap_key"):
+            assert "merge-duplicates" in self.headers["Prefer"]
+            for g in body:
+                Fake.gap_table[g["gap_key"]] = {k: v for k, v in g.items() if k != "gap_key"}
+            return self._send(201, "")
         self._send(404, "{}")
 
     def do_PATCH(self):
@@ -78,6 +89,7 @@ def fake(tmp_path, monkeypatch):
     srv = ThreadingHTTPServer(("127.0.0.1", 0), Fake)
     base = f"http://127.0.0.1:{srv.server_address[1]}"
     Fake.feedback, Fake.patches, Fake.inserted, Fake.videos, Fake.cands, Fake.missing_table = [], [], [], [], [], False
+    Fake.gap_table, Fake.no_gap_table = {}, False
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     know = tmp_path / "knowledge.json"
     know.write_text(json.dumps({"claims": [{"Claim": "The Research Academy unlocks at Energy Core Level 10.", "Evidence Tier": "Tier 2"}]}))
@@ -120,7 +132,13 @@ def test_learning_run(fake):
     assert checked[2]["action"] == "needs_screenshot"
     # link-less correction kept for the admin review
     gaps = json.loads((tmp / "gaps.json").read_text())
-    assert gaps["corrections_pending_review"][0]["id"] == 3
+    needs = [p for p, b in Fake.patches if b["status"] == "needs_review"]
+    assert needs == ["/rest/v1/app_feedback?id=in.(3)"], "link-less correction goes to the review page"
+    assert all("processed_at" not in b for _, b in Fake.patches if b["status"] == "needs_review")
+    # gaps are stored in the database table the review page reads
+    assert {g["status"] for g in Fake.gap_table.values()} == {"open", "covered"}
+    assert Fake.gap_table[L.gap_key("When is the next Kaboom event?")]["unanswered"] == 2
+    assert Fake.gap_table[L.gap_key("When does Kaboom start?")]["not_helpful"] == 3
     # two wordings of the same question -> one gap counted twice; the academy question is already covered
     open_gaps = {k: g for k, g in gaps["gaps"].items() if g["status"] == "open"}
     kaboom = [g for g in open_gaps.values() if "kaboom" in g["example"].lower() and g["unanswered"]]
@@ -129,10 +147,9 @@ def test_learning_run(fake):
     # a fact cited in 3 unhelpful answers is flagged for re-checking
     assert r["flagged_facts"][0][0] == bad_fact
     # every row is marked processed
-    patched = ",".join(p for p, _ in Fake.patches)
-    for i in (1, 2, 3, 4, 5, 6, 10, 11, 12, 20):
-        assert str(i) in patched
-    assert all(b["status"] == "processed" for _, b in Fake.patches)
+    processed = ",".join(p for p, b in Fake.patches if b["status"] == "processed")
+    for i in (1, 2, 4, 5, 6, 10, 11, 12, 20):
+        assert f"({i}" in processed or f",{i}" in processed, i
     md = L.markdown(r)
     assert "Kaboom" in md and "needs_screenshot" in md
 
@@ -148,6 +165,27 @@ def test_learning_run_is_repeatable_and_dry_run_writes_nothing(fake):
     (tmp / "gaps.json").unlink()
     L.run(apply=False)
     assert not Fake.patches and not (tmp / "gaps.json").exists()
+
+
+def test_dismissed_gap_stays_dismissed_and_answered_gap_reopens(fake):
+    base, tmp = fake
+    Fake.gap_table = {L.gap_key("How do I repaint my flagship?"): {"example": "How do I repaint my flagship?", "count": 4, "status": "dismissed"},
+                      L.gap_key("When is the next Kaboom event?"): {"example": "When is the next Kaboom event?", "count": 3, "status": "answered"}}
+    Fake.feedback = [fb(1, "unanswered", "how do i repaint my flagship"), fb(2, "unanswered", "When is the next Kaboom event?")]
+    L.run(apply=True)
+    paint = Fake.gap_table[L.gap_key("How do I repaint my flagship?")]
+    kaboom = Fake.gap_table[L.gap_key("When is the next Kaboom event?")]
+    assert paint["status"] == "dismissed" and paint["count"] == 5
+    assert kaboom["status"] == "open" and kaboom["count"] == 4
+
+
+def test_runs_without_the_gap_table(fake):
+    base, tmp = fake
+    Fake.no_gap_table = True
+    Fake.feedback = [fb(1, "unanswered", "When is the next Kaboom event?")]
+    r = L.run(apply=True)
+    assert any("knowledge_gaps" in n for n in r["notes"])
+    assert json.loads((tmp / "gaps.json").read_text())["gaps"]
 
 
 def test_missing_table_explains_setup(fake):

@@ -13,11 +13,14 @@
  * Routes:  GET /health    ->  {ok, providers, models, feedback}
  *          POST /chat     ->  body {messages:[{role:"user"|"assistant", content}]}
  *                            response: OpenAI-style server-sent events (text/event-stream)
+ *          /admin/*       ->  the owner's review page API (see admin.js; password protected)
  *          POST /feedback ->  body {kind, question, answer_excerpt?, correction?, source_url?, cited_facts?, app_version?}
  *                            stored anonymously in Supabase public.app_feedback (no IP, no account data)
  *                            for the daily learning run. Needs SUPABASE_URL + SUPABASE_KEY (prefer the
  *                            publishable key: the table's policy allows it to insert only, never read).
  */
+
+import { handleAdmin, adminConfigured } from "./admin.js";
 
 const DEFAULTS = {
   GEMINI_BASE_URL: "https://generativelanguage.googleapis.com/v1beta/openai",
@@ -56,7 +59,7 @@ function corsHeaders(origin, env) {
   return {
     "Access-Control-Allow-Origin": allowed ? origin : "null",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
   };
@@ -145,7 +148,12 @@ export async function handle(request, env, now = Date.now()) {
   if (url.pathname === "/health" && request.method === "GET") {
     const c = candidates(env);
     return json({ ok: c.length > 0, providers: [...new Set(c.map((x) => x.provider))], models: c.length,
-                  feedback: !!(env.SUPABASE_URL && env.SUPABASE_KEY) }, 200, cors);
+                  feedback: !!(env.SUPABASE_URL && env.SUPABASE_KEY), admin: adminConfigured(env) }, 200, cors);
+  }
+
+  if (url.pathname.startsWith("/admin/")) {
+    if (!allowedOrigin(origin, env)) return json({ error: "origin_not_allowed" }, 403, cors);
+    return handleAdmin(request, env, url, cors, json, now);
   }
 
   if (url.pathname === "/feedback" && request.method === "POST") {

@@ -32,7 +32,7 @@ let n = 0; const t = async (name, fn) => { reset(); await fn(); n++; console.log
 
 await t("health reports configured providers without secrets", async () => {
   const r = await handle(req("/health"), env()); const j = await r.json();
-  assert.deepStrictEqual(j, { ok: true, providers: ["gemini"], models: 3, feedback: false });
+  assert.deepStrictEqual(j, { ok: true, providers: ["gemini"], models: 3, feedback: false, admin: false });
   assert.strictEqual((await (await handle(req("/health"), fbEnv())).json()).feedback, true);
   const r2 = await (await handle(req("/health"), {})).json(); assert.strictEqual(r2.ok, false);
 });
