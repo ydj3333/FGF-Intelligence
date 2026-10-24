@@ -28,7 +28,7 @@ jobs:
       - run: python -m pip install pytest
       - run: python -m py_compile agent.py v5_extension.py constraint_extractor.py operational_intelligence.py fgf_agent/*.py scripts/run_v8_agent_benchmark.py
       # No API key needed: scripted model + local mock Anthropic/OpenAI servers.
-      - run: pytest -q tests/test_fgf_agent.py tests/test_constraint_extractor.py tests/test_constraint_extractor_full_roster.py
+      - run: python -m pytest -q tests/test_fgf_agent.py tests/test_constraint_extractor.py tests/test_constraint_extractor_full_roster.py
 
   live-agent-benchmark:
     # Paid LLM calls: manual trigger only. Fails if no key is configured, so a
