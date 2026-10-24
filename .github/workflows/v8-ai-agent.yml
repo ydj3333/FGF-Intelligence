@@ -2,7 +2,7 @@ name: v8 AI agent
 
 on:
   push:
-    branches: [main, "feature/fgf-v8-**"]
+    branches: [main, "feature/fgf-v8-**", "integration/fgf-v8"]
     paths: ["fgf_agent/**", "agent.py", "constraint_extractor.py", "operational_intelligence.py", "web/index.html", "tests/test_fgf_agent.py", "tests/test_constraint_extractor*.py", "scripts/run_v8_agent_benchmark.py", ".github/workflows/v8-ai-agent.yml"]
   pull_request:
     paths: ["fgf_agent/**", "agent.py", "constraint_extractor.py", "operational_intelligence.py", "web/index.html", "tests/test_fgf_agent.py", "tests/test_constraint_extractor*.py", "scripts/run_v8_agent_benchmark.py", ".github/workflows/v8-ai-agent.yml"]
@@ -11,6 +11,11 @@ on:
       limit:
         description: "Questions to run in the live agent benchmark (0 = all 50)"
         default: "0"
+      run_live_benchmark:
+        description: "Run paid live-model benchmark (requires configured provider credentials)"
+        type: boolean
+        required: true
+        default: false
 
 jobs:
   offline-tests:
@@ -28,7 +33,7 @@ jobs:
   live-agent-benchmark:
     # Paid LLM calls: manual trigger only. Fails if no key is configured, so a
     # release cannot be signed off without actually evaluating the agent.
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.run_live_benchmark
     runs-on: ubuntu-latest
     needs: offline-tests
     env:

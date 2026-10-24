@@ -72,7 +72,8 @@ def test_v6_generic_graph_requirement_question():
     assert r["reasoning"]["mode"] in ("graph_requirement","requirement")
 
 def test_v6_generic_entity_parser_does_not_match_substrings():
-    engine=agent.get_engine()
+    from knowledge_query_engine import get_engine  # get_engine lives here, not in agent.py
+    engine=get_engine()
     p=engine.parse("What does Commerce Guild creation require?")
     assert p.entity=="commerce guild creation"
     assert p.question_type=="requirement"
@@ -270,12 +271,16 @@ def test_v7_best_strategy_enumerates_options_without_exceeding_evidence_budget()
         {"Claim":"Guild activities can provide Credits.","Evidence Tier":"Tier 2 — Community","Status":"Confirmed"},
     ]
     result=KnowledgeQueryEngine(claims).compose("What is the best way to farm Credits?")
-    assert result["reasoning"]["mode"] == "strategy_options"
-    assert "Available evidenced options/methods" in result["answer"]
+    # Credits now have a dedicated handler (strategy_credit_farming) with the
+    # same contract as the generic strategy_options path: enumerate evidenced
+    # options, stay within the evidence budget, never crown a single "best".
+    assert result["reasoning"]["mode"] in ("strategy_options", "strategy_credit_farming")
     assert "Merchant expeditions" in result["answer"]
     assert "Daily quests" in result["answer"]
     assert len(result["evidence"]) <= 4
-    assert "does not establish a defensible single best option" in result["answer"]
+    low=result["answer"].lower()
+    assert ("does not establish a defensible single best option" in low
+            or "does not establish one universal best" in low)
 
 
 def test_v7_best_flagship_f2p_enumerates_relevant_options_without_inventing_winner():

@@ -32,15 +32,15 @@ def _contradicts(extracted: str, existing: str) -> bool:
     import re
     a, b = str(extracted or '').lower(), str(existing or '').lower()
     # Explicit polarity is a strong signal when the same topic is discussed.
-    neg = r"\\b(?:not|no|never|cannot|can't|doesn't|does not|isn't|is not|requires no|without)\\b"
+    neg = r"\b(?:not|no|never|cannot|can't|doesn't|does not|isn't|is not|requires no|without)\b"
     a_neg, b_neg = bool(re.search(neg, a)), bool(re.search(neg, b))
     if a_neg != b_neg:
         return True
     # Different explicit numeric values are contradictory only when both claims
     # share a meaningful subject token. This avoids treating unrelated numbers
     # (e.g. a level and a cost) as contradictions.
-    nums_a = set(re.findall(r"\\b\\d+(?:[.,]\\d+)?%?\\b", a))
-    nums_b = set(re.findall(r"\\b\\d+(?:[.,]\\d+)?%?\\b", b))
+    nums_a = set(re.findall(r"\b\d+(?:[.,]\d+)?%?\b", a))
+    nums_b = set(re.findall(r"\b\d+(?:[.,]\d+)?%?\b", b))
     if nums_a and nums_b and nums_a != nums_b:
         stop={'the','and','for','with','from','that','this','are','you','can','has','have','into','when','then'}
         ta={x for x in re.findall(r"[a-z]{4,}",a) if x not in stop}

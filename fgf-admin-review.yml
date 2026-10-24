@@ -1,0 +1,27 @@
+name: FGF Admin Review Packet
+
+on:
+  schedule:
+    - cron: '30 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  review-packet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Generate review packet
+        run: python scripts/admin_review_cycle.py
+      - name: Commit review packet
+        run: |
+          git config user.name 'FGF Intelligence Bot'
+          git config user.email 'fgf-intelligence-bot@users.noreply.github.com'
+          git add data/admin_review.md
+          git diff --cached --quiet || git commit -m 'chore: refresh FGF admin review packet'
+          git push

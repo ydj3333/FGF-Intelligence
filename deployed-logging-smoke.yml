@@ -1,0 +1,23 @@
+name: Deployed L0-L6 Runtime Verification
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deployed-runtime-logging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Wait for Render and verify all seven runtime levels
+        env:
+          FGF_PUBLIC_BASE_URL: https://fgf-intelligence.onrender.com
+          FGF_EXPECTED_DEPLOY_COMMIT: 92cca1de97ae0733c0ef6066a3fdf077f6592466
+          FGF_DEPLOY_WAIT_SECONDS: '600'
+        run: python scripts/verify_runtime_logging.py
