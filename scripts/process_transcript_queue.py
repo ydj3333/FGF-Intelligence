@@ -71,7 +71,7 @@ def main():
         vid = v["video_id"]
         try:
             subprocess.run([sys.executable, "scripts/extract_claims_from_transcript.py",
-                            "--video-id", vid], check=True)
+                            "--video-id=" + vid], check=True)
             subprocess.run([sys.executable, "scripts/cross_reference_claims.py",
                             "--video-id", vid], check=True)
             cmd = [sys.executable, "scripts/update_video_database.py", "--video-id", vid]
