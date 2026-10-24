@@ -44,7 +44,7 @@ alter table public.app_feedback drop constraint if exists app_feedback_status_ch
 alter table public.app_feedback add constraint app_feedback_status_check
   check (status in ('new', 'needs_review', 'processed', 'ignored'));
 
--- Questions players ask that the knowledge base can't answer well (filled by FGF Learning).
+-- Questions players ask that the knowledge base can't answer well (filled by FGF Player Learning).
 create table if not exists public.knowledge_gaps (
   gap_key text primary key check (char_length(gap_key) between 1 and 200),
   example text not null,

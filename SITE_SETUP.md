@@ -108,7 +108,7 @@ Every 6 hours, new facts flow in on their own: sources → database → app. The
 ## The app learns from players (one-time: 2 minutes)
 Under every answer, players can tap 👍 / 👎 or **Correct this** (with an optional link to proof). When the AI can't answer a question from the facts, the app notes that too. All of this is sent anonymously, with no account or device details.
 
-Every night the **FGF Learning** workflow:
+Every night the **FGF Player Learning** workflow:
 - **checks every link players send**: facts from that page or video go through the same checks as the harvester and enter *Under Review*. Players can point to evidence but never change facts directly.
 - **collects knowledge gaps** (questions asked often but not answered) for your review page, and marks them *covered* once the facts arrive.
 - puts **corrections without a link** on your review page.
