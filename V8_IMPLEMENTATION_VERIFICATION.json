@@ -1,0 +1,20 @@
+{
+  "package": "FGF Intelligence v8.0 integration candidate",
+  "source": "user-uploaded FGF-Intelligence-v8.zip",
+  "patch": "user-uploaded fgf-v8-on-main.patch",
+  "patch_already_applied_to_source_package": true,
+  "patch_reverse_check_exit_code": 0,
+  "focused_tests": {
+    "command": "python -m pytest -q tests/test_fgf_agent.py tests/test_constraint_extractor.py tests/test_constraint_extractor_full_roster.py",
+    "result": "30 passed in 2.55s"
+  },
+  "python_compile": {
+    "command": "python -m py_compile agent.py v5_extension.py constraint_extractor.py operational_intelligence.py fgf_agent/agent.py fgf_agent/llm.py fgf_agent/retrieval.py fgf_agent/tools.py fgf_agent/grounding.py scripts/run_v8_agent_benchmark.py",
+    "result": "passed"
+  },
+  "full_suite": "Not verified in this run; execution exceeded the available time window.",
+  "live_model_benchmark": "Not run; requires the deployed provider configuration.",
+  "github_push_or_pr": "Not performed by this packaging step.",
+  "render_deployment": "Not performed.",
+  "knowledge_data": "Kept exactly as present in the uploaded ZIP; no data files overwritten by this step."
+}

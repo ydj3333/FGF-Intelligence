@@ -1,0 +1,5 @@
+
+# FGF app build output (built by CI)
+site/dist/
+__pycache__/
+*.pyc

@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "about": "Sources the automatic harvester reads (scripts/harvest_sources.py), from data/v4_source_registry.json. With use_database_sources, every web source in Supabase public.sources is harvested too. Login-walled sources (X, Instagram, Facebook) can't be read automatically for free: drop screenshots into inbox/ instead. Discord is read through your own server following the official announcement channel (see SITE_SETUP.md).",
+  "limits": {
+    "max_pages_per_run": 20,
+    "max_claims_per_page": 25,
+    "max_chars_per_page": 16000
+  },
+  "sources": [
+    {
+      "id": "SRC-04",
+      "name": "FGF Official News / Patches",
+      "tier": 2,
+      "tier_label": "Tier 2 — Official Developer",
+      "adapter": "news_index",
+      "url": "https://www.foundation.game/en/news",
+      "link_pattern": "^https://www\\.foundation\\.game/en/news/[a-z0-9-]+/?$",
+      "max_items": 12,
+      "enabled": true
+    },
+    {
+      "id": "SRC-03",
+      "name": "FGF Official Portal",
+      "tier": 2,
+      "tier_label": "Tier 2 — Official Developer",
+      "adapter": "page",
+      "url": "https://www.foundation.game/en",
+      "enabled": true
+    },
+    {
+      "id": "SRC-12",
+      "name": "Steam News / Update History",
+      "tier": 2,
+      "tier_label": "Tier 2 — Official Developer",
+      "adapter": "steam_news",
+      "app_id": 4223760,
+      "max_items": 10,
+      "enabled": true
+    },
+    {
+      "id": "SRC-01",
+      "name": "FGF Wiki / Encyclopedia Galactica",
+      "tier": 3,
+      "tier_label": "Tier 3 — Strong Tested Community",
+      "adapter": "sitemap",
+      "url": "https://fgfwiki.com/sitemap.xml",
+      "include_pattern": "^https://fgfwiki\\.com/en/",
+      "render": true,
+      "max_items": 15,
+      "enabled": true
+    },
+    {
+      "id": "SRC-02",
+      "name": "FGF Fandom Wiki",
+      "tier": 3,
+      "tier_label": "Tier 3 — Strong Tested Community",
+      "adapter": "mediawiki_recent",
+      "api": "https://foundation-galactic-frontier.fandom.com/api.php",
+      "page_base": "https://foundation-galactic-frontier.fandom.com/wiki/",
+      "max_items": 10,
+      "enabled": true
+    },
+    {
+      "id": "SRC-10",
+      "name": "FGF Reddit / Player Community",
+      "tier": 3,
+      "tier_label": "Tier 3 — Creator/Community",
+      "adapter": "reddit_new",
+      "url": "https://www.reddit.com/r/FoundationGFrontier/new.json?limit=25",
+      "min_score": 3,
+      "max_items": 10,
+      "enabled": true
+    },
+    {
+      "id": "SRC-08",
+      "name": "FGF Official YouTube",
+      "tier": 2,
+      "tier_label": "Tier 2 — Official Developer",
+      "adapter": "youtube_channel",
+      "channel_id": "UCSfLPashpUfR8bGyXY3v_sQ",
+      "watch_video": true,
+      "max_items": 3,
+      "enabled": true
+    },
+    {
+      "id": "SRC-11-PL2",
+      "name": "YouTube playlist: Foundation Galactic Frontier -- FGF",
+      "tier": 3,
+      "tier_label": "Tier 3 — Creator/Community",
+      "adapter": "youtube_playlist",
+      "playlist_id": "PLhETODnD1CQ9UEHk7NDJVeifZo-Bz3oDv",
+      "max_items": 3,
+      "enabled": true
+    },
+    {
+      "id": "SRC-09",
+      "name": "FGF Official Discord (announcements, followed into your server)",
+      "tier": 2,
+      "tier_label": "Tier 2 — Official Developer",
+      "adapter": "discord_channel",
+      "channels_env": "FGF_DISCORD_CHANNEL_IDS",
+      "first_run_items": 15,
+      "enabled": true
+    }
+  ],
+  "use_database_sources": true
+}

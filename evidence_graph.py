@@ -49,9 +49,11 @@ def _clean(value: str) -> str:
 
 
 def _key(value: str) -> str:
-    value = _clean(value).lower()
-    value = re.sub(r"\b(the|a|an)\b", " ", value)
-    return re.sub(r"\s+", " ", value).strip()
+    original = _clean(value).lower()
+    value = re.sub(r"\b(the|a|an)\b", " ", original)
+    value = re.sub(r"\s+", " ", value).strip()
+    # Never strip a name down to nothing (an entity literally called "A").
+    return value or original
 
 
 def _variants(value: str) -> set[str]:

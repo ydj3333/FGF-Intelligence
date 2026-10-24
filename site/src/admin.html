@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f5fa" media="(prefers-color-scheme: light)">
+<title>FGF Review</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500&family=Oxanium:wght@600;700&display=swap">
+<style>
+{{STYLE}}
+/* Review page */
+[hidden] { display: none !important; }
+.adm { max-width: 860px; margin: 0 auto; display: grid; gap: 16px; padding-top: 18px; }
+.adm-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.adm-tabs::-webkit-scrollbar { display: none; }
+.adm-tab { flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 7px 14px; font-weight: 700; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.adm-tab[aria-selected="true"] { color: var(--fg); border-color: var(--accent); background: var(--accent-soft); }
+.count { font-family: var(--font-mono); font-size: 0.75rem; background: var(--surface-2); border-radius: 999px; padding: 1px 8px; color: var(--fg); }
+.adm-tab[aria-selected="true"] .count { background: var(--surface); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toolbar input[type="search"], .toolbar select, .adm input[type="password"], .adm input[type="url"], .adm textarea, .adm select {
+  border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 9px 12px; min-width: 0; }
+.toolbar input[type="search"] { flex: 1 1 200px; }
+.bulk { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: var(--step--1); color: var(--muted); }
+.bulk label { display: inline-flex; gap: 6px; align-items: center; margin-right: auto; }
+.items { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px; display: grid; gap: 10px; }
+.item.leaving { opacity: 0.45; pointer-events: none; }
+.item-top { display: flex; gap: 10px; align-items: flex-start; }
+.item-top input[type="checkbox"] { margin-top: 5px; width: 18px; height: 18px; flex: none; }
+.item .text { margin: 0; font-size: var(--step-0); line-height: 1.5; }
+.item .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: var(--step--1); color: var(--muted); }
+.quote { margin: 0; padding: 8px 12px; border-left: 3px solid var(--line); color: var(--muted); font-size: var(--step--1); background: var(--surface-2); border-radius: 0 8px 8px 0; }
+.versus { display: grid; gap: 8px; }
+.versus p { margin: 0; padding: 10px 12px; border-radius: 10px; }
+.versus .new { background: var(--accent-soft); }
+.versus .old { background: var(--signal-soft); }
+.versus b { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font-mono); color: var(--muted); margin-bottom: 2px; }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.acts .btn { padding: 7px 14px; }
+.btn.ok { color: var(--signal); border-color: color-mix(in srgb, var(--signal) 45%, transparent); }
+.btn.bad { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.proof { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--line); border-radius: 10px; }
+.form { display: grid; gap: 12px; }
+.form label { display: grid; gap: 4px; font-size: var(--step--1); font-weight: 700; }
+.form textarea { min-height: 80px; resize: vertical; font-weight: 400; }
+.form .hint { font-weight: 400; color: var(--muted); }
+.tiers { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0; }
+.tiers legend { font-size: var(--step--1); font-weight: 700; margin-bottom: 4px; }
+.tiers label { display: inline-flex; flex-direction: row; gap: 6px; align-items: center; font-weight: 400; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.context { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; margin: 0; font-size: var(--step--1); }
+.empty { text-align: center; color: var(--muted); padding: 28px 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--r-lg); }
+.pager { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: var(--step--1); color: var(--muted); }
+.toast { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg);
+  padding: 10px 16px; border-radius: 999px; font-size: var(--step--1); font-weight: 700; z-index: 40; max-width: calc(100vw - 32px); }
+.toast.err { background: var(--warn); color: var(--bg); }
+.login { max-width: 420px; margin: 8vh auto 0; }
+.publish-note { font-size: var(--step--1); color: var(--muted); margin: 0; }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Back to the FGF Intelligence app">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="17" cy="17" r="15" fill="none" stroke="var(--line)" stroke-width="2"/>
+        <ellipse cx="17" cy="17" rx="15" ry="6" fill="none" stroke="var(--accent)" stroke-width="2" transform="rotate(-24 17 17)"/>
+        <circle cx="17" cy="17" r="4.5" fill="var(--signal)"/>
+        <circle cx="29.2" cy="11.6" r="2.4" fill="var(--accent)"/>
+      </svg>
+      <div><b>FGF REVIEW</b><span>Approve what the app has learned</span></div>
+    </a>
+    <button class="btn primary" id="publish" type="button" hidden>Publish now</button>
+    <button class="btn ghost" id="signout" type="button" hidden>Sign out</button>
+  </div>
+</header>
+
+<main class="adm" id="main">
+  <section class="panel login" id="login-view" hidden aria-labelledby="login-title">
+    <h1 id="login-title">Sign in to review</h1>
+    <p class="note" style="margin:0">For the app's owner. Everything players see stays unchanged until you approve it.</p>
+    <form class="form" id="login-form">
+      <label>Password<input type="password" id="password" autocomplete="current-password" required></label>
+      <label style="display:flex;flex-direction:row;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="remember"> Stay signed in on this device (12 hours)</label>
+      <button class="btn primary" type="submit">Sign in</button>
+      <p class="note warn" id="login-error" role="alert" hidden></p>
+    </form>
+  </section>
+
+  <section id="setup-view" class="panel" hidden>
+    <h1>Review page not set up yet</h1>
+    <p id="setup-text" style="margin:0"></p>
+  </section>
+
+  <section id="panel-view" hidden>
+    <div class="adm" style="padding-top:0">
+      <p class="publish-note" id="publish-note"></p>
+      <nav class="adm-tabs" role="tablist" aria-label="Review queues">
+        <button class="adm-tab" role="tab" data-type="review">To review <span class="count" data-count="review">–</span></button>
+        <button class="adm-tab" role="tab" data-type="conflicts">Disputes <span class="count" data-count="conflicts">–</span></button>
+        <button class="adm-tab" role="tab" data-type="corrections">Player corrections <span class="count" data-count="corrections">–</span></button>
+        <button class="adm-tab" role="tab" data-type="gaps">Knowledge gaps <span class="count" data-count="gaps">–</span></button>
+        <button class="adm-tab" role="tab" data-type="add">+ Add a fact</button>
+      </nav>
+      <p class="note" id="queue-help" style="margin:0"></p>
+
+      <div id="list-view">
+        <div class="toolbar" id="filters" style="margin-bottom:10px">
+          <input type="search" id="q" placeholder="Search facts…" aria-label="Search facts">
+          <select id="tier" aria-label="Tier"><option value="">All tiers</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option></select>
+        </div>
+        <div class="bulk" id="bulk" style="margin-bottom:10px">
+          <label><input type="checkbox" id="select-all"> Select all on this page</label>
+          <button class="btn ok" id="bulk-approve" type="button" disabled>Approve selected</button>
+          <button class="btn bad" id="bulk-reject" type="button" disabled>Reject selected</button>
+        </div>
+        <ul class="items" id="items" aria-live="polite"></ul>
+        <div class="pager" id="pager" style="margin-top:12px"></div>
+      </div>
+
+      <section class="panel" id="add-view" hidden aria-labelledby="add-title">
+        <h2 id="add-title">Add a fact</h2>
+        <p class="context" id="add-context" hidden></p>
+        <form class="form" id="add-form">
+          <label>The fact <span class="hint">One clear sentence, with exact numbers and dates.</span>
+            <textarea id="f-claim" maxlength="400" required placeholder="e.g. Server migration requires 10 Migration Permits."></textarea></label>
+          <label>Category<select id="f-category"></select></label>
+          <fieldset class="tiers">
+            <legend>How sure is it?</legend>
+            <label><input type="radio" name="f-tier" value="1"> Tier 1 · seen in-game / official proof</label>
+            <label><input type="radio" name="f-tier" value="2" checked> Tier 2 · official post or tested wiki</label>
+            <label><input type="radio" name="f-tier" value="3"> Tier 3 · community report</label>
+          </fieldset>
+          <label>Source link <span class="hint">Optional, but recommended.</span><input type="url" id="f-source" maxlength="500" placeholder="https://"></label>
+          <label>Note or proof <span class="hint">Needed for Tier 1 if there's no link, e.g. “Seen on the event screen, 24 Oct”.</span>
+            <textarea id="f-note" maxlength="500" style="min-height:56px"></textarea></label>
+          <div class="acts"><button class="btn primary" type="submit">Save fact</button><button class="btn ghost" type="reset" id="f-reset">Clear</button></div>
+        </form>
+      </section>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script type="application/json" id="fgf-config">{{CONFIG}}</script>
+<script>{{ADMIN}}</script>
+</body>
+</html>

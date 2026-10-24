@@ -22,7 +22,7 @@ ROOT=Path(__file__).parent
 OBSERVER_TOKEN=os.getenv('FGF_OBSERVER_TOKEN','').strip()
 LIVE_RUNTIME=LiveObservationRuntime(os.getenv('FGF_SUPABASE_URL','https://qdoixzfkkmvzjfkhzups.supabase.co').rstrip('/'), os.getenv('FGF_SUPABASE_SECRET_KEY') or os.getenv('FGF_SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_SERVICE_ROLE_KEY'))
 DATA=json.loads((ROOT/'data/knowledge.json').read_text(encoding='utf-8'))
-RELEASE='v7.1.2-fleet-state'
+RELEASE='v8.0.0-ai-agent'
 CLAIMS=DATA['claims']; RULES=DATA['rules']; CONFLICTS=DATA['conflicts']
 GUIDE_CLAIMS=[]
 
@@ -378,7 +378,7 @@ def topic_requirements(q):
     ql=q.lower()
     req=[]
     if ('fusion seed' in ql or 'fusion seeds' in ql or
-        re.search(r'\\b(?:energy\\s+)?core\\s*(?:3[1-9]|[4-9]0?)\\b', ql) or
+        re.search(r'\b(?:energy\s+)?core\s*(?:3[1-9]|[4-9]0?)\b', ql) or
         'energy core' in ql):
         req.append('energy_core')
     if any(x in ql for x in ('repair','damaged','destroyed','repair module','repair cabin','repair bay','fix my fleet','recover')):
@@ -956,7 +956,7 @@ def answer_quality_gate(q,text,claims,evidence_used=None):
             'cannot establish','not available in the evidence'
         ))
         numeric_core_claim=any(
-            re.search(r'\\b\\d{1,3}(?:,\\d{3})*\\b', c.get('Claim',''))
+            re.search(r'\b\d{1,3}(?:,\d{3})*\b', c.get('Claim',''))
             and any(x in c.get('Claim','').lower() for x in ('fusion seed','fusion seeds','core 35','core level'))
             for c in used_claims
         )
@@ -1308,7 +1308,7 @@ class H(BaseHTTPRequestHandler):
             configured=bool(os.getenv('FGF_LLM_API_KEY') or os.getenv('OPENAI_API_KEY'))
             avg=(sum(LLM_HEALTH['latencies_ms'])/len(LLM_HEALTH['latencies_ms'])) if LLM_HEALTH['latencies_ms'] else None
             synthesis={**LLM_HEALTH,'configured':configured,'model':LLM_MODEL,'average_latency_ms':round(avg,1) if avg is not None else None}
-            return self._json({'ok':True,'version':RELEASE,'deployment_commit':os.getenv('RENDER_GIT_COMMIT','unknown'),'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'canonical_vocabulary':CANONICAL_VOCABULARY_AUDIT,'knowledge_generated':DATA.get('generated'),'logging':_logging_status()})
+            return self._json({'ok':True,'version':RELEASE,'deployment_commit':os.getenv('RENDER_GIT_COMMIT','unknown'),'claims':len(CLAIMS),'sources':DATA['stats'].get('sources',0),'changes':DATA['stats'].get('change_log_entries',0),'conflicts':len(CONFLICTS),'tier1':DATA['stats']['tier1_claims'],'synthesis_configured':configured,'synthesis_status':SYNTHESIS_RUNTIME_STATUS,'model':LLM_MODEL,'synthesis':synthesis,'response_engine':{'status':'ready','primary_model':'fgf-v6-knowledge-query-engine','llm_enhancement_enabled':os.getenv('FGF_ENABLE_LLM_ENHANCEMENT','false').lower() in ('1','true','yes','on'),'external_api_required':False,'deterministic_synthesis_version':'1.5','knowledge_query_engine_version':'6.0.0'},'adaptive_retrieval':True,'bounded_learning':True,'event_calendar_aware':True,'shared_moonlight_current':True,'claim_lifecycle_aware':True,'lifecycle_states':summarize_states(CLAIMS),'canonical_vocabulary':CANONICAL_VOCABULARY_AUDIT,'knowledge_generated':DATA.get('generated'),'ai_agent':_agent_status_safe(),'logging':_logging_status()})
         if u.path=='/api/v63/live/status':
             if not _observer_authorized(self):
                 return self._json({'ok':False,'error':'Observer authorization required'},401)
@@ -1322,12 +1322,16 @@ class H(BaseHTTPRequestHandler):
             except Exception:
                 limit=5
             return self._json({'ok':True,'results':LIVE_RUNTIME.find_relevant(qs.get('q',[''])[0], limit=limit)})
+        if u.path=='/api/agent/status':
+            return self._json({'ok':True,'release':RELEASE,'agent':_agent_status_safe()})
         if u.path=='/api/ask':
             qs=parse_qs(u.query);q=qs.get('q',[''])[0];ctx={}
             if qs.get('season',[''])[0]: ctx['season']=qs.get('season',[''])[0]
             if qs.get('core_level',[''])[0]: ctx['core_level']=qs.get('core_level',[''])[0]
+            sid=qs.get('session_id',[''])[0] or None
+            pid=qs.get('player_id',[''])[0] or None
             try:
-                return self._json(answer(q,ctx or None))
+                return self._json(answer(q,ctx or None,session_id=sid,player_id=pid))
             except Exception as exc:
                 # API boundary must fail as JSON, never as an upstream HTML/502.
                 # The underlying exception is logged by the process platform;
@@ -1503,6 +1507,30 @@ class H(BaseHTTPRequestHandler):
         self.send_error(404)
     def do_POST(self):
         u=urlparse(self.path)
+        if u.path=='/api/chat':
+            # Multi-turn chat with the AI agent. Body:
+            # {"message": str, "session_id": str?, "player_id": str?,
+            #  "player_context": {"season","core_level","champions","spending",...}?}
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n>32768:return self._json({'ok':False,'error':'Request too large'},413)
+                body=json.loads(self.rfile.read(n).decode('utf-8') or '{}')
+                msg=str(body.get('message') or body.get('q') or '').strip()
+                if not msg:return self._json({'ok':False,'error':'message is required'},400)
+                if len(msg)>2000:return self._json({'ok':False,'error':'message is too long (max 2000 characters)'},400)
+                if body.get('reset') and body.get('session_id'):
+                    try:
+                        from fgf_agent import get_agent
+                        a=get_agent()
+                        if a: a.sessions.clear(str(body.get('session_id')))
+                    except Exception:
+                        pass
+                ctx=body.get('player_context') if isinstance(body.get('player_context'),dict) else None
+                return self._json(answer(msg,ctx,session_id=body.get('session_id'),player_id=body.get('player_id')))
+            except json.JSONDecodeError:
+                return self._json({'ok':False,'error':'Invalid JSON body'},400)
+            except Exception as exc:
+                return self._json({'ok':False,'error':'chat_engine_error','exception_type':type(exc).__name__,'release':RELEASE},500)
         if u.path=='/api/player/profile':
             try:
                 n=int(self.headers.get('Content-Length','0'))
@@ -1567,7 +1595,7 @@ def _fgf_log_request(method):
             stage_level, stage_name = "L1", "observation_request"
         elif path.startswith("/api/benchmarks/") or path.startswith("/api/benchmark"):
             stage_level, stage_name = "L5", "benchmark_request"
-        elif path.startswith("/api/ask") or path.startswith("/api/query"):
+        elif path.startswith("/api/ask") or path.startswith("/api/query") or path.startswith("/api/chat"):
             stage_level, stage_name = "L4", "answer_request"
         elif path.startswith("/api/player/profile"):
             stage_level, stage_name = "L3", "player_learning_context_request"
@@ -1693,10 +1721,14 @@ try:
                 for row in rows[:8]:
                     if isinstance(row, list) and len(row) >= 2:
                         actions.append(f"{row[0]}: {row[1]}")
+                # Name the event the player asked about; shorthand such as
+                # "T100" otherwise never appears expanded in the answer.
+                title = str(operational.get('title') or '').strip()
+                heading = (title + "\n\n") if title and title.split(' — ')[0] not in summary else ''
                 if actions:
-                    merged['answer'] = summary + "\n\n" + "\n".join(actions)
+                    merged['answer'] = heading + summary + "\n\n" + "\n".join(actions)
                 elif summary:
-                    merged['answer'] = summary
+                    merged['answer'] = heading + summary
                 merged['answer_type'] = 'event_best_strategy'
                 merged['reasoning'] = {
                     'mode': 'event_best_strategy',
@@ -1712,6 +1744,14 @@ try:
         except Exception as exc:
             merged['visual'] = None
             merged['visual_warning'] = 'Visual answer renderer unavailable: ' + type(exc).__name__
+        # Core-first release gate: expose the immutable v6 baseline and whether
+        # the final answer still contains it (recomputed after the layers above,
+        # which may legitimately replace it with an event plan).
+        baseline = str(result.get('baseline_answer') or core.get('answer') or '')
+        layering = dict(result.get('answer_layering') or {})
+        layering['baseline_preserved'] = bool(baseline) and baseline in str(merged.get('answer') or '')
+        merged['baseline_answer'] = baseline
+        merged['answer_layering'] = layering
         _log_event("L2", "answer_evidence_summary",
                    evidence_count=len(merged.get("evidence", [])) if isinstance(merged.get("evidence"), list) else 0,
                    evidence_state=str(merged.get("evidence_state") or "unknown"),
@@ -1728,6 +1768,56 @@ try:
 
 except Exception:
     pass
+
+# ---------------------------------------------------------------------------
+# AI agent layer (fgf_agent). When an LLM key is configured, an LLM agent that
+# plans, searches the knowledge base repeatedly, uses the calculators above and
+# writes fact-checked, cited answers becomes the primary answer path. The
+# deterministic engine above stays as the automatic fallback (no key, provider
+# outage, or FGF_AGENT_MODE=deterministic), so the service never goes down
+# because of the LLM.
+# ---------------------------------------------------------------------------
+_DETERMINISTIC_ANSWER = answer
+
+
+def _agent_status_safe():
+    try:
+        from fgf_agent import agent_status
+        return agent_status()
+    except Exception as exc:
+        return {'enabled': False, 'reason_disabled': 'agent_import_failed: ' + type(exc).__name__}
+
+
+def answer(question, player_context=None, session_id=None, player_id=None):
+    agent_obj = None
+    fallback_reason = None
+    try:
+        from fgf_agent import get_agent
+        from fgf_agent.agent import AgentUnavailable
+        agent_obj = get_agent()
+    except Exception as exc:
+        fallback_reason = 'agent_import_failed: ' + type(exc).__name__
+    if agent_obj is not None:
+        try:
+            result = agent_obj.ask(question, session_id=session_id,
+                                   player_context=player_context, player_id=player_id)
+            try:
+                result['visual'] = build_visual_answer(question, result)
+            except Exception:
+                result['visual'] = None
+            return result
+        except AgentUnavailable as exc:
+            fallback_reason = 'agent_unavailable: ' + str(exc)
+        except Exception as exc:
+            fallback_reason = 'agent_error: ' + type(exc).__name__
+        _log_event('L4', 'agent_fallback_to_deterministic', status='degraded', reason=str(fallback_reason)[:120])
+    result = _DETERMINISTIC_ANSWER(question, player_context)
+    if fallback_reason:
+        result['agent_fallback_reason'] = fallback_reason
+    if session_id:
+        result['session_id'] = session_id
+    return result
+
 
 if __name__=='__main__':
     _log_event('L0', 'runtime_starting', release=RELEASE, logging_levels=_log_level_catalog(), port=int(os.getenv('PORT','8000')))

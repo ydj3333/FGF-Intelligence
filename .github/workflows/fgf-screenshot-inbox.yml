@@ -1,0 +1,59 @@
+name: FGF Screenshot Inbox
+
+# Upload screenshots to inbox/official, inbox/ingame or inbox/community (see inbox/README.md).
+# This reads them with the free AI, adds grounded facts to the database, moves the images to
+# inbox/processed/<date>/, and starts the corpus sync so the app updates.
+# Secrets: GEMINI_API_KEY, FGF_SUPABASE_SECRET_KEY (or FGF_SUPABASE_SERVICE_ROLE_KEY).
+
+on:
+  push:
+    paths:
+      - "inbox/official/**"
+      - "inbox/ingame/**"
+      - "inbox/community/**"
+  schedule:
+    - cron: "35 */6 * * *"     # retries images left over after AI limits
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: fgf-screenshot-inbox
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      FGF_SUPABASE_URL: ${{ secrets.FGF_SUPABASE_URL || vars.FGF_SUPABASE_URL || 'https://qdoixzfkkmvzjfkhzups.supabase.co' }}
+      FGF_SUPABASE_SECRET_KEY: ${{ secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Read screenshots
+        id: ingest
+        run: python scripts/ingest_screenshots.py --apply
+      - name: Move processed screenshots
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain inbox)" ]; then echo "Nothing moved."; exit 0; fi
+          git config user.name "fgf-inbox"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A inbox
+          git commit -m "chore: file processed screenshots"
+          for attempt in 1 2 3; do
+            if git fetch origin main && git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          exit 1
+      - name: Start the corpus sync so new facts reach the app now
+        if: steps.ingest.outputs.inserted != '' && steps.ingest.outputs.inserted != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run corpus-sync.yml --ref main
