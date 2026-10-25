@@ -291,7 +291,7 @@ def synthesize_deterministic(question: str, claims: List[Dict[str,Any]], conflic
         attacker=target["counter_attacker"]
         for idx,c,_ in selected:
             txt=_text(c)
-            if re.search(r'\\b'+re.escape(attacker)+r'\\b[^.]{0,40}\\bcounter(?:s|ed)?\\b',txt.lower()):
+            if re.search(r'\b'+re.escape(attacker)+r'\b[^.]{0,40}\bcounter(?:s|ed)?\b',txt.lower()):
                 rel.append((idx,txt))
         if rel:
             lines.append(rel[0][1] + f" [E{rel[0][0]}]")

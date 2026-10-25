@@ -85,7 +85,7 @@ def main():
     held_back = 0
 
     def claim_key(text):
-        normalized = re.sub(r"\\s+", " ", str(text or "").strip().lower())
+        normalized = re.sub(r"\s+", " ", str(text or "").strip().lower())
         return "yt3-" + hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:20]
 
     def learn_claim(c):

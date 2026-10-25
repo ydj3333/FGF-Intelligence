@@ -128,7 +128,7 @@ def _similarity(a,b):
  return .7*word+.3*char
 
 def _char_grams(s):
- s=re.sub(r"\\s+"," ",s.lower())
+ s=re.sub(r"\s+"," ",s.lower())
  return {s[i:i+3] for i in range(max(0,len(s)-2))}
 
 def _meaningful_overlap(a,b):
@@ -261,6 +261,14 @@ class QuestionParser:
     entity=max(entity_candidates)[1]
    else:
     entity=self._canonical_entity(ql)
+    # Prefer the more specific subject the player named ("commerce guild
+    # creation") over a broader vocabulary match ("commerce guild").
+    if entity!="unknown":
+     m=re.search(r"(?:what|which)\s+(?:does|do|is|are)\s+(.+?)\s+(?:require|requires|unlock|unlocks|give|gives|change|changes|affect|affects)\b", ql)
+     if m:
+      subject=re.sub(r"\s+"," ",m.group(1).strip())
+      if subject!=entity and entity in subject and len(subject.split())<=5:
+       entity=subject
   qualifier=""
   if entity!="unknown":
    m=re.search(r"\b([a-z][a-z-]{2,})\s+"+re.escape(entity)+r"\b",ql)
@@ -314,7 +322,11 @@ class QuestionParser:
    qtype=prop
   if "duplicate" in ql or "duplicates" in ql or re.search(r"\bdupes?\b", ql): prop="duplicate"
   elif "dps" in ql: prop="dps"
-  elif any(w in ql for w in ("reward","rewards","prize","prizes")): prop="reward"
+  elif any(w in ql for w in ("reward","rewards","prize","prizes","festival crew","crew choice","ship skin","name frame","avatar frame","killing effect")): prop="reward"
+  # A detected comparison question ("X better than Y", "worth", "vs") must
+  # carry the comparison property, even if it mentions a reward.
+  if qtype=="comparison" and prop in ("general","reward"):
+   prop="comparison"
   expansions=[q]
   if entity in ENTITY_ALIASES: expansions+=ENTITY_ALIASES[entity]
   if prop in PROPERTY_ALIASES: expansions+=PROPERTY_ALIASES[prop]
@@ -765,6 +777,13 @@ class KnowledgeQueryEngine:
           "Use the established requirements and progression facts, mark the exact cost as unknown, "
           "and re-check the latest authoritative evidence before committing resources.")
     return self._answer(p,text,[],"safe_strategy_policy")
+   if p.question_type=="strategy":
+    # Say *why* we abstain: a "best way" question needs evidenced options
+    # before any recommendation can be made.
+    return self._empty(
+     p,
+     "The current knowledge base does not establish a reliable recommendation or enough evidenced options for this decision.",
+    )
    return self._empty(p)
   if p.question_type=="level_threshold":
    cand=[]
@@ -836,6 +855,12 @@ class KnowledgeQueryEngine:
     top=cand[:2]
     return self._answer(p," ".join(x[2] for x in top),[x[0] for x in top],"numeric")
    return self._empty(p,"The current knowledge base does not establish the requested numeric value.")
+  # Reward questions about Shared Moonlight ("which Festival Crew can I choose")
+  # use the specialized reward answer whatever their question type, so a
+  # generic event claim (e.g. the daily Sign-In) cannot replace it.
+  if p.entity=="shared moonlight" and p.property=="reward" and p.question_type not in ("strategy","comparison","event_schedule"):
+   r=self._strategy_shared_moonlight_rewards(p,rel)
+   if r:return r
   if p.question_type=="strategy":
    # Specialized event handlers must run before generic F2P strategy so an
    # event-specific question cannot be hijacked by unrelated global F2P facts.
@@ -904,7 +929,7 @@ class KnowledgeQueryEngine:
     )
   if p.question_type=="multi_hop" and p.entity!="unknown":
    aliases=[p.entity] + ([p.qualifier+" "+p.entity] if p.qualifier else [])
-   wants_availability=bool(re.search(r"\\b(?:where|available|shop|location)\\b", p.raw.lower()))
+   wants_availability=bool(re.search(r"\b(?:where|available|shop|location)\b", p.raw.lower()))
    if wants_availability:
     paths=self.graph.derive(
      aliases,

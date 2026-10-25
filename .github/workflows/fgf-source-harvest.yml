@@ -1,0 +1,115 @@
+name: FGF Source Harvest
+
+# Keeps the knowledge database filling itself from the registered sources
+# (data/harvest_sources.json + Supabase public.sources): official news & patches,
+# the official portal, Steam update notes, the FGF wiki, the Fandom wiki, Reddit,
+# the official YouTube channel and playlists (Gemini watches the videos), and
+# Discord announcements followed into your own server.
+#
+# New/changed pages -> free AI (Gemini) extracts atomic facts -> only facts whose
+# quote and numbers appear on the page are kept -> new facts are written to
+# Supabase public.claims (never Tier 1, never canonical; conflicts with Tier 1/2
+# evidence are held back as "Conflicting" for review).
+# When new facts were written, the corpus sync is started immediately; that sync
+# then triggers "Publish FGF app", so players see new facts within minutes.
+#
+# Secrets: GEMINI_API_KEY, FGF_SUPABASE_SECRET_KEY (or FGF_SUPABASE_SERVICE_ROLE_KEY).
+# Optional (Discord): secret DISCORD_BOT_TOKEN, variables FGF_DISCORD_CHANNEL_IDS and FGF_DISCORD_GUILD_ID.
+
+on:
+  schedule:
+    - cron: "5 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only report what would be added (write nothing)"
+        type: boolean
+        default: false
+      source:
+        description: "Only this source id (e.g. SRC-04); empty = all"
+        required: false
+        default: ""
+      max_pages:
+        description: "Maximum changed pages to process this run"
+        required: false
+        default: "20"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: fgf-source-harvest
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      FGF_DISCORD_CHANNEL_IDS: ${{ vars.FGF_DISCORD_CHANNEL_IDS }}
+      FGF_DISCORD_GUILD_ID: ${{ vars.FGF_DISCORD_GUILD_ID }}
+      FGF_SUPABASE_URL: ${{ secrets.FGF_SUPABASE_URL || vars.FGF_SUPABASE_URL || 'https://qdoixzfkkmvzjfkhzups.supabase.co' }}
+      FGF_SUPABASE_SECRET_KEY: ${{ secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install browser for JavaScript-only pages (FGF wiki)
+        run: |
+          python -m pip install --quiet playwright pytest yt-dlp
+          python -m playwright install --with-deps chromium
+
+      - name: Test the harvester
+        run: python -m pytest -q tests/test_harvest_sources.py tests/test_harvest_media.py
+
+      - name: Check setup
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then echo "::warning::GEMINI_API_KEY is not set: pages are fetched but no facts can be extracted."; fi
+          if [ -z "$FGF_SUPABASE_SECRET_KEY" ]; then echo "::warning::Supabase key is not set: running as a dry run."; fi
+
+      - name: Harvest sources
+        id: harvest
+        env:
+          DRY: ${{ inputs.dry_run }}
+          ONLY: ${{ inputs.source }}
+          MAXP: ${{ inputs.max_pages || '20' }}
+        run: |
+          args="--max-pages $MAXP --report harvest-report.json"
+          if [ -n "$ONLY" ]; then args="$args --source $ONLY"; fi
+          if [ "$DRY" != "true" ]; then args="$args --apply"; fi
+          python scripts/harvest_sources.py $args
+
+      - name: Save harvest state (which pages were already read)
+        if: always()
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data/harvest_state.json 2>/dev/null && [ -z "$(git ls-files --others --exclude-standard data/harvest_state.json)" ]; then
+            echo "No state change."; exit 0
+          fi
+          git config user.name "fgf-harvester"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/harvest_state.json
+          git commit -m "chore: record FGF source harvest state"
+          for attempt in 1 2 3; do
+            if git fetch origin main && git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push harvest state; pages will be re-checked next run."
+
+      - name: Start the corpus sync so new facts reach the app now
+        if: steps.harvest.outputs.inserted != '' && steps.harvest.outputs.inserted != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run corpus-sync.yml --ref main
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: harvest-report-${{ github.run_id }}
+          path: harvest-report.json
+          if-no-files-found: ignore

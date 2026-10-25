@@ -1,0 +1,82 @@
+name: FGF Player Learning
+
+# The app learns from its players, safely.
+# Reads the anonymous feedback the app sends (ratings, corrections, questions it couldn't
+# answer) from Supabase public.app_feedback and:
+#   - checks every source a player links to: its facts go through the harvester's checks
+#     (quote and numbers must appear in the source, duplicates skipped, contradictions with
+#     Tier 1/2 held back) and enter "Under Review"; players never change facts directly
+#   - groups unanswered questions into knowledge gaps (data/knowledge_gaps.json)
+#   - flags facts that keep appearing in unhelpful answers
+# Results: data/learning_report.md and the run summary. New facts start the corpus sync,
+# which republishes the app.
+#
+# One-time: run sql/app_feedback.sql in Supabase (SITE_SETUP.md). Secrets: GEMINI_API_KEY,
+# FGF_SUPABASE_SECRET_KEY (or FGF_SUPABASE_SERVICE_ROLE_KEY).
+
+on:
+  schedule:
+    - cron: "20 2 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only report (write nothing)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: fgf-learning
+  cancel-in-progress: false
+
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      FGF_SUPABASE_URL: ${{ secrets.FGF_SUPABASE_URL || vars.FGF_SUPABASE_URL || 'https://qdoixzfkkmvzjfkhzups.supabase.co' }}
+      FGF_SUPABASE_SECRET_KEY: ${{ secrets.FGF_SUPABASE_SECRET_KEY || secrets.FGF_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install tools
+        run: |
+          python -m pip install --quiet playwright pytest pillow
+          python -m playwright install --with-deps chromium
+
+      - name: Test the learning loop
+        run: python -m pytest -q tests/test_learning_loop.py
+
+      - name: Learn from players
+        id: learn
+        env:
+          DRY: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY" = "true" ]; then python scripts/learn_from_players.py; else python scripts/learn_from_players.py --apply; fi
+
+      - name: Save knowledge gaps and report
+        if: inputs.dry_run != true
+        run: |
+          set -euo pipefail
+          git add -A data/knowledge_gaps.json data/learning_report.md 2>/dev/null || true
+          if git diff --cached --quiet; then echo "Nothing to save."; exit 0; fi
+          git config user.name "fgf-learning"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "chore: FGF learning report"
+          for attempt in 1 2 3; do
+            if git fetch origin main && git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push the learning report."
+
+      - name: Start the corpus sync so new facts reach the app
+        if: steps.learn.outputs.inserted != '' && steps.learn.outputs.inserted != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run corpus-sync.yml --ref main

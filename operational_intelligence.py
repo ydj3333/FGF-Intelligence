@@ -11,6 +11,7 @@ from typing import Any, Dict, List
 import re
 
 from constraint_extractor import extract_constraints
+from event_strategy_engine import CandidateAction, PlayerState, build_event_model, decide
 
 NOT_ESTABLISHED = "Not established in current evidence"
 
@@ -306,7 +307,8 @@ def _kaboom_roster_answer(question: str, roster: List[str], evidence_count: int)
         rows.append([pos, champion, role, why, "Tactical inference — exact slot order not established"])
 
     return {
-        "mode": "event_strategy_engine",
+        "mode": "event_combo_roster_aware",
+        "engine": "event_strategy_engine",
         "title": "Kaboom, Robots! — roster-constrained strategy",
         "basis": "v7 Event Strategy Engine: event mechanics are evaluated against the player's explicit roster before ranking recommendations.",
         "core_evidence_count": evidence_count,
