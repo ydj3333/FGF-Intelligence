@@ -1,6 +1,6 @@
 # FGF Intelligence — Admin Evidence Review
 
-Generated: 2026-11-02T09:51:25.816105+00:00
+Generated: 2026-11-09T10:10:08.020909+00:00
 
 ## Decision rule
 - Tier 1 changes require explicit admin confirmation of the exact proposition and proof.
@@ -26,4 +26,4 @@ For each item choose exactly one: CONFIRM → promote to the appropriate tier; R
 
 ## Review metadata
 Configured review interval: 21 days.
-Next scheduled review recorded by the learning state: 2026-11-23T04:28:04.144207+00:00
+Next scheduled review recorded by the learning state: 2026-11-30T04:41:15.298431+00:00
